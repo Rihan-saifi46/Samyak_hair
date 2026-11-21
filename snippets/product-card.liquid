@@ -117,3 +117,136 @@
 </product-card>
 
 {% render 'product-card-styles' %}
+
+<script>
+  if (!window.__samyakWishlistInit) {
+    window.__samyakWishlistInit = true;
+    (function () {
+      const STORAGE_KEY = 'samyak_wishlist';
+      function getWishlist() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveWishlist(items) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        } catch (e) {}
+      }
+      function syncButtons() {
+        const wishlist = getWishlist();
+        const ids = wishlist.map(item => (typeof item === 'object' && item !== null ? String(item.id) : String(item)));
+        document.querySelectorAll('.samyak-wishlist-btn').forEach((btn) => {
+          const id = btn.getAttribute('data-product-id');
+          if (id && ids.includes(String(id))) {
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-pressed', 'true');
+          } else {
+            btn.classList.remove('is-active');
+            btn.setAttribute('aria-pressed', 'false');
+          }
+        });
+      }
+
+      // Capture phase click handler to intercept wishlist clicks before link navigation
+      document.addEventListener(
+        'click',
+        function (e) {
+          const btn = e.target.closest('.samyak-wishlist-btn');
+          if (!btn) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+
+          const id = btn.getAttribute('data-product-id');
+          if (!id) return;
+
+          const btnData = btn.dataset;
+          let itemToSave;
+
+          if (btnData.productTitle) {
+            itemToSave = {
+              id: String(id),
+              handle: btnData.productHandle || '',
+              title: btnData.productTitle || '',
+              price: btnData.productPrice || '',
+              image: btnData.productImage || '',
+              url: btnData.productUrl || ('/products/' + (btnData.productHandle || ''))
+            };
+          } else {
+            // Fallback for legacy card elements or async JSON scripts
+            const card = btn.closest('product-card') || btn.closest('.product-grid__item');
+            let productData = null;
+            if (card) {
+              const jsonScript = card.querySelector('.samyak-product-json');
+              if (jsonScript) {
+                try { productData = JSON.parse(jsonScript.textContent); } catch (err) {}
+              }
+            }
+            itemToSave = productData ? {
+              id: String(id),
+              handle: productData.handle || '',
+              title: productData.title || '',
+              price: (productData.price ? '₹' + (productData.price / 100).toFixed(2) : ''),
+              image: productData.featured_image || (productData.images && productData.images[0]) || '',
+              url: productData.url || ('/products/' + productData.handle)
+            } : String(id);
+          }
+
+          let wishlist = getWishlist();
+          const existingIdx = wishlist.findIndex(item => {
+            if (typeof item === 'object' && item !== null) return String(item.id) === String(id);
+            return String(item) === String(id);
+          });
+
+          if (existingIdx > -1) {
+            wishlist.splice(existingIdx, 1);
+            btn.classList.remove('is-active');
+            btn.setAttribute('aria-pressed', 'false');
+          } else {
+            wishlist.push(itemToSave);
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-pressed', 'true');
+          }
+          saveWishlist(wishlist);
+          document.dispatchEvent(new CustomEvent('wishlist:updated', { bubbles: true }));
+        },
+        true
+      );
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncButtons);
+      } else {
+        syncButtons();
+      }
+
+      // Event-driven re-synchronization without document.body polling
+      document.addEventListener('wishlist:updated', syncButtons);
+      document.addEventListener('shopify:section:load', syncButtons);
+      document.addEventListener('shopify:section:reorder', syncButtons);
+
+      // Scoped debounced observer strictly targeting product grid containers if dynamic items load
+      let scheduled = false;
+      const debouncedSync = () => {
+        if (!scheduled) {
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            syncButtons();
+          });
+        }
+      };
+
+      const gridContainers = document.querySelectorAll('.product-grid, .resource-list, .ui-test-collection-grid, [data-hydration-key]');
+      if (gridContainers.length > 0) {
+        const gridObserver = new MutationObserver(debouncedSync);
+        gridContainers.forEach(container => {
+          gridObserver.observe(container, { childList: true });
+        });
+      }
+    })();
+  }
+</script>

@@ -13,6 +13,15 @@
         type="image/png"
         href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
       >
+    {%- else -%}
+      <link
+        rel="icon"
+        href="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+      >
+      <link
+        rel="apple-touch-icon"
+        href="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+      >
     {%- endif -%}
 
     {%- render 'view-transition-opt-in' -%}
@@ -23,6 +32,16 @@
     {%- render 'scripts' -%}
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-palette' -%}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Inter:wght@400;500;600&display=swap">
+    </noscript>
+    <link rel="stylesheet" href="{{ 'impression4u-core.css' | asset_url }}">
+    <link rel="preload" as="style" href="{{ 'component-cart-drawer.css' | asset_url }}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ 'component-cart-drawer.css' | asset_url }}"></noscript>
 
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}
@@ -166,11 +185,15 @@
 
     {% render 'cart-drawer', render_wrapper: true %}
     {% render 'theme-drawer' %}
+    {% render 'wishlist-drawer' %}
 
     {% render 'search-modal' %}
+    {% render 'quick-shop-drawer' %}
 
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {% render 'whatsapp-floating-button' %}
   </body>
 </html>

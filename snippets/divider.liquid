@@ -23,7 +23,7 @@
     {% if settings.divider_color != blank %}--color-border: {{ settings.divider_color }};{% endif %}
     {% render 'spacing-style', settings: settings %}
   "
-  {% if attributes %}
+  {% if attributes and block %}
     {{- block.shopify_attributes -}}
   {% endif %}
 >

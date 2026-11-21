@@ -1,0 +1,100 @@
+{% comment %}
+  Section: Main Customer Register
+  Renders Shopify's official authenticated customer registration form.
+  Styled to match Samyak Hair Accessories luxury boutique aesthetic.
+{% endcomment %}
+
+<div class="samyak-login-section">
+  <div class="samyak-login-container">
+    <div class="samyak-auth-card">
+      <div class="samyak-auth-header">
+        <h1 class="samyak-auth-title">Create Account</h1>
+        <p class="samyak-auth-subtitle">Register for wholesale pricing, faster checkout, and order tracking</p>
+      </div>
+
+      {%- form 'create_customer', class: 'samyak-auth-form' -%}
+        {%- if form.errors -%}
+          <div class="samyak-auth-error" role="alert" tabindex="-1" autofocus>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+              {{ form.errors | default_errors }}
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="samyak-form-field">
+          <label for="RegisterFirstName" class="samyak-field-label">First Name</label>
+          <input
+            type="text"
+            name="customer[first_name]"
+            id="RegisterFirstName"
+            autocomplete="given-name"
+            class="samyak-field-input"
+            placeholder="First Name"
+            {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+          >
+        </div>
+
+        <div class="samyak-form-field">
+          <label for="RegisterLastName" class="samyak-field-label">Last Name</label>
+          <input
+            type="text"
+            name="customer[last_name]"
+            id="RegisterLastName"
+            autocomplete="family-name"
+            class="samyak-field-input"
+            placeholder="Last Name"
+            {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+          >
+        </div>
+
+        <div class="samyak-form-field">
+          <label for="RegisterEmail" class="samyak-field-label">Email Address</label>
+          <input
+            type="email"
+            name="customer[email]"
+            id="RegisterEmail"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            class="samyak-field-input"
+            placeholder="e.g. boutique@domain.com"
+            {% if form.email %}value="{{ form.email }}"{% endif %}
+            required
+          >
+        </div>
+
+        <div class="samyak-form-field">
+          <label for="RegisterPassword" class="samyak-field-label">Password</label>
+          <input
+            type="password"
+            name="customer[password]"
+            id="RegisterPassword"
+            autocomplete="new-password"
+            class="samyak-field-input"
+            placeholder="Create a password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="samyak-auth-submit-btn">
+          Create Account
+        </button>
+
+        <div class="samyak-auth-footer">
+          <p>Already have an account? <a href="{{ routes.account_login_url | default: '/account/login' }}" class="samyak-auth-link">Sign In</a></p>
+          <p><a href="{{ routes.root_url }}" class="samyak-auth-link-back">&larr; Return to Store</a></p>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Customer Register",
+  "settings": []
+}
+{% endschema %}

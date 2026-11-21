@@ -1,0 +1,209 @@
+{% doc %}
+  Renders the verified B2B customer reviews section for Samyak Hair Accessories wholesale homepage.
+{% enddoc %}
+
+<div class="samyak-reviews-section" aria-labelledby="customer-reviews-title">
+  <div class="samyak-reviews-container">
+    <div class="samyak-section-header" style="justify-content: center; text-align: center; margin-bottom: 36px;">
+      <div>
+        <span class="samyak-section-eyebrow">VERIFIED WHOLESALE BUYER FEEDBACK</span>
+        <h2 class="samyak-section-title" id="customer-reviews-title">What Our Retailers Say</h2>
+        <p class="samyak-section-subtitle">Real experiences from boutique owners, salons, and resellers across India.</p>
+      </div>
+    </div>
+
+    <div class="samyak-reviews-layout">
+      <div class="samyak-review-summary">
+        <div class="samyak-score-row">
+          <span class="samyak-score">4.8</span>
+          <span class="samyak-stars" aria-label="5 stars">★★★★★</span>
+          <span class="samyak-review-count">Based on 94+ wholesale shipments</span>
+        </div>
+        <p class="samyak-review-summary-desc">
+          Rated for exceptional clip grip durability, zero transit damage, and prompt WhatsApp dispatch updates.
+        </p>
+      </div>
+
+      <div class="samyak-review-list">
+        <article class="samyak-review-card">
+          <div class="samyak-review-person">
+            <span class="samyak-review-avatar" aria-hidden="true">A</span>
+            <div>
+              <h3 class="samyak-review-name">Arun Raj</h3>
+              <p class="samyak-review-meta">Muttupet, Tamil Nadu · Verified Retailer</p>
+            </div>
+          </div>
+          <div class="samyak-stars" aria-label="5 stars">★★★★★</div>
+          <p class="samyak-review-text">“The flower hair clips and metal clutches arrived within 4 days. Packing in master carton was solid with zero broken items. Margin is excellent in our retail shop.”</p>
+        </article>
+
+        <article class="samyak-review-card">
+          <div class="samyak-review-person">
+            <span class="samyak-review-avatar" aria-hidden="true">K</span>
+            <div>
+              <h3 class="samyak-review-name">Komal Sharma</h3>
+              <p class="samyak-review-meta">New Delhi · Instagram Reseller</p>
+            </div>
+          </div>
+          <div class="samyak-stars" aria-label="5 stars">★★★★★</div>
+          <p class="samyak-review-text">“Low ₹2,000 MOQ allowed me to start testing without blocking huge funds. Korean pins and satin scrunchies sold out within 48 hours of posting stories!”</p>
+        </article>
+
+        <article class="samyak-review-card">
+          <div class="samyak-review-person">
+            <span class="samyak-review-avatar" aria-hidden="true">A</span>
+            <div>
+              <h3 class="samyak-review-name">Ajith Kumar</h3>
+              <p class="samyak-review-meta">Mavelikara, Kerala · Boutique Owner</p>
+            </div>
+          </div>
+          <div class="samyak-stars" aria-label="5 stars">★★★★★</div>
+          <p class="samyak-review-text">“Korean hair clips quality is top notch. The spring tension is strong, not cheap plastic. Reordering our 4th wholesale lot this month.”</p>
+        </article>
+
+        <article class="samyak-review-card">
+          <div class="samyak-review-person">
+            <span class="samyak-review-avatar" aria-hidden="true">M</span>
+            <div>
+              <h3 class="samyak-review-name">Mahesh Gaikwad</h3>
+              <p class="samyak-review-meta">Pune, Maharashtra · Wholesale Buyer</p>
+            </div>
+          </div>
+          <div class="samyak-stars" aria-label="5 stars">★★★★★</div>
+          <p class="samyak-review-text">“Proper GST tax invoice provided with input credit. Fast dispatch from Delhi. Customer support on WhatsApp responds quickly to lot queries.”</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .samyak-reviews-section {
+    background: #F7F5EE;
+    color: #181A19;
+    padding-block: clamp(40px, 6vw, 76px);
+  }
+
+  .samyak-reviews-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+  }
+
+  .samyak-reviews-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.5fr);
+    gap: clamp(24px, 4vw, 52px);
+    align-items: start;
+  }
+
+  .samyak-review-summary {
+    padding: 28px;
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 12px;
+  }
+
+  .samyak-score-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .samyak-score {
+    font-family: var(--font-serif, 'Playfair Display', 'Cormorant Garamond', serif);
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1;
+    color: #181A19;
+  }
+
+  .samyak-stars {
+    color: #9E825C;
+    letter-spacing: 2px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  .samyak-review-count {
+    color: #5C615E;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .samyak-review-summary-desc {
+    margin: 16px 0 0;
+    font-size: 13px;
+    color: #5C615E;
+    line-height: 1.5;
+  }
+
+  .samyak-review-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 28px;
+  }
+
+  .samyak-review-card {
+    padding: 20px;
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 12px;
+    min-width: 0;
+  }
+
+  .samyak-review-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .samyak-review-avatar {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 50%;
+    background: rgba(17, 59, 50, 0.12);
+    color: #113B32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .samyak-review-name {
+    margin: 0;
+    font-weight: 600;
+    color: #181A19;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .samyak-review-meta {
+    color: #5C615E;
+    font-size: 12px;
+    margin: 2px 0 0;
+    line-height: 1.3;
+  }
+
+  .samyak-review-text {
+    margin: 10px 0 0;
+    color: #5C615E;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 860px) {
+    .samyak-reviews-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .samyak-review-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

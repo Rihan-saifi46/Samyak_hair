@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samyak Header Drawer & Responsive Test Harness</title>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #FAF8F2; color: #181A19; }
+
+    /* Theme Tokens */
+    :root {
+      --color-foreground: #181A19;
+      --color-background: #F6F4EE;
+      --font-body--family: sans-serif;
+    }
+
+    /* 3-Zone Header Row Styles */
+    .header__row--top,
+    .samyak-header-3zone-bar {
+      background-color: #F6F4EE !important;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .samyak-header-3zone-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      padding: 16px 36px 14px;
+      gap: 24px;
+      max-width: 100%;
+    }
+
+    .samyak-hdr-col--left {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-shrink: 0;
+    }
+
+    .samyak-hdr-drawer-trigger {
+      display: none;
+    }
+
+    .samyak-hdr-col--center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .samyak-hdr-col--right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    /* Search & Desktop Nav Links */
+    .samyak-hdr-nav-links {
+      display: flex;
+      gap: 16px;
+      list-style: none;
+      margin-top: 8px;
+    }
+    .samyak-hdr-nav-links a {
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #181A19;
+      font-weight: 500;
+    }
+
+    /* Drawer Styles */
+    .menu-drawer-container {
+      display: flex;
+      position: relative;
+    }
+    .header__icon--summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header__icon--summary::-webkit-details-marker { display: none; }
+    
+    .header-drawer-icon {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    .header-drawer-icon svg { width: 100%; height: 100%; }
+    .header-drawer-icon--close { display: none; }
+    details.menu-open .header-drawer-icon--open { display: none; }
+    details.menu-open .header-drawer-icon--close { display: block; }
+
+    .menu-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 320px;
+      max-width: 85vw;
+      height: 100vh;
+      background: #FFFFFF;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    details.menu-open .menu-drawer {
+      transform: translateX(0);
+    }
+    .menu-drawer__close-button {
+      align-self: flex-end;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      margin-bottom: 16px;
+    }
+    .menu-drawer__navigation ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .menu-drawer__navigation a {
+      text-decoration: none;
+      font-size: 15px;
+      color: #181A19;
+      font-weight: 500;
+    }
+
+    /* Responsive Queries */
+    @media screen and (max-width: 1024px) {
+      .samyak-hdr-drawer-trigger {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      .samyak-hdr-drawer-trigger .header__drawer {
+        display: block;
+      }
+      .samyak-hdr-drawer-trigger .header__icon--summary {
+        padding: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #113B32;
+        border: none;
+        background: transparent;
+        min-width: 38px;
+        min-height: 38px;
+      }
+      .samyak-hdr-drawer-trigger .header-drawer-icon {
+        width: 22px;
+        height: 22px;
+        display: block;
+      }
+      .samyak-hdr-drawer-trigger .header-drawer-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+      .samyak-header-3zone-bar {
+        padding: 12px 18px;
+        gap: 14px;
+      }
+      .samyak-hdr-nav-links {
+        display: none !important;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .samyak-header-3zone-bar {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3-ZONE HEADER BAR -->
+  <div class="samyak-header-3zone-bar" id="samyak-header-bar">
+    <!-- Left Zone: Drawer Trigger (Mobile) + Brand Logo -->
+    <div class="samyak-hdr-col samyak-hdr-col--left">
+      <div class="samyak-hdr-drawer-trigger" id="samyak-drawer-trigger-wrap">
+        <div class="header__drawer" ref="headerDrawerContainer" data-hydration-key="header-drawer-mobile">
+          <header-drawer class="header-drawer" id="header-drawer-component">
+            <details id="Details-menu-drawer-container" class="menu-drawer-container" ref="details">
+              <summary
+                class="header__icon header__icon--menu header__icon--summary"
+                id="samyak-menu-summary-btn"
+                aria-label="Menu"
+                aria-expanded="false"
+              >
+                <span class="svg-wrapper header-drawer-icon header-drawer-icon--open">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                </span>
+                <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </span>
+              </summary>
+              <div ref="menuDrawer" class="menu-drawer" id="samyak-menu-drawer-panel">
+                <button
+                  class="button close-button menu-drawer__close-button"
+                  id="samyak-menu-drawer-close-btn"
+                  type="button"
+                  aria-label="Close"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#181A19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <nav class="menu-drawer__navigation" aria-label="Mobile Navigation">
+                  <ul role="list">
+                    <li><a href="/" class="menu-drawer__menu-item">Home</a></li>
+                    <li><a href="/collections/all" class="menu-drawer__menu-item">Shop Wholesale</a></li>
+                    <li><a href="/collections/hair-claws" class="menu-drawer__menu-item">Hair Claws</a></li>
+                    <li><a href="/collections/korean-collection" class="menu-drawer__menu-item">Korean Collection</a></li>
+                    <li><a href="/pages/about" class="menu-drawer__menu-item">About Us</a></li>
+                    <li><a href="/pages/contact" class="menu-drawer__menu-item">Contact Us</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </details>
+          </header-drawer>
+        </div>
+      </div>
+      <div class="samyak-hdr-logo-box" id="samyak-brand-logo">
+        <a href="/" style="font-weight:700; font-size:18px; color:#113B32; text-decoration:none; letter-spacing:0.04em;">SAMYAK</a>
+      </div>
+    </div>
+
+    <!-- Center Zone: Search + Nav Links -->
+    <div class="samyak-hdr-col samyak-hdr-col--center">
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <input type="text" placeholder="Search wholesale catalog..." style="padding:7px 14px; border:1px solid #D6D1C4; border-radius:4px; font-size:12px; width:220px;" id="samyak-search-input">
+        <ul class="samyak-hdr-nav-links" id="samyak-desktop-nav-links">
+          <li><a href="/collections/hair-claws">HAIR CLAWS</a></li>
+          <li><a href="/collections/korean-collection">KOREAN COLLECTION</a></li>
+          <li><a href="/collections/all">ALL WHOLESALE</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right Zone: Action Icons -->
+    <div class="samyak-hdr-col samyak-hdr-col--right">
+      <div style="display:flex; gap:14px;" id="samyak-action-icons">
+        <a href="/cart" aria-label="Shopping Bag">👜</a>
+        <a href="/pages/wishlist" aria-label="Wishlist">🤍</a>
+        <a href="/account" aria-label="Account">👤</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Header Drawer Native Logic (matching header-drawer.js)
+    const details = document.getElementById('Details-menu-drawer-container');
+    const summary = document.getElementById('samyak-menu-summary-btn');
+    const closeBtn = document.getElementById('samyak-menu-drawer-close-btn');
+
+    function openDrawer() {
+      details.setAttribute('open', '');
+      details.classList.add('menu-open');
+      summary.setAttribute('aria-expanded', 'true');
+      closeBtn.focus();
+    }
+
+    function closeDrawer() {
+      details.classList.remove('menu-open');
+      summary.setAttribute('aria-expanded', 'false');
+      setTimeout(() => {
+        details.removeAttribute('open');
+        summary.focus();
+      }, 100);
+    }
+
+    summary.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (details.classList.contains('menu-open')) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeDrawer();
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape' && details.classList.contains('menu-open')) {
+        closeDrawer();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -53,20 +53,22 @@
         results_size: collection.products_count
       %}
 
-      {% assign products_per_page = 24 %}
-
-      {% if section.settings.enable_infinite_scroll == false %}
-        {% assign products_per_page = section.settings.products_per_page %}
+      {% assign products_per_page = section.settings.products_per_page | default: 30 %}
+      {% if section.settings.enable_infinite_scroll %}
+        {% assign products_per_page = 30 %}
       {% endif %}
 
       {% paginate collection.products by products_per_page %}
         {% capture children %}
+          {% assign global_offset = paginate.current_offset | default: 0 %}
           {% for product in collection.products %}
+            {% assign global_index = global_offset | plus: forloop.index0 %}
             <li
               id="{{ section.id }}-{{ product.id }}"
-              class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+              class="product-grid__item product-grid__item--{{ global_index }}"
               data-page="{{ paginate.current_page }}"
               data-product-id="{{ product.id }}"
+              data-global-index="{{ global_index }}"
               ref="cards[]"
             >
               {% content_for 'block',
@@ -104,6 +106,10 @@
       "label": "t:settings.type",
       "options": [
         {
+          "value": "bento",
+          "label": "Editorial Bento Grid"
+        },
+        {
           "value": "grid",
           "label": "t:options.grid"
         },
@@ -112,7 +118,7 @@
           "label": "t:options.editorial"
         }
       ],
-      "default": "grid"
+      "default": "bento"
     },
     {
       "type": "select",
@@ -166,9 +172,9 @@
       "id": "products_per_page",
       "label": "t:settings.products_per_page",
       "min": 8,
-      "max": 36,
-      "step": 4,
-      "default": 24,
+      "max": 60,
+      "step": 1,
+      "default": 30,
       "visible_if": "{{ section.settings.enable_infinite_scroll == false }}"
     },
     {
@@ -216,7 +222,7 @@
       "max": 50,
       "step": 1,
       "unit": "px",
-      "default": 16
+      "default": 24
     },
     {
       "type": "range",

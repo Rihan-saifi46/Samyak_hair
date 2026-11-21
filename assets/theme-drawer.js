@@ -146,11 +146,10 @@ export class ThemeDrawer extends Component {
     panel.close();
     removeTrapFocus();
 
-    if (this.#modalQuery.matches) {
-      lockScroll(panel);
+    lockScroll(panel);
+    try {
       panel.showModal();
-    } else {
-      unlockScroll(panel);
+    } catch (_e) {
       panel.show();
       trapFocus(panel);
     }
@@ -216,10 +215,10 @@ export class ThemeDrawer extends Component {
 
     this.#previouslyFocused = /** @type {HTMLElement | null} */ (document.activeElement);
 
-    if (this.#modalQuery.matches) {
-      lockScroll(panel);
+    lockScroll(panel);
+    try {
       panel.showModal();
-    } else {
+    } catch (_e) {
       panel.show();
       trapFocus(panel);
     }
@@ -229,6 +228,7 @@ export class ThemeDrawer extends Component {
     onAnimationEnd(panel, () => panel.classList.remove(openClass), { subtree: false });
 
     this.setAttribute('open', '');
+    this.classList.add('active');
     this.dispatchEvent(new DrawerOpenEvent());
 
     document.addEventListener('keydown', this.#onKeyDown);
@@ -324,6 +324,7 @@ export class ThemeDrawer extends Component {
     const scrollTopWhileLocked = closingAsModal ? getScrollTop() : null;
 
     this.removeAttribute('open');
+    this.classList.remove('active');
     this.dispatchEvent(new DrawerCloseEvent());
 
     unlockScroll(panel);

@@ -1,0 +1,211 @@
+{% doc %}
+  Renders the customer segments section ("Built for Your Business") for Samyak Hair Accessories wholesale homepage.
+{% enddoc %}
+
+<div class="samyak-segments-section">
+  <div class="samyak-segments-container">
+    <div class="samyak-segments-header">
+      <span class="samyak-section-eyebrow">TAILORED WHOLESALE SOLUTIONS</span>
+      <h2 class="samyak-section-title">Built for Your Business</h2>
+      <p class="samyak-section-subtitle">Whether you operate a high-street store, an online brand, or a styling salon, we supply the margins you need.</p>
+    </div>
+
+    <div class="samyak-segments-grid">
+      <div class="samyak-segment-card">
+        <div class="samyak-segment-card__tag">FOR RETAILERS</div>
+        <h3 class="samyak-segment-card__title">Retail Store & Boutique Owners</h3>
+        <p class="samyak-segment-card__desc">
+          Stock proven high-margin hair accessories with blister packaging and barcode cards ready for immediate retail hanging display.
+        </p>
+        <ul class="samyak-segment-card__list">
+          <li>✓ Sadar Bazar wholesale rate pricing</li>
+          <li>✓ Trending Korean & metal claw clips</li>
+          <li>✓ Sturdy display-ready pack cards</li>
+          <li>✓ Continuous fast stock replenishment</li>
+        </ul>
+        <a href="{{ routes.collections_url }}" class="samyak-segment-card__link">Explore Retail Packs →</a>
+      </div>
+
+      <div class="samyak-segment-card samyak-segment-card--featured">
+        <div class="samyak-segment-card__tag samyak-segment-card__tag--featured">MOST POPULAR</div>
+        <h3 class="samyak-segment-card__title">Online & Instagram Resellers</h3>
+        <p class="samyak-segment-card__desc">
+          Launch and scale your social commerce brand with low risk, high aesthetic appeal, and unbranded high-res photography.
+        </p>
+        <ul class="samyak-segment-card__list">
+          <li>✓ Low ₹2,000 trial order threshold</li>
+          <li>✓ High viral appeal aesthetic designs</li>
+          <li>✓ Unwatermarked photos on request</li>
+          <li>✓ Direct Pan-India courier dispatch</li>
+        </ul>
+        <a href="{{ routes.collections_url }}" class="samyak-segment-card__link samyak-segment-card__link--featured">Start Reselling Today →</a>
+      </div>
+
+      <div class="samyak-segment-card">
+        <div class="samyak-segment-card__tag">FOR STYLISTS</div>
+        <h3 class="samyak-segment-card__title">Beauty Salons & Bridal Stylists</h3>
+        <p class="samyak-segment-card__desc">
+          Heavy-duty professional metal clips, crystal party pins, faux hair donuts, and extensions built for high-end hairstyling.
+        </p>
+        <ul class="samyak-segment-card__list">
+          <li>✓ High-tension grip salon claw clips</li>
+          <li>✓ Luxury pearl & crystal bridal hairpins</li>
+          <li>✓ Hair donuts & volumizing extensions</li>
+          <li>✓ Consistent bulk lots available year-round</li>
+        </ul>
+        <a href="{{ routes.collections_url }}" class="samyak-segment-card__link">View Bridal & Salon Range →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .samyak-segments-section {
+    width: 100%;
+    padding-block: clamp(40px, 6vw, 72px);
+    background: #FAF8F3;
+    border-block: 1px solid #E4E0D6;
+  }
+
+  .samyak-segments-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+  }
+
+  .samyak-segments-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 36px;
+  }
+
+  .samyak-section-eyebrow {
+    font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #5C615E;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .samyak-section-title {
+    font-family: var(--font-serif, 'Cormorant Garamond', serif);
+    font-size: clamp(26px, 3.5vw, 38px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #181A19;
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+
+  .samyak-section-subtitle {
+    font-size: 14.5px;
+    color: #5C615E;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .samyak-segments-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 2.5vw, 28px);
+    align-items: stretch;
+  }
+
+  .samyak-segment-card {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 12px;
+    padding: clamp(20px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(24, 26, 25, 0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .samyak-segment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(17, 59, 50, 0.08);
+  }
+
+  .samyak-segment-card--featured {
+    border-color: #113B32;
+    background: #FCFBF7;
+    box-shadow: 0 6px 20px rgba(17, 59, 50, 0.08);
+  }
+
+  .samyak-segment-card__tag {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #5C615E;
+    background: #EFECE4;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+
+  .samyak-segment-card__tag--featured {
+    color: #FCFBF7;
+    background: #113B32;
+  }
+
+  .samyak-segment-card__title {
+    margin: 0 0 12px;
+    font-family: var(--font-serif, 'Cormorant Garamond', serif);
+    font-size: clamp(20px, 2.2vw, 23px);
+    font-weight: 500;
+    color: #181A19;
+    line-height: 1.25;
+  }
+
+  .samyak-segment-card__desc {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #5C615E;
+  }
+
+  .samyak-segment-card__list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+    color: #181A19;
+  }
+
+  .samyak-segment-card__link {
+    margin-top: auto;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #113B32;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+  }
+
+  .samyak-segment-card__link:hover {
+    color: #0B2922;
+  }
+
+  .samyak-segment-card__link--featured {
+    color: #113B32;
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .samyak-segments-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+</style>

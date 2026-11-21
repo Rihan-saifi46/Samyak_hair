@@ -1,0 +1,491 @@
+{% doc %}
+  Renders the right-side Wishlist Drawer for Samyak Hair Accessories.
+  Seamlessly connects to the existing localStorage 'samyak_wishlist' architecture
+  and responds to 'wishlist:updated' events.
+{% enddoc %}
+
+<div id="samyak-wishlist-drawer" class="samyak-wl-drawer" aria-hidden="true">
+  <!-- Dark Backdrop -->
+  <div class="samyak-wl-overlay" id="samyak-wl-backdrop" aria-hidden="true"></div>
+
+  <!-- Right Slide-in Panel -->
+  <div class="samyak-wl-panel" role="dialog" aria-modal="true" aria-labelledby="samyak-wl-title">
+    <!-- Header -->
+    <div class="samyak-wl-header">
+      <div class="samyak-wl-header-info">
+        <h2 id="samyak-wl-title" class="samyak-wl-title">My Wishlist</h2>
+        <span class="samyak-wl-count-badge" id="samyak-wl-count-badge">0 items</span>
+      </div>
+      <button
+        type="button"
+        class="samyak-wl-close-btn"
+        id="samyak-wl-close-btn"
+        aria-label="Close Wishlist"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Scrollable Item List -->
+    <div class="samyak-wl-body" id="samyak-wl-body">
+      <!-- Items dynamically populated via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div class="samyak-wl-empty" id="samyak-wl-empty" style="display: none;">
+      <div class="samyak-wl-empty-icon">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C5A280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+      <h3 class="samyak-wl-empty-title">Your wishlist is empty</h3>
+      <p class="samyak-wl-empty-desc">
+        Save your favorite hair accessories to review and order in bulk anytime.
+      </p>
+      <a href="{{ routes.all_products_collection_url }}" class="samyak-wl-browse-btn" id="samyak-wl-browse-btn">
+        EXPLORE COLLECTION &rarr;
+      </a>
+    </div>
+
+    <!-- Footer Action -->
+    <div class="samyak-wl-footer" id="samyak-wl-footer">
+      <a href="/pages/wishlist" class="samyak-wl-view-btn">
+        VIEW FULL WISHLIST &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Wishlist Drawer Core Styles */
+  .samyak-wl-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0.3s ease;
+  }
+
+  .samyak-wl-drawer.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .samyak-wl-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 59, 50, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .samyak-wl-drawer.is-open .samyak-wl-overlay {
+    opacity: 1;
+  }
+
+  .samyak-wl-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 92vw);
+    background: #FFFFFF;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+
+  .samyak-wl-drawer.is-open .samyak-wl-panel {
+    transform: translateX(0);
+  }
+
+  /* Header */
+  .samyak-wl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid #ECE8E1;
+    background: #FAF8F5;
+  }
+
+  .samyak-wl-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .samyak-wl-title {
+    font-family: var(--font-serif, 'Cormorant Garamond', serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: #113B32;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .samyak-wl-count-badge {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    color: #5C615E;
+    background: #EFECE4;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .samyak-wl-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #181A19;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .samyak-wl-close-btn:hover {
+    background: #EFECE4;
+    transform: rotate(90deg);
+  }
+
+  /* Scrollable Body */
+  .samyak-wl-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #FFFFFF;
+  }
+
+  /* Wishlist Item Card */
+  .samyak-wl-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    background: #FAF8F5;
+    border: 1px solid #EFECE6;
+    border-radius: 8px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .samyak-wl-item:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .samyak-wl-thumb {
+    width: 68px;
+    height: 68px;
+    border-radius: 6px;
+    background: #FFFFFF;
+    object-fit: contain;
+    padding: 4px;
+    border: 1px solid #EAE6DE;
+    flex-shrink: 0;
+  }
+
+  .samyak-wl-item-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .samyak-wl-item-title {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 13px;
+    font-weight: 500;
+    color: #1A1A1A;
+    text-decoration: none;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+    transition: color 0.15s;
+  }
+
+  .samyak-wl-item-title:hover {
+    color: #113B32;
+  }
+
+  .samyak-wl-item-price {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    color: #113B32;
+  }
+
+  .samyak-wl-remove-btn {
+    background: transparent;
+    border: none;
+    color: #8C928F;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 18px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .samyak-wl-remove-btn:hover {
+    color: #B91C1C;
+    background: rgba(185, 28, 28, 0.08);
+  }
+
+  /* Empty State */
+  .samyak-wl-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .samyak-wl-empty-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #FAF8F5;
+    border: 1px solid #ECE8E1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .samyak-wl-empty-title {
+    font-family: var(--font-serif, 'Cormorant Garamond', serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: #113B32;
+    margin: 0 0 8px;
+  }
+
+  .samyak-wl-empty-desc {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 13px;
+    color: #5C615E;
+    line-height: 1.5;
+    max-width: 260px;
+    margin: 0 0 20px;
+  }
+
+  .samyak-wl-browse-btn {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #113B32;
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+  }
+
+  .samyak-wl-browse-btn:hover {
+    background: #0D2D26;
+  }
+
+  /* Footer */
+  .samyak-wl-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #ECE8E1;
+    background: #FAF8F5;
+  }
+
+  .samyak-wl-view-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #113B32;
+    color: #FFFFFF;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 13px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .samyak-wl-view-btn:hover {
+    background: #0D2D26;
+  }
+</style>
+
+<script>
+  (function() {
+    var WISHLIST_KEY = 'samyak_wishlist';
+
+    function getWishlist() {
+      try {
+        var raw = localStorage.getItem(WISHLIST_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveWishlist(list) {
+      try {
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function renderWishlistDrawer() {
+      var list = getWishlist();
+      var countEl = document.getElementById('samyak-wl-count-badge');
+      var bodyEl = document.getElementById('samyak-wl-body');
+      var emptyEl = document.getElementById('samyak-wl-empty');
+      var footerEl = document.getElementById('samyak-wl-footer');
+
+      if (!bodyEl) return;
+
+      var totalItems = list.length;
+      if (countEl) countEl.textContent = totalItems + (totalItems === 1 ? ' item' : ' items');
+
+      // Update header badge if present
+      var hdrBadge = document.getElementById('samyak-header-wishlist-count');
+      if (hdrBadge) {
+        if (totalItems > 0) {
+          hdrBadge.textContent = totalItems;
+          hdrBadge.style.display = 'flex';
+        } else {
+          hdrBadge.style.display = 'none';
+        }
+      }
+
+      if (totalItems === 0) {
+        bodyEl.innerHTML = '';
+        bodyEl.style.display = 'none';
+        if (emptyEl) emptyEl.style.display = 'flex';
+        if (footerEl) footerEl.style.display = 'none';
+        return;
+      }
+
+      if (emptyEl) emptyEl.style.display = 'none';
+      bodyEl.style.display = 'flex';
+      if (footerEl) footerEl.style.display = 'block';
+
+      var html = '';
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
+        var id = typeof item === 'object' && item !== null ? item.id : String(item);
+        var title = (typeof item === 'object' && item !== null && item.title) ? item.title : 'Wholesale Hair Accessory';
+        var price = (typeof item === 'object' && item !== null && item.price) ? item.price : '';
+        var img = (typeof item === 'object' && item !== null && item.image) ? item.image : '';
+        var url = (typeof item === 'object' && item !== null && item.url) ? item.url : (item.handle ? '/products/' + item.handle : '#');
+
+        html += '<div class="samyak-wl-item" data-wishlist-id="' + id + '">';
+        if (img) {
+          html += '<a href="' + url + '"><img src="' + img + '" alt="' + title.replace(/"/g, '&quot;') + '" class="samyak-wl-thumb" loading="lazy"></a>';
+        } else {
+          html += '<div class="samyak-wl-thumb" style="display:flex;align-items:center;justify-content:center;color:#C5A280;">' +
+                  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
+                  '</div>';
+        }
+        html += '<div class="samyak-wl-item-details">';
+        html += '<a href="' + url + '" class="samyak-wl-item-title">' + title + '</a>';
+        if (price) {
+          html += '<div class="samyak-wl-item-price">' + price + '</div>';
+        }
+        html += '</div>';
+        html += '<button type="button" class="samyak-wl-remove-btn" data-remove-id="' + id + '" aria-label="Remove ' + title.replace(/"/g, '&quot;') + ' from wishlist" title="Remove">&times;</button>';
+        html += '</div>';
+      }
+
+      bodyEl.innerHTML = html;
+
+      // Attach remove handlers
+      var removeBtns = bodyEl.querySelectorAll('[data-remove-id]');
+      removeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var removeId = btn.getAttribute('data-remove-id');
+          var current = getWishlist();
+          var updated = current.filter(function(it) {
+            var itId = typeof it === 'object' && it !== null ? String(it.id) : String(it);
+            return itId !== String(removeId);
+          });
+          saveWishlist(updated);
+          document.dispatchEvent(new CustomEvent('wishlist:updated', { bubbles: true }));
+        });
+      });
+    }
+
+    function openWishlistDrawer() {
+      renderWishlistDrawer();
+      var drawer = document.getElementById('samyak-wishlist-drawer');
+      if (drawer) {
+        drawer.classList.add('is-open');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeWishlistDrawer() {
+      var drawer = document.getElementById('samyak-wishlist-drawer');
+      if (drawer) {
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Expose global controller
+    window.openWishlistDrawer = openWishlistDrawer;
+    window.closeWishlistDrawer = closeWishlistDrawer;
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      renderWishlistDrawer();
+
+      var backdrop = document.getElementById('samyak-wl-backdrop');
+      var closeBtn = document.getElementById('samyak-wl-close-btn');
+
+      if (backdrop) backdrop.addEventListener('click', closeWishlistDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeWishlistDrawer);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeWishlistDrawer();
+      });
+
+      // Intercept header wishlist trigger clicks
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest && e.target.closest('.samyak-hdr-wishlist-btn, [data-wishlist-drawer-trigger]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openWishlistDrawer();
+        }
+      });
+    });
+
+    // Re-render when wishlist updates
+    document.addEventListener('wishlist:updated', renderWishlistDrawer);
+  })();
+</script>

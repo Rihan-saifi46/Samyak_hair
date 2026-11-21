@@ -1,0 +1,259 @@
+{% comment %}
+  Section: Main Customer Account
+  Renders Shopify's official authenticated customer account dashboard (orders, addresses, logout).
+  Styled to match Samyak Hair Accessories luxury boutique aesthetic.
+{% endcomment %}
+
+<div class="samyak-account-section">
+  <div class="samyak-account-container">
+    <div class="samyak-account-header">
+      <div>
+        <h1 class="samyak-account-title">My Account</h1>
+        <p class="samyak-account-subtitle">Welcome back, {{ customer.name }} &middot; <a href="{{ routes.account_logout_url }}" class="samyak-logout-link">Sign Out</a></p>
+      </div>
+      <div class="samyak-account-quick-links">
+        <a href="/pages/wishlist" class="samyak-acc-pill-btn">View Wishlist</a>
+        <a href="{{ routes.all_products_collection_url }}" class="samyak-acc-pill-btn samyak-acc-pill-btn--primary">Browse Products</a>
+      </div>
+    </div>
+
+    <div class="samyak-account-grid">
+      <!-- Order History -->
+      <div class="samyak-account-orders-card">
+        <h2 class="samyak-card-title">Order History</h2>
+        {%- paginate customer.orders by 10 -%}
+          {%- if customer.orders.size > 0 -%}
+            <div class="samyak-orders-table-wrap">
+              <table class="samyak-orders-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Fulfillment</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for order in customer.orders -%}
+                    <tr>
+                      <td><a href="{{ order.customer_url }}" class="samyak-order-link">{{ order.name }}</a></td>
+                      <td>{{ order.created_at | time_tag: format: 'date' }}</td>
+                      <td>{{ order.financial_status_label }}</td>
+                      <td>{{ order.fulfillment_status_label }}</td>
+                      <td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td>
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+            {%- if paginate.pages > 1 -%}
+              {%- render 'pagination', paginate: paginate -%}
+            {%- endif -%}
+          {%- else -%}
+            <div class="samyak-empty-orders">
+              <p>You haven't placed any wholesale orders yet.</p>
+              <a href="{{ routes.all_products_collection_url }}" class="samyak-btn-shop">Start Shopping</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+
+      <!-- Account Details & Address -->
+      <div class="samyak-account-details-card">
+        <h2 class="samyak-card-title">Account Details</h2>
+        <div class="samyak-details-body">
+          <p class="samyak-customer-name"><strong>{{ customer.name }}</strong></p>
+          <p class="samyak-customer-email">{{ customer.email }}</p>
+          {%- if customer.default_address -%}
+            <div class="samyak-address-preview">
+              <h3 class="samyak-address-heading">Default Shipping Address:</h3>
+              <p>{{ customer.default_address.address1 }}</p>
+              {%- if customer.default_address.address2 != blank -%}
+                <p>{{ customer.default_address.address2 }}</p>
+              {%- endif -%}
+              <p>{{ customer.default_address.city }}, {{ customer.default_address.province_code }} {{ customer.default_address.zip }}</p>
+              <p>{{ customer.default_address.country }}</p>
+              {%- if customer.default_address.phone != blank -%}
+                <p>Phone: {{ customer.default_address.phone }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          <a href="{{ routes.account_addresses_url }}" class="samyak-manage-addresses-link">
+            Manage Addresses ({{ customer.addresses_count }}) &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .samyak-account-section {
+    background-color: #FAF8F5;
+    padding-block: clamp(40px, 5vw, 70px);
+    padding-inline: 20px;
+    min-height: 70vh;
+  }
+
+  .samyak-account-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .samyak-account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 36px;
+    border-bottom: 1px solid #ECE7E1;
+    padding-bottom: 20px;
+  }
+
+  .samyak-account-title {
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: clamp(26px, 3.2vw, 36px);
+    font-weight: 600;
+    color: #113B32;
+    margin: 0 0 6px;
+  }
+
+  .samyak-account-subtitle {
+    font-size: 14px;
+    color: #636865;
+    margin: 0;
+  }
+
+  .samyak-logout-link {
+    color: #B02A37;
+    text-decoration: underline;
+  }
+
+  .samyak-account-quick-links {
+    display: flex;
+    gap: 10px;
+  }
+
+  .samyak-acc-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 20px;
+    border-radius: 30px;
+    border: 1px solid #113B32;
+    color: #113B32;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .samyak-acc-pill-btn--primary {
+    background: #113B32;
+    color: #FFFFFF;
+  }
+
+  .samyak-account-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+  }
+
+  .samyak-account-orders-card,
+  .samyak-account-details-card {
+    background: #FFFFFF;
+    border: 1px solid #ECE7E1;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  }
+
+  .samyak-card-title {
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: 20px;
+    color: #113B32;
+    margin: 0 0 18px;
+    border-bottom: 1px solid #F0ECE4;
+    padding-bottom: 12px;
+  }
+
+  .samyak-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  .samyak-orders-table th,
+  .samyak-orders-table td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #F0ECE4;
+  }
+
+  .samyak-orders-table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #8C928F;
+    text-transform: uppercase;
+  }
+
+  .samyak-order-link {
+    color: #113B32;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .samyak-empty-orders {
+    text-align: center;
+    padding: 36px 20px;
+    color: #636865;
+  }
+
+  .samyak-btn-shop {
+    display: inline-block;
+    margin-top: 12px;
+    background: #113B32;
+    color: #FFFFFF;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .samyak-address-preview {
+    margin-top: 14px;
+    font-size: 13.5px;
+    color: #4D524F;
+    line-height: 1.5;
+  }
+
+  .samyak-address-heading {
+    font-size: 13px;
+    color: #181A19;
+    margin: 0 0 4px;
+  }
+
+  .samyak-manage-addresses-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: #113B32;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  @media (max-width: 860px) {
+    .samyak-account-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Customer Account",
+  "settings": []
+}
+{% endschema %}

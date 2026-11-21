@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samyak Wholesale - Product Cards & Quick Shop Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #f3f0ea;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 60px 24px;
+      color: #1a1a1a;
+    }
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .demo-header {
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .demo-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      color: #113B32;
+      margin-bottom: 8px;
+    }
+    .demo-header p {
+      font-size: 14px;
+      color: #666666;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    /* ==========================================================================
+       PRODUCT CARD STYLES (MATCHING IMAGE 1 & IMAGE 2)
+       ========================================================================== */
+    .product-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #FCFBF7;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07);
+    }
+    .product-card__link {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* Image Container (Aspect-ratio: 4 / 5) */
+    .card-gallery {
+      aspect-ratio: 4 / 5;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px 12px 0 0;
+      background: #F4EFEA;
+      width: 100%;
+    }
+    .card-gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .product-card:hover .card-gallery img {
+      transform: scale(1.03);
+    }
+
+    /* Top-Right Floating Wishlist Button */
+    .samyak-wishlist-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #FCFBF7;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1E1E1E;
+      padding: 0;
+      pointer-events: auto;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+    .samyak-wishlist-btn:hover {
+      transform: scale(1.1);
+      background: #FFFFFF;
+    }
+    .samyak-wishlist-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #1E1E1E;
+      fill: none;
+      transition: fill 0.2s ease, stroke 0.2s ease, transform 0.2s ease;
+    }
+    .samyak-wishlist-btn.is-active svg {
+      fill: #8C2D43;
+      stroke: #8C2D43;
+      transform: scale(1.12);
+    }
+
+    /* Bottom-Left Hover QUICK SHOP Pill Button */
+    .samyak-quick-shop-btn {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      background: #FCFBF7;
+      color: #1A1A1A;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+    .product-card:hover .samyak-quick-shop-btn,
+    .product-card:focus-within .samyak-quick-shop-btn {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .samyak-quick-shop-btn:hover {
+      background: #FFFFFF;
+      color: #4A0E17;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+    }
+    .samyak-quick-shop-btn:active {
+      transform: translateY(1px);
+    }
+    @media (max-width: 768px) {
+      .samyak-quick-shop-btn {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding: 8px 14px;
+        font-size: 10px;
+        bottom: 10px;
+        left: 10px;
+      }
+    }
+
+    /* Card Footer Info (Padding 14px 16px) */
+    .product-card__content {
+      background: #FCFBF7;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 0 0 12px 12px;
+    }
+    .product-card__title {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #1E1E1E;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-card__price {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: #6B7280;
+    }
+
+    /* ==========================================================================
+       SLIDE-OVER SPLIT QUICK SHOP DRAWER (MATCHING IMAGE 3)
+       ========================================================================== */
+    .samyak-quick-shop-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      visibility: hidden;
+      pointer-events: none;
+      transition: visibility 0.35s ease;
+    }
+    .samyak-quick-shop-drawer.samyak-quick-shop-drawer--open {
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .samyak-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 20, 18, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 1;
+      cursor: pointer;
+    }
+    .samyak-quick-shop-drawer--open .samyak-drawer-backdrop {
+      opacity: 1;
+    }
+    .samyak-drawer-container {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      height: 100dvh;
+      width: 58vw;
+      max-width: 780px;
+      min-width: 340px;
+      background: #FCFBF7;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      overflow: hidden;
+    }
+    .samyak-quick-shop-drawer--open .samyak-drawer-container {
+      transform: translateX(0);
+    }
+    .samyak-drawer-showcase {
+      background: #F4EFEA;
+      position: relative;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .samyak-drawer-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+    .samyak-drawer-content {
+      background: #FCFBF7;
+      padding: 36px 32px;
+      position: relative;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .samyak-drawer-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #E5E2DC;
+      background: #FCFBF7;
+      color: #1A1A1A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      z-index: 10;
+    }
+    .samyak-drawer-close-btn:hover {
+      background: #EDE8E1;
+      border-color: #D1CCC4;
+      transform: scale(1.06);
+    }
+    .samyak-drawer-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #6B7280;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .samyak-drawer-title {
+      font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+      font-size: 28px;
+      line-height: 1.2;
+      color: #1A1A1A;
+      margin: 8px 0 10px;
+      font-weight: 500;
+    }
+    .samyak-drawer-price {
+      font-size: 15px;
+      font-weight: 600;
+      color: #4A0E17;
+      margin-bottom: 24px;
+    }
+    .samyak-drawer-variants-section {
+      margin-bottom: 24px;
+    }
+    .samyak-drawer-variant-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #4B5563;
+      margin-bottom: 10px;
+    }
+    .samyak-drawer-variants-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .samyak-drawer-variant-btn {
+      width: 100%;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 12px;
+      font-family: inherit;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid #E5E2DC;
+      background: #FFFFFF;
+      color: #374151;
+      font-weight: 500;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .samyak-drawer-variant-btn:hover:not(.is-unavailable) {
+      border-color: #9CA3AF;
+      background: #FAF8F5;
+    }
+    .samyak-drawer-variant-btn.is-selected {
+      background: #4A0E17;
+      color: #FFFFFF;
+      border-color: #4A0E17;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(74, 14, 23, 0.25);
+    }
+    .samyak-drawer-variant-btn.is-unavailable {
+      border-color: #E5E2DC;
+      background: #F9FAFB;
+      color: #9CA3AF;
+      text-decoration: line-through;
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .samyak-drawer-add-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      background: #4A0E17;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(74, 14, 23, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .samyak-drawer-add-btn:hover:not(:disabled) {
+      background: #350A10;
+      box-shadow: 0 6px 18px rgba(74, 14, 23, 0.3);
+    }
+    .samyak-drawer-add-btn:disabled {
+      background: #9CA3AF;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .samyak-drawer-add-btn.is-added {
+      background: #113B32;
+    }
+    .samyak-drawer-pdp-link {
+      display: inline-block;
+      font-size: 12px;
+      color: #374151;
+      margin-top: 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #D1D5DB;
+      text-decoration: none;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      align-self: flex-start;
+    }
+    .samyak-drawer-pdp-link:hover {
+      color: #1A1A1A;
+      border-color: #1A1A1A;
+    }
+    @media (max-width: 768px) {
+      .samyak-drawer-container {
+        grid-template-columns: 1fr;
+        width: 100vw;
+        max-width: 100vw;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .samyak-drawer-showcase {
+        height: 260px;
+        max-height: 260px;
+        flex: 0 0 260px;
+      }
+      .samyak-drawer-content {
+        padding: 24px 20px;
+        flex: 1;
+        overflow-y: visible;
+      }
+      .samyak-drawer-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>Samyak Wholesale - Hair Accessories</h1>
+      <p>Hover over any card to reveal the "QUICK SHOP" pill, or click the heart to save to wishlist.</p>
+    </div>
+
+    <div class="product-grid">
+      <!-- Card 1 -->
+      <div class="product-card">
+        <a href="#product-1" class="product-card__link"></a>
+        <div class="card-gallery">
+          <img src="https://cdn.impression4u.com/storage/1744/home-category-1-gold-pearl-chain-clutcher.webp" alt="Gold Pearl Chain Metal Clutcher">
+          
+          <button type="button" class="samyak-wishlist-btn" data-product-id="101" aria-label="Save to Wishlist">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </button>
+
+          <button type="button" class="samyak-quick-shop-btn" data-quick-shop-trigger data-product-id="101">
+            QUICK SHOP
+          </button>
+
+          <script type="application/json" class="samyak-product-json">
+            {
+              "id": 101,
+              "title": "Gold Pearl Chain Metal Clutcher",
+              "handle": "gold-pearl-chain-metal-clutcher",
+              "price": 24000,
+              "featured_image": "https://cdn.impression4u.com/storage/1744/home-category-1-gold-pearl-chain-clutcher.webp",
+              "url": "#product-1",
+              "variants": [
+                { "id": 1001, "title": "Pack of 6 (Wholesale Standard)", "price": 24000, "available": true },
+                { "id": 1002, "title": "Pack of 12 (Wholesale Master Carton)", "price": 45000, "available": true },
+                { "id": 1003, "title": "Sample Pack of 2 (Trial)", "price": 9500, "available": false }
+              ]
+            }
+          </script>
+        </div>
+        <div class="product-card__content">
+          <h3 class="product-card__title">Gold Pearl Chain Metal Clutcher — Luxury Edition</h3>
+          <span class="product-card__price">₹240 / Pack</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card">
+        <a href="#product-2" class="product-card__link"></a>
+        <div class="card-gallery">
+          <img src="https://cdn.impression4u.com/storage/1748/home-category-5-flower-beaded-hair-clip.webp" alt="Flower Beaded Korean Hair Clip">
+          
+          <button type="button" class="samyak-wishlist-btn" data-product-id="102" aria-label="Save to Wishlist">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </button>
+
+          <button type="button" class="samyak-quick-shop-btn" data-quick-shop-trigger data-product-id="102">
+            QUICK SHOP
+          </button>
+
+          <script type="application/json" class="samyak-product-json">
+            {
+              "id": 102,
+              "title": "Flower Beaded Korean Hair Clip",
+              "handle": "flower-beaded-korean-hair-clip",
+              "price": 18000,
+              "featured_image": "https://cdn.impression4u.com/storage/1748/home-category-5-flower-beaded-hair-clip.webp",
+              "url": "#product-2",
+              "variants": [
+                { "id": 1004, "title": "Assorted Pastel Mix (12 Pcs)", "price": 18000, "available": true },
+                { "id": 1005, "title": "Monochrome Pearl White (12 Pcs)", "price": 18000, "available": true }
+              ]
+            }
+          </script>
+        </div>
+        <div class="product-card__content">
+          <h3 class="product-card__title">Flower Beaded Korean Hair Clip Set</h3>
+          <span class="product-card__price">₹180 / Pack</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card">
+        <a href="#product-3" class="product-card__link"></a>
+        <div class="card-gallery">
+          <img src="https://cdn.impression4u.com/storage/1752/home-category-9-blush-satin-scrunchie.webp" alt="Blush Satin Silk Scrunchie">
+          
+          <button type="button" class="samyak-wishlist-btn" data-product-id="103" aria-label="Save to Wishlist">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </button>
+
+          <button type="button" class="samyak-quick-shop-btn" data-quick-shop-trigger data-product-id="103">
+            QUICK SHOP
+          </button>
+
+          <script type="application/json" class="samyak-product-json">
+            {
+              "id": 103,
+              "title": "Blush Satin Silk Scrunchies",
+              "handle": "blush-satin-silk-scrunchies",
+              "price": 12000,
+              "featured_image": "https://cdn.impression4u.com/storage/1752/home-category-9-blush-satin-scrunchie.webp",
+              "url": "#product-3",
+              "variants": [
+                { "id": 1006, "title": "Jumbo Size (Pack of 10)", "price": 12000, "available": true },
+                { "id": 1007, "title": "Mini Skinny Size (Pack of 20)", "price": 11000, "available": true }
+              ]
+            }
+          </script>
+        </div>
+        <div class="product-card__content">
+          <h3 class="product-card__title">Premium Blush Satin Silk Scrunchies</h3>
+          <span class="product-card__price">₹120 / Pack</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER QUICK SHOP DRAWER COMPONENT -->
+  <div id="samyak-quick-shop-drawer" class="samyak-quick-shop-drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="samyak-drawer-title">
+    <div class="samyak-drawer-backdrop" data-drawer-close></div>
+    <div class="samyak-drawer-container">
+      <!-- Left Half Showcase -->
+      <div class="samyak-drawer-showcase">
+        <img id="samyak-drawer-img" src="" alt="Product Showcase" class="samyak-drawer-img">
+      </div>
+      <!-- Right Half Configuration -->
+      <div class="samyak-drawer-content">
+        <button type="button" class="samyak-drawer-close-btn" data-drawer-close aria-label="Close Quick Shop">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <span class="samyak-drawer-eyebrow">QUICK SHOP</span>
+        <h2 id="samyak-drawer-title" class="samyak-drawer-title"></h2>
+        <div id="samyak-drawer-price" class="samyak-drawer-price"></div>
+
+        <div class="samyak-drawer-variants-section">
+          <span class="samyak-drawer-variant-label" id="samyak-drawer-option-label">CHOOSE YOUR PACK / VARIANT</span>
+          <div id="samyak-drawer-variants-list" class="samyak-drawer-variants-list"></div>
+        </div>
+
+        <div id="samyak-drawer-feedback" class="samyak-drawer-feedback" style="display: none;"></div>
+
+        <button type="button" id="samyak-drawer-add-btn" class="samyak-drawer-add-btn">
+          <span id="samyak-drawer-btn-text">ADD TO BAG</span>
+        </button>
+
+        <a id="samyak-drawer-pdp-link" href="#" class="samyak-drawer-pdp-link">
+          View full product details &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var drawer = document.getElementById('samyak-quick-shop-drawer');
+      var showcaseImg = document.getElementById('samyak-drawer-img');
+      var titleEl = document.getElementById('samyak-drawer-title');
+      var priceEl = document.getElementById('samyak-drawer-price');
+      var variantsList = document.getElementById('samyak-drawer-variants-list');
+      var addBtn = document.getElementById('samyak-drawer-add-btn');
+      var btnText = document.getElementById('samyak-drawer-btn-text');
+      var pdpLink = document.getElementById('samyak-drawer-pdp-link');
+
+      var currentProduct = null;
+      var selectedVariant = null;
+
+      function formatMoney(cents) {
+        if (cents == null) return '';
+        var amount = (cents / 100).toLocaleString('en-IN', {
+          maximumFractionDigits: (cents % 100 === 0) ? 0 : 2
+        });
+        return '₹' + amount;
+      }
+
+      function openDrawer(productData) {
+        currentProduct = productData;
+        if (!currentProduct) return;
+
+        var mainImg = currentProduct.featured_image || (currentProduct.images && currentProduct.images[0]) || '';
+        if (typeof mainImg === 'object' && mainImg.src) mainImg = mainImg.src;
+        showcaseImg.src = mainImg;
+
+        titleEl.textContent = currentProduct.title;
+        pdpLink.href = currentProduct.url || '#';
+
+        variantsList.innerHTML = '';
+        var variants = currentProduct.variants || [];
+
+        if (variants.length > 0) {
+          var firstAvail = variants.find(function(v) { return v.available; }) || variants[0];
+          selectedVariant = firstAvail;
+
+          variants.forEach(function(variant) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'samyak-drawer-variant-btn';
+            btn.textContent = variant.title;
+
+            if (!variant.available) {
+              btn.classList.add('is-unavailable');
+            }
+            if (variant.id === selectedVariant.id) {
+              btn.classList.add('is-selected');
+            }
+
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              selectVariant(variant, btn);
+            });
+
+            variantsList.appendChild(btn);
+          });
+        }
+
+        updatePriceAndButton();
+        drawer.classList.add('samyak-quick-shop-drawer--open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function selectVariant(variant, btn) {
+        selectedVariant = variant;
+        variantsList.querySelectorAll('.samyak-drawer-variant-btn').forEach(function(b) {
+          b.classList.remove('is-selected');
+        });
+        btn.classList.add('is-selected');
+        updatePriceAndButton();
+      }
+
+      function updatePriceAndButton() {
+        if (!selectedVariant) return;
+        priceEl.textContent = formatMoney(selectedVariant.price);
+        if (selectedVariant.available) {
+          addBtn.disabled = false;
+          addBtn.classList.remove('is-added');
+          btnText.textContent = 'ADD TO BAG';
+        } else {
+          addBtn.disabled = true;
+          addBtn.classList.remove('is-added');
+          btnText.textContent = 'OUT OF STOCK';
+        }
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove('samyak-quick-shop-drawer--open');
+        document.body.style.overflow = '';
+      }
+
+      drawer.querySelectorAll('[data-drawer-close]').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          closeDrawer();
+        });
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDrawer();
+      });
+
+      addBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        btnText.textContent = 'ADDING...';
+        addBtn.disabled = true;
+        setTimeout(function() {
+          btnText.textContent = '✓ ADDED TO BAG';
+          addBtn.classList.add('is-added');
+          setTimeout(function() {
+            closeDrawer();
+            addBtn.disabled = false;
+            addBtn.classList.remove('is-added');
+            btnText.textContent = 'ADD TO BAG';
+          }, 700);
+        }, 500);
+      });
+
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('[data-quick-shop-trigger]');
+        if (!trigger) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        var card = trigger.closest('.product-card');
+        var jsonScript = card ? card.querySelector('.samyak-product-json') : null;
+        if (jsonScript) {
+          try {
+            openDrawer(JSON.parse(jsonScript.textContent));
+          } catch(err) { console.error(err); }
+        }
+      });
+
+      // Wishlist toggle
+      document.addEventListener('click', function(e) {
+        var wishBtn = e.target.closest('.samyak-wishlist-btn');
+        if (!wishBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        wishBtn.classList.toggle('is-active');
+      });
+    })();
+  </script>
+</body>
+</html>

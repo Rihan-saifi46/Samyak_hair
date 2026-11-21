@@ -1,0 +1,363 @@
+<header class="site">
+    <div class="wrap hbar">
+        <div class="hlead">
+            <button class="iconbtn burger" onclick="toggleNav()" aria-label="Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+            </button>
+            <a class="brand" href="https://impression4u.com">Impression<span>4U</span><small>Hair Accessories</small></a>
+        </div>
+
+        <div class="search-wrap" x-data="storefrontSearch()" @click.outside="close()" @photo-search-pick.window="$event.detail === 'desktop' && $refs.lens.click()">
+            <form class="search" @submit.prevent="submit()" role="search">
+                <input type="search" x-model="q" @input="onInput()" @focus="open = true" @keydown.escape="close()"
+                    placeholder="Search clutchers, bands, scrunchies…" aria-label="Search" autocomplete="off">
+                <input type="file" x-ref="lens" accept="image/*" @change="onImage($event)" hidden>
+                <button class="lens" type="button" aria-label="Search by photo" title="Search by photo" @click="$dispatch('photo-search-info', 'desktop')"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+</button>
+                <button class="go" type="submit" aria-label="Search"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+</button>
+            </form>
+
+            <div class="search-drop" x-show="open" x-cloak x-transition.opacity.duration.150ms>
+                
+                <template x-if="loading && !results.length">
+                    <div class="search-empty" x-text="visual ? 'Finding matching products…' : 'Searching…'"></div>
+                </template>
+                
+                <template x-if="results.length">
+                    <div>
+                        <div class="search-head"><span x-text="visual ? 'Visual matches' : 'Products'"></span></div>
+                        <template x-for="p in results" :key="p.id">
+                            <a class="search-item" :href="'/products/' + p.slug">
+                                <span class="search-thumb">
+                                    <template x-if="p.thumbnail"><img :src="p.thumbnail" :alt="p.name"></template>
+                                </span>
+                                <span class="search-meta">
+                                    <span class="search-name" x-text="p.name"></span>
+                                    <span class="search-brand" x-text="p.brand"></span>
+                                </span>
+                                <span class="search-price">
+                                    <span x-text="money(p.price)"></span>
+                                    <small x-show="p.price_label" x-text="'/ ' + (p.price_label || '').toLowerCase()"></small>
+                                </span>
+                            </a>
+                        </template>
+                        <template x-if="!visual">
+                            <button type="button" class="search-all" @click="submit()">
+                                See all results for “<span x-text="q.trim()"></span>”
+                            </button>
+                        </template>
+                        <template x-if="visual && visualToken">
+                            <button type="button" class="search-all" @click="seeAllVisual()">
+                                See all matching results
+                            </button>
+                        </template>
+                    </div>
+                </template>
+                
+                <template x-if="q.trim() && !loading && !visual && !results.length">
+                    <div class="search-empty">No matches for “<span x-text="q.trim()"></span>”</div>
+                </template>
+                <template x-if="visual && !loading && !results.length">
+                    <div class="search-empty">No visual matches found — try another photo.</div>
+                </template>
+
+                
+                <template x-if="!q.trim() && !visual && recent.length">
+                    <div>
+                        <div class="search-head">
+                            <span>Recent searches</span>
+                            <button type="button" @click="clearRecent()">Clear</button>
+                        </div>
+                        <template x-for="term in recent" :key="term">
+                            <button type="button" class="search-recent" @click="pickRecent(term)">
+                                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+ <span x-text="term"></span>
+                            </button>
+                        </template>
+                    </div>
+                </template>
+                
+                <template x-if="!q.trim() && !visual && !loading">
+                    <button type="button" class="psh-line" @click="$dispatch('photo-search-info', 'desktop')"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+ Have a photo? Find matching products</button>
+                </template>
+            </div>
+        </div>
+
+        <div class="hact">
+                            <a class="iconbtn" href="https://impression4u.com/login" aria-label="My favourites" title="My favourites" x-data @click.prevent="$dispatch('open-login')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.6-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.6C19 15.4 12 20 12 20Z" stroke-linejoin="round"/></svg>
+</a>
+                        <a wire:key="lw-3584748565-0" wire:snapshot="{&quot;data&quot;:{&quot;count&quot;:0},&quot;memo&quot;:{&quot;id&quot;:&quot;c2sWaJlwwosVxFpRRZPG&quot;,&quot;name&quot;:&quot;storefront.cart-menu&quot;,&quot;path&quot;:&quot;\/&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;release&quot;:&quot;a-a-a&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;en&quot;,&quot;islands&quot;:[]},&quot;checksum&quot;:&quot;9b0cfd5a3b64302cae44b5aa2d59465abe5e17f3c8e0f1ab17bc6107b2defcbc&quot;}" wire:effects="{&quot;partials&quot;:[],&quot;listeners&quot;:[&quot;addToCart&quot;,&quot;cartSetQty&quot;,&quot;cart-updated&quot;],&quot;dispatches&quot;:[{&quot;name&quot;:&quot;cart-state&quot;,&quot;params&quot;:{&quot;lines&quot;:[]}}]}" wire:id="c2sWaJlwwosVxFpRRZPG" wire:name="storefront.cart-menu" class="iconbtn" href="https://impression4u.com/cart" aria-label="Cart (0 items)">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 8h14l-1 12H6L5 8Z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-linecap="round"/></svg>
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></a>
+                            <a class="acct" href="https://impression4u.com/login" aria-label="Sign in" title="Sign in" x-data @click.prevent="$dispatch('open-login')">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-4 4-6 7.5-6s6.3 2 7.5 6" stroke-linecap="round"/></svg>
+                </a>
+                    </div>
+    </div>
+
+    <div class="wrap search-m" x-data="mobileSearch()" @photo-search-pick.window="$event.detail === 'mobile' && pickPhoto()">
+        <div class="msearch-bar">
+            <button type="button" class="msearch-bar-main" @click="openIt()">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+<span>Search products…</span>
+            </button>
+            <button type="button" class="msearch-bar-cam" @click="$dispatch('photo-search-info', 'mobile')" aria-label="Search by photo">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+            </button>
+        </div>
+
+        <div class="msearch-screen" x-show="open" x-cloak x-transition.opacity.duration.150ms>
+            <div class="msearch-top">
+                <button type="button" class="msearch-ic" @click="close()" aria-label="Back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+                <input x-ref="input" type="search" x-model="q" @input="onInput()" @keydown.enter="submitAll()"
+                    placeholder="Search clutchers, bands, scrunchies…" autocomplete="off" enterkeyhint="search">
+                <input type="file" x-ref="lens" accept="image/*" @change="onImage($event)" hidden>
+                <button type="button" class="msearch-ic" @click="$dispatch('photo-search-info', 'mobile')" aria-label="Search by photo"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+</button>
+            </div>
+            <div class="msearch-body">
+                <template x-if="loading && !results.length"><div class="search-empty">Searching…</div></template>
+                <template x-if="visual && results.length"><div class="search-head"><span>Visual matches</span></div></template>
+                <template x-for="p in results" :key="p.id">
+                    <a class="search-item" :href="'/products/' + p.slug">
+                        <span class="search-thumb"><template x-if="p.thumbnail"><img :src="p.thumbnail" :alt="p.name"></template></span>
+                        <span class="search-meta"><span class="search-name" x-text="p.name"></span><span class="search-brand" x-text="p.brand"></span></span>
+                        <span class="search-price"><span x-text="money(p.price)"></span></span>
+                    </a>
+                </template>
+                <template x-if="q.trim() && !visual && results.length">
+                    <button type="button" class="search-all" @click="submitAll()">See all results for “<span x-text="q.trim()"></span>”</button>
+                </template>
+                <template x-if="visual && visualToken && results.length">
+                    <button type="button" class="search-all" @click="seeAllVisual()">See all matching results</button>
+                </template>
+                <template x-if="q.trim() && !loading && !visual && !results.length"><div class="search-empty">No matches for “<span x-text="q.trim()"></span>”.</div></template>
+                <template x-if="visual && !loading && !results.length"><div class="search-empty">No visual matches found — try another photo.</div></template>
+                <template x-if="!q.trim() && !visual && !loading">
+                    <button type="button" class="psh-line" @click="$dispatch('photo-search-info', 'mobile')"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+ Have a photo? Find matching products</button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div class="navbar"><div class="wrap"><ul class="hnav">
+        <li><a href="https://impression4u.com/products?tag=new-arrivals">New Arrivals</a></li>
+        <li><a href="https://impression4u.com/products?tag=best-sellers">Best Sellers</a></li>
+        <li><a href="https://impression4u.com/products?tag=e-commerce">For online sellers</a></li>
+        <li class="has-mega">
+            <a href="https://impression4u.com/products">Shop By Category <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+            <div class="drop"><div class="mega-cols">
+                                                                                <div class="mega-col">
+                            <a class="mega-head" href="https://impression4u.com/products?category=scrunchies-rubbers">Scrunchies &amp; Rubbers</a>
+                                                            <ul class="mega-subs">
+                                                                            <li><a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=scrunchies-casual-wear">Casual Wear</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=scrunchies-occasion-special">Occasion Special</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=100pc-bunch">100pc Bunch</a></li>
+                                                                    </ul>
+                                                    </div>
+                                                                                                    <div class="mega-col">
+                            <a class="mega-head" href="https://impression4u.com/products?category=kids">Kids</a>
+                                                            <ul class="mega-subs">
+                                                                            <li><a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-combos-casual">Combos – Casual</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-combos-premium">Combos – Premium</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-bracelets">Bracelets</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-finger-ring">Finger Ring</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-hair-clip-trendy">Hair Clip Trendy</a></li>
+                                                                    </ul>
+                                                    </div>
+                                                                                                    <div class="mega-col">
+                            <a class="mega-head" href="https://impression4u.com/products?category=hair-clips-clutchers">Hair Clips/Clutchers</a>
+                                                            <ul class="mega-subs">
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-fabric">Fabric</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-premium-stone">Premium Stone</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-premium-acrylic">Premium Acrylic</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-casual-wear">Casual Wear</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=metal-clutcher">Metal Clutcher</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=banana-clips">Banana Clips</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=hair-sticks">Sticks</a></li>
+                                                                    </ul>
+                                                    </div>
+                                                                                                    <div class="mega-col">
+                            <a class="mega-head" href="https://impression4u.com/products?category=false-hair">False Hair</a>
+                                                            <ul class="mega-subs">
+                                                                            <li><a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-clutchers">Hair Clutchers</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-tools">Tools</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-rubber">Hair Rubber</a></li>
+                                                                    </ul>
+                                                    </div>
+                                                                                                    <div class="mega-col">
+                            <a class="mega-head" href="https://impression4u.com/products?category=hair-band">Hair Band</a>
+                                                            <ul class="mega-subs">
+                                                                            <li><a href="https://impression4u.com/products?category=hair-band&amp;subcategory=crown">Crown</a></li>
+                                                                            <li><a href="https://impression4u.com/products?category=hair-band&amp;subcategory=hair-bands">Hair Band</a></li>
+                                                                    </ul>
+                                                    </div>
+                                                </div></div>
+        </li>
+        <li>
+            <a href="https://impression4u.com/products">Popular Brands <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+            <div class="drop"><div class="drop-list">
+                                    <a href="https://impression4u.com/products?brand=bofieni">BOFIENI<span>16</span></a>
+                                    <a href="https://impression4u.com/products?brand=hana">HANA<span>57</span></a>
+                                    <a href="https://impression4u.com/products?brand=imported">IMPORTED<span>376</span></a>
+                                    <a href="https://impression4u.com/products?brand=seoul-style">SEOUL STYLE<span>58</span></a>
+                                    <a href="https://impression4u.com/products?brand=zaya">ZAYA<span>68</span></a>
+                            </div></div>
+        </li>
+        <li><a href="https://impression4u.com/order-your-design" class="hot">Order Your Design</a></li>
+        <li><a href="https://impression4u.com/account/orders">Track Order</a></li>
+        <li><a href="https://impression4u.com/about">About Us</a></li>
+    </ul></div></div>
+
+    
+        <div class="mnav" id="drawer">
+        <div class="mnav-scrim" onclick="toggleNav(false)"></div>
+        <nav class="mnav-panel" aria-label="Menu">
+            <div class="mnav-head">
+                <a class="brand" href="https://impression4u.com">Impression<span>4U</span></a>
+                <button type="button" class="mnav-close" onclick="toggleNav(false)" aria-label="Close menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+</button>
+            </div>
+
+            <div class="mnav-body">
+                                    <a class="mnav-me" href="https://impression4u.com/login" x-data @click.prevent="toggleNav(false); $dispatch('open-login')">
+                        <span class="mnav-av"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-4 4-6 7.5-6s6.3 2 7.5 6" stroke-linecap="round"/></svg>
+</span>
+                        <span class="mnav-me-t"><strong>Sign in</strong><span>Track orders and save favourites</span></span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                
+                <div class="mnav-tiles">
+                    <a href="https://impression4u.com/products?tag=new-arrivals"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" stroke-linejoin="round"/></svg>
+<span>New arrivals</span></a>
+                    <a href="https://impression4u.com/products?tag=best-sellers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+<span>Best sellers</span></a>
+                    <a href="https://impression4u.com/products?tag=e-commerce"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" stroke-linecap="round"/></svg>
+<span>For online sellers</span></a>
+                    <a href="https://impression4u.com/order-your-design"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v11H4v-11Z" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.3"/></svg>
+<span>Order your design</span></a>
+                </div>
+
+                <div class="mnav-sec">
+                    <h3>Shop by category</h3>
+                    <a href="https://impression4u.com/products">View all</a>
+                </div>
+                <div class="mnav-acc-list">
+                                                                                                                                                <details class="mnav-cat" name="mnav-cat"  open >
+                                <summary>
+                                    <span class="mnav-ic"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5c-1 2.2-1 3.8 0 5.3M12 15.2c1 1.5 1 3.1 0 5.3M3.5 12c2.2 1 3.8 1 5.3 0M15.2 12c1.5-1 3.1-1 5.3 0M6 6c1.1 2.2 2.2 3.3 3.7 3.7M14.3 14.3c1.5.4 2.6 1.5 3.7 3.7M18 6c-2.2 1.1-3.3 2.2-3.7 3.7M9.7 14.3c-.4 1.5-1.5 2.6-3.7 3.7"/></svg>
+</span>
+                                    <span class="mnav-cat-n">Scrunchies &amp; Rubbers</span>
+                                    <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </summary>
+                                <div class="mnav-subs">
+                                    <a class="mnav-all" href="https://impression4u.com/products?category=scrunchies-rubbers">Shop all Scrunchies &amp; Rubbers</a>
+                                                                            <a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=scrunchies-casual-wear">Casual Wear</a>
+                                                                            <a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=scrunchies-occasion-special">Occasion Special</a>
+                                                                            <a href="https://impression4u.com/products?category=scrunchies-rubbers&amp;subcategory=100pc-bunch">100pc Bunch</a>
+                                                                    </div>
+                            </details>
+                                                                                                                                                                        <details class="mnav-cat" name="mnav-cat" >
+                                <summary>
+                                    <span class="mnav-ic"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 3.5l2.4 5 5.4.7-4 3.7 1 5.4L12 15.7l-4.8 2.6 1-5.4-4-3.7 5.4-.7L12 3.5Z"/></svg>
+</span>
+                                    <span class="mnav-cat-n">Kids</span>
+                                    <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </summary>
+                                <div class="mnav-subs">
+                                    <a class="mnav-all" href="https://impression4u.com/products?category=kids">Shop all Kids</a>
+                                                                            <a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-combos-casual">Combos – Casual</a>
+                                                                            <a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-combos-premium">Combos – Premium</a>
+                                                                            <a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-bracelets">Bracelets</a>
+                                                                            <a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-finger-ring">Finger Ring</a>
+                                                                            <a href="https://impression4u.com/products?category=kids&amp;subcategory=kids-hair-clip-trendy">Hair Clip Trendy</a>
+                                                                    </div>
+                            </details>
+                                                                                                                                                                        <details class="mnav-cat" name="mnav-cat" >
+                                <summary>
+                                    <span class="mnav-ic"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 12h16"/><path d="M5 12c0-4 3-7 7-7s7 3 7 7"/><path d="M6.5 12v5M9.5 12v6M12 12v6.5M14.5 12v6M17.5 12v5"/></svg>
+</span>
+                                    <span class="mnav-cat-n">Hair Clips / Clutchers</span>
+                                    <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </summary>
+                                <div class="mnav-subs">
+                                    <a class="mnav-all" href="https://impression4u.com/products?category=hair-clips-clutchers">Shop all Hair Clips / Clutchers</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-fabric">Fabric</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-premium-stone">Premium Stone</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-premium-acrylic">Premium Acrylic</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=clutchers-casual-wear">Casual Wear</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=metal-clutcher">Metal Clutcher</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=banana-clips">Banana Clips</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-clips-clutchers&amp;subcategory=hair-sticks">Sticks</a>
+                                                                    </div>
+                            </details>
+                                                                                                                                                                        <details class="mnav-cat" name="mnav-cat" >
+                                <summary>
+                                    <span class="mnav-ic"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 4h12"/><path d="M8 4c-2 4 2 6 0 10s1 6 0 7"/><path d="M12 4c-2 4 2 6 0 10s1 6 0 7"/><path d="M16 4c-2 4 2 6 0 10s1 6 0 7"/></svg>
+</span>
+                                    <span class="mnav-cat-n">False Hair</span>
+                                    <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </summary>
+                                <div class="mnav-subs">
+                                    <a class="mnav-all" href="https://impression4u.com/products?category=false-hair">Shop all False Hair</a>
+                                                                            <a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-clutchers">Hair Clutchers</a>
+                                                                            <a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-tools">Tools</a>
+                                                                            <a href="https://impression4u.com/products?category=false-hair&amp;subcategory=false-hair-rubber">Hair Rubber</a>
+                                                                    </div>
+                            </details>
+                                                                                                                                                                        <details class="mnav-cat" name="mnav-cat" >
+                                <summary>
+                                    <span class="mnav-ic"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 18c0-6.5 3.6-11 8-11s8 4.5 8 11"/><path d="M6.6 17.5c.3-5 2.6-8 5.4-8s5.1 3 5.4 8"/><path d="M10 7.6l2-2.4 2 2.4"/></svg>
+</span>
+                                    <span class="mnav-cat-n">Hair Band</span>
+                                    <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </summary>
+                                <div class="mnav-subs">
+                                    <a class="mnav-all" href="https://impression4u.com/products?category=hair-band">Shop all Hair Band</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-band&amp;subcategory=crown">Crown</a>
+                                                                            <a href="https://impression4u.com/products?category=hair-band&amp;subcategory=hair-bands">Hair Band</a>
+                                                                    </div>
+                            </details>
+                                                            </div>
+
+                                    <div class="mnav-sec"><h3>Popular brands</h3></div>
+                    <div class="mnav-brands">
+                                                    <a href="https://impression4u.com/products?brand=bofieni">BOFIENI</a>
+                                                    <a href="https://impression4u.com/products?brand=hana">HANA</a>
+                                                    <a href="https://impression4u.com/products?brand=imported">IMPORTED</a>
+                                                    <a href="https://impression4u.com/products?brand=seoul-style">SEOUL STYLE</a>
+                                                    <a href="https://impression4u.com/products?brand=zaya">ZAYA</a>
+                                            </div>
+                
+                <div class="mnav-links">
+                    <a href="https://impression4u.com/account/orders"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M12 3l8 4v10l-8 4-8-4V7l8-4Z" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke-linejoin="round"/></svg>
+<span>Track order</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+                    <a href="https://impression4u.com/account"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-4 4-6 7.5-6s6.3 2 7.5 6" stroke-linecap="round"/></svg>
+<span>My account</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+                    <a href="https://impression4u.com/about"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.2"/></svg>
+<span>About us</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+                </div>
+
+                <div class="mnav-help">
+                    <strong>Need help with an order?</strong>
+                    <p>Message us on WhatsApp or give us a call.</p>
+                    <div>
+                        <a class="wa" href="https://wa.me/919667855108" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4l-4.5 1.1Z" stroke-linejoin="round"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .9c-1.2-.5-2.2-1.5-2.7-2.7l.9-1-1-2L9 8.5Z" stroke-linejoin="round"/></svg>
+WhatsApp</a>
+                        <a href="tel:+919667855108"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke-linejoin="round"/></svg>
+Call us</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>

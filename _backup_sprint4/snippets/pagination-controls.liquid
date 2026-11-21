@@ -1,0 +1,300 @@
+{%- doc -%}
+  Renders pagination controls with previous/next navigation and page numbers.
+
+  @param {object} paginate - The paginate object
+  @param {string} [ref] - Component reference attribute for the pagination nav element
+  @param {string} [on_click_handler] - Component function to handle pagination clicks.
+
+  When provided the handler will receive URL search params as data. It extracts URL parameters from each pagination link
+  and passes them through the onclick attribute in the format: "on:click='handler?params'". This allows components to
+  intercept pagination and update content via section-renderer. The handler receives an object containing the URL search
+  parameters (e.g., {page: "2"})
+
+  @example
+  {%- paginate collection.products by 24 -%}
+    {%- render 'pagination-controls', paginate: paginate -%}
+  {%- endpaginate -%}
+{%- enddoc -%}
+
+{%- if paginate.pages > 1 -%}
+  <nav
+    class="pagination"
+    aria-label="{{ 'content.pagination.nav_label' | t }}"
+    data-current_page="{{ paginate.current_page }}"
+    {% if ref != blank %}
+      ref="{{ ref }}"
+    {% endif %}
+  >
+    <ul
+      class="pagination__list"
+      role="list"
+    >
+      <li class="pagination__item">
+        {%- if paginate.previous -%}
+          {%- assign prev_params = paginate.previous.url | split: '?' | last -%}
+          <a
+            href="{{ paginate.previous.url }}"
+            aria-label="{{ 'content.pagination.previous' | t }}"
+            class="pagination__link pagination__link--arrow"
+            {% if on_click_handler != blank %}
+              on:click="{{ on_click_handler }}?{{ prev_params }}"
+            {% endif %}
+          >
+            {{ 'icon-chevron-left.svg' | inline_asset_content }}
+          </a>
+        {%- else -%}
+          <span
+            aria-label="{{ 'content.pagination.previous' | t }}"
+            class="pagination__link pagination__link--arrow pagination__link--disabled"
+            aria-disabled="true"
+          >
+            {{ 'icon-chevron-left.svg' | inline_asset_content }}
+          </span>
+        {%- endif -%}
+      </li>
+
+      {%- assign current_page = paginate.current_page -%}
+      {%- assign last_visible_page = 0 -%}
+      {%- assign just_saw_ellipsis = false -%}
+
+      {%- for part in paginate.parts -%}
+        {% liquid
+          assign should_hide_on_mobile = false
+          assign is_page_number = false
+          assign page_number = 0
+
+          if part.is_link
+            assign page_number = part.title | plus: 0
+            if page_number > 0
+              assign is_page_number = true
+              assign distance_from_current = page_number | minus: current_page | abs
+              if page_number != 1 and page_number != paginate.pages and distance_from_current > 1
+                assign should_hide_on_mobile = true
+              endif
+            endif
+          elsif part.is_link == false and part.title != '&hellip;'
+            assign is_page_number = true
+            assign page_number = current_page
+          endif
+
+          if part.title == '&hellip;'
+            assign just_saw_ellipsis = true
+          else
+            if is_page_number and should_hide_on_mobile == false
+              assign last_visible_plus_one = last_visible_page | plus: 1
+              if last_visible_page > 0 and page_number > last_visible_plus_one and just_saw_ellipsis == false
+                echo '<li class="pagination__item pagination__item--mobile-only pagination__item--gap">'
+                echo '<span class="pagination__link pagination__link--gap" aria-hidden="true">&hellip;</span>'
+                echo '</li>'
+              endif
+              assign last_visible_page = page_number
+              assign just_saw_ellipsis = false
+            endif
+          endif
+        %}
+
+        {% liquid
+          assign li_classes = 'pagination__item'
+          if should_hide_on_mobile
+            assign li_classes = li_classes | append: ' pagination__item--mobile-hide'
+          endif
+          if part.title == '&hellip;'
+            assign li_classes = li_classes | append: ' pagination__item--gap'
+          endif
+        %}
+        <li class="{{ li_classes }}">
+          {%- if part.is_link -%}
+            {%- assign part_params = part.url | split: '?' | last -%}
+            <a
+              href="{{ part.url }}"
+              aria-label="{{ 'content.pagination.page' | t: page: part.title }}"
+              class="pagination__link pagination__link--page"
+              {% if on_click_handler != blank %}
+                on:click="{{ on_click_handler }}?{{ part_params }}"
+              {% endif %}
+            >
+              {{ part.title }}
+            </a>
+          {%- else -%}
+            {%- if part.title == '&hellip;' -%}
+              <span
+                class="pagination__link pagination__link--gap"
+                aria-hidden="true"
+                >&hellip;</span
+              >
+            {%- else -%}
+              <span
+                class="pagination__link pagination__link--page pagination__link--current"
+                aria-current="page"
+              >
+                {{- part.title -}}
+              </span>
+            {%- endif -%}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+
+      <li class="pagination__item">
+        {%- if paginate.next -%}
+          {%- assign next_params = paginate.next.url | split: '?' | last -%}
+          <a
+            href="{{ paginate.next.url }}"
+            aria-label="{{ 'content.pagination.next' | t }}"
+            class="pagination__link pagination__link--arrow"
+            {% if on_click_handler != blank %}
+              on:click="{{ on_click_handler }}?{{ next_params }}"
+            {% endif %}
+          >
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </a>
+        {%- else -%}
+          <span
+            aria-label="{{ 'content.pagination.next' | t }}"
+            class="pagination__link pagination__link--arrow pagination__link--disabled"
+            aria-disabled="true"
+          >
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </span>
+        {%- endif -%}
+      </li>
+    </ul>
+  </nav>
+{%- endif -%}
+
+{% stylesheet %}
+  .pagination {
+    --pagination-size: 32px;
+    --pagination-radius: 4px;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 48px !important;
+    margin-bottom: 24px !important;
+    padding: 0 !important;
+    position: relative !important;
+    isolation: isolate !important;
+  }
+
+  .pagination__list {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .pagination__item {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .pagination__item.pagination__item--gap {
+    width: auto !important;
+    min-width: 18px !important;
+  }
+
+  .pagination__link {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border: 1px solid #E4E0D6 !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif) !important;
+    background: #FFFFFF !important;
+    color: #181A19 !important;
+    text-decoration: none !important;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    user-select: none !important;
+  }
+
+  .pagination__link:hover:not(.pagination__link--current):not(.pagination__link--disabled):not(.pagination__link--gap) {
+    background: #F4F2EC !important;
+    border-color: #181A19 !important;
+    color: #181A19 !important;
+  }
+
+  .pagination__link:focus-visible {
+    outline: 2px solid #181A19 !important;
+    outline-offset: 2px !important;
+  }
+
+  .pagination__link--current,
+  .pagination__link[aria-current='page'] {
+    background: #181A19 !important;
+    color: #FFFFFF !important;
+    border-color: #181A19 !important;
+    font-weight: 600 !important;
+    cursor: default !important;
+  }
+
+  .pagination__link--gap {
+    border: none !important;
+    background: transparent !important;
+    color: #6B7280 !important;
+    cursor: default !important;
+    pointer-events: none !important;
+    font-size: 12px !important;
+    width: auto !important;
+    min-width: 18px !important;
+  }
+
+  .pagination__link--arrow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #FFFFFF !important;
+    color: #181A19 !important;
+  }
+
+  .pagination__link--disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    background: #FAFAFA !important;
+    border-color: #ECE9DF !important;
+  }
+
+  .pagination__link svg {
+    width: 8px !important;
+    height: 12px !important;
+    flex-shrink: 0 !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  /* Chevrons point toward reading direction, so they flip in RTL. */
+  [dir='rtl'] .pagination__link--arrow svg {
+    transform: scaleX(-1);
+  }
+
+  @media screen and (max-width: 749px) {
+    .pagination {
+      margin-top: 36px !important;
+      margin-bottom: 20px !important;
+    }
+
+    .pagination__item--mobile-hide {
+      display: none !important;
+    }
+
+    .pagination__item--mobile-only {
+      display: flex !important;
+    }
+  }
+{% endstylesheet %}

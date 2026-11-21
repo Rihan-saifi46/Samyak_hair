@@ -1,0 +1,382 @@
+{%- doc -%}
+  Product card layout styles. Kept in a standalone snippet so empty filtered grids
+  can preload the styles before facets morph product cards into the section.
+
+  @example
+  {% render 'product-card-styles' %}
+{%- enddoc -%}
+
+{% stylesheet %}
+  /* ==========================================================================
+     SAMYAK WHOLESALE MINIMALIST ELEVATED PRODUCT CARDS (REFERENCE DESIGN)
+     ========================================================================== */
+
+  .product-card {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: #FCFBF7 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    border: 1px solid #E4E0D6 !important;
+  }
+
+  .product-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Card Image Container (Aspect Ratio 4 / 5) */
+  .product-card .card-gallery {
+    aspect-ratio: 4 / 5 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 12px 12px 0 0 !important;
+    background: #EFECE4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .product-card .product-media-container,
+  .product-card .card-gallery .slideshow,
+  .product-card .card-gallery .slideshow__viewport {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Product Card Wrapper: flex-column, full cell height */
+  .product-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    background: transparent !important;
+  }
+
+  .product-card__content.product-grid__card {
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+    height: 100% !important;
+  }
+
+  /* Image Frame inside Card Wrapper */
+  .product-card .card-gallery,
+  .product-card .product-media-container,
+  .product-card .card-gallery > a > .product-media-container {
+    flex: 1 1 auto !important;
+    background: #F4F2EC !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    min-height: 220px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  @media screen and (max-width: 767px) {
+    .product-card .card-gallery,
+    .product-card .product-media-container,
+    .product-card .card-gallery > a > .product-media-container {
+      min-height: 175px !important;
+    }
+  }
+
+  /* Product Image in Image Frame (clean centered, object-fit: contain, 1.03 scale hover) */
+  .product-card .card-gallery img,
+  .product-card .product-media-container img,
+  .product-card .product-media__image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    padding: 12px !important;
+    transition: transform 0.45s ease !important;
+  }
+
+  /* Larger Hero feature cards (Products 3 & 12) naturally display larger product imagery */
+  .product-grid__item--bento-hero-right .card-gallery img,
+  .product-grid__item--bento-hero-left .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n + 3) .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n + 12) .card-gallery img {
+    object-fit: contain !important;
+    padding: 24px !important;
+  }
+
+  /* Horizontal wide cards (Products 4, 10, 15) center cutout accessories with generous breathing room */
+  .product-grid__item--bento-wide-left .card-gallery img,
+  .product-grid__item--bento-wide-center .card-gallery img,
+  .product-grid__item--bento-wide-right .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n + 4) .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n + 10) .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n + 15) .card-gallery img,
+  .product-grid:not([product-grid-view='zoom-out']) .product-grid__item:nth-child(15n) .card-gallery img {
+    object-fit: contain !important;
+    padding: 16px 28px !important;
+  }
+
+  .product-card:hover .card-gallery img,
+  .product-card:hover .product-media-container img,
+  .product-card:hover .product-media__image {
+    transform: scale(1.03) !important;
+  }
+
+  /* Top-Right Floating Wishlist Button (30px x 30px, rgba(255,255,255,0.85), border-radius 50%) */
+  .samyak-wishlist-btn {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    border: none !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #181A19 !important;
+    padding: 0 !important;
+    pointer-events: auto !important;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .samyak-wishlist-btn:hover {
+    transform: scale(1.08) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .samyak-wishlist-btn svg,
+  .samyak-wishlist-btn .samyak-heart-icon {
+    width: 14px !important;
+    height: 14px !important;
+    stroke: #181A19 !important;
+    stroke-width: 1.8 !important;
+    fill: none !important;
+    transition: fill 0.2s ease, stroke 0.2s ease, transform 0.2s ease !important;
+    pointer-events: none !important;
+  }
+
+  .samyak-wishlist-btn.is-active svg,
+  .samyak-wishlist-btn.is-active .samyak-heart-icon {
+    fill: #113B32 !important;
+    stroke: #113B32 !important;
+    transform: scale(1.05) !important;
+  }
+
+  /* Bottom-Left Floating QUICK SHOP Pill Button Inside Product Card Image */
+  .samyak-quick-shop-pill-btn {
+    position: absolute !important;
+    bottom: 14px !important;
+    left: 14px !important;
+    z-index: 5 !important;
+    background: #FCFBF7 !important;
+    color: #181A19 !important;
+    border-radius: 999px !important;
+    padding: 9px 18px !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid #E4E0D6 !important;
+    cursor: pointer !important;
+    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif) !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0 !important;
+    transform: translateY(8px) !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
+    outline: none !important;
+    user-select: none !important;
+  }
+
+  .product-card:hover .samyak-quick-shop-pill-btn,
+  .product-card:focus-within .samyak-quick-shop-pill-btn,
+  .card-gallery:hover .samyak-quick-shop-pill-btn {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+
+  .samyak-quick-shop-pill-btn:hover {
+    background: #FFFFFF !important;
+    color: #113B32 !important;
+    border-color: #113B32 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16) !important;
+  }
+
+  .samyak-quick-shop-pill-btn:active {
+    transform: translateY(1px) !important;
+  }
+
+  @media (hover: none), screen and (max-width: 768px) {
+    .samyak-quick-shop-pill-btn {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+    }
+  }
+
+  /* Minimalist Caption Below Image (padding-top: 8px; text-align: left;) */
+  .product-card .product-title,
+  .product-card [data-block-type="product-title"],
+  .product-card h3.product-title,
+  .product-card .product-grid-view-zoom-out--details {
+    padding: 8px 0 2px 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    background: transparent !important;
+  }
+
+  .product-card .product-title a,
+  .product-card .product-title h2,
+  .product-card .product-title h3,
+  .product-card .product-title p {
+    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif) !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #181A19 !important;
+    line-height: 1.3 !important;
+    margin: 0 0 2px 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    text-align: left !important;
+    letter-spacing: normal !important;
+  }
+
+  .product-card .price,
+  .product-card [data-block-type="price"] {
+    padding: 0 0 4px 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    background: transparent !important;
+  }
+
+  .product-card .price .price__regular,
+  .product-card .price .price-item,
+  .product-card .price span,
+  .product-card .price .price-item--regular {
+    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif) !important;
+    font-size: 11.5px !important;
+    font-weight: 400 !important;
+    color: #6B7280 !important;
+    letter-spacing: normal !important;
+    text-align: left !important;
+    line-height: 1.3 !important;
+  }
+
+  .product-card .price .price-item--sale {
+    font-size: 11.5px !important;
+    font-weight: 500 !important;
+    color: #181A19 !important;
+  }
+
+  .product-card .price .price-item--compare-at {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: #9CA3AF !important;
+    text-decoration: line-through !important;
+    margin-left: 4px !important;
+  }
+
+  /* Completely remove and hide all bottom buttons, forms, and steppers */
+  .product-card .buy-buttons,
+  .product-card [data-block-type="buy-buttons"],
+  .product-card .quick-add,
+  .product-card quick-add-component,
+  .product-card product-form-component,
+  .product-card .quantity,
+  .product-card quantity-selector-component,
+  .product-card .samyak-quick-shop-btn,
+  .product-card .shopify-payment-button,
+  .product-card .add-to-cart-button,
+  .product-card button[name="add"],
+  .product-card .product-card__buttons {
+    display: none !important;
+  }
+
+  .product-grid__card.product-grid__card {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: var(--product-card-gap);
+    align-items: var(--product-card-alignment);
+    text-decoration: none;
+    color: var(--color, var(--color-foreground));
+    padding-block: var(--padding-block-start) var(--padding-block-end);
+    padding-inline: var(--padding-inline-start) var(--padding-inline-end);
+    overflow: hidden;
+  }
+
+  .product-grid__card swatches-variant-picker-component overflow-list::part(list) {
+    flex-wrap: wrap;
+  }
+
+  /*
+    Product cards are narrow, so group content stacks on mobile. A group that
+    turns "vertical on mobile" off renders without .mobile-column and keeps the
+    horizontal direction it was given.
+  */
+  .product-grid__card .group-block > :is(.mobile-column, :not(.layout-panel-flex--row)) {
+    @media screen and (max-width: 749px) {
+      flex-direction: column;
+    }
+  }
+
+  /* Collection and product list cards have equal heights */
+  :is(.product-grid__item, .resource-list__item) .product-card {
+    display: grid;
+    height: 100%;
+  }
+
+  /* Product card title truncation - applied on mobile regardless of view */
+  @media screen and (max-width: 749px) {
+    :is(.product-card, .product-grid__card) :is(h4, .h4) {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 3;
+    }
+  }
+
+  .product-card__placeholder-image svg {
+    height: 100%;
+  }
+
+  .product-card__content slideshow-component {
+    --cursor: pointer;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-card slideshow-arrows .slideshow-control {
+      display: none;
+    }
+  }
+{% endstylesheet %}

@@ -28,6 +28,11 @@
           --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
         }
 
+      {% when 'bento' %}
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']) {
+          --product-grid-columns-desktop: repeat(4, 1fr);
+        }
+
 
       {% when 'organic' %}
         {% assign large_span = 2 %}
@@ -124,7 +129,7 @@
         <h4 class="main-collection-grid__title">{{ title }}</h4>
       {% endif %}
       <ul
-        class="product-grid product-grid--{{ section.id }} product-grid--{{ section.settings.layout_type }} {% if section.settings.mobile_product_card_size == 'large' %} product-grid-mobile--large{% endif %}"
+        class="product-grid product-grid--{{ section.id }} product-grid--{{ section.settings.layout_type }} product-grid--bento {% if section.settings.mobile_product_card_size == 'large' %} product-grid-mobile--large{% endif %}"
         data-testid="product-grid"
         product-grid-view="default"
         ref="grid"
@@ -219,6 +224,71 @@
 
   .product-grid__item {
     border: var(--product-card-border-width) solid rgb(var(--color-border-rgb) / var(--product-card-border-opacity));
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ==========================================================================
+     STANDARD CONSISTENT RESPONSIVE PRODUCT GRID (TASK 2)
+     All product cards have identical structure, dimensions, and layout
+     ========================================================================== */
+
+  /* Desktop (1024px+) */
+  @media screen and (min-width: 1024px) {
+    .product-grid,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) {
+      display: grid !important;
+      grid-template-columns: repeat(var(--product-grid-columns-count, 4), minmax(0, 1fr)) !important;
+      gap: 24px 16px !important;
+    }
+
+    /* Uniform standard grid item: 1 col, 1 row */
+    .product-grid .product-grid__item,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) .product-grid__item {
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+    }
+  }
+
+  /* When vertical filter sidebar is active on desktop, adjust to clean 3 columns */
+  @media screen and (min-width: 1024px) {
+    .collection-wrapper:has(.facets--vertical) .product-grid,
+    .collection-wrapper:has(.facets--vertical) .product-grid-container .product-grid:not([product-grid-view='zoom-out']) {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* Tablet Responsive (768px - 1023px): Clean uniform 2-column grid */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .product-grid,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 20px 16px !important;
+    }
+
+    .product-grid .product-grid__item,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) .product-grid__item {
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+    }
+  }
+
+  /* Mobile Responsive (< 768px): Clean uniform 2-column grid */
+  @media screen and (max-width: 767px) {
+    .product-grid,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 16px 12px !important;
+    }
+
+    .product-grid .product-grid__item,
+    .product-grid-container .product-grid:not([product-grid-view='zoom-out']) .product-grid__item {
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+    }
   }
 
   [product-grid-view='default'] .product-grid__item {

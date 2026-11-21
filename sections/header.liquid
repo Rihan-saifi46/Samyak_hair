@@ -1,11 +1,7 @@
 
 
 {% liquid
-  assign order = 'logo,menu,localization,search,drawer_search,actions'
-
-  if shop.customer_accounts_enabled
-    assign order = 'drawer_search,logo,menu,localization,search,actions'
-  endif
+  assign order = 'logo,menu,localization,search,actions'
 
   assign rows = 'top,bottom' | split: ','
   assign search_style = 'none'
@@ -109,48 +105,12 @@
     assign search_class = 'search-action--hidden-on-drawer'
   endif
 
-  # Handle localization positioning
-  if section.settings.localization_position == 'left'
-    if section.settings.search_position == 'left'
-      if shop.customer_accounts_enabled
-        assign order = 'drawer_search,logo,search,localization,menu,actions'
-      else
-        assign order = 'logo,search,localization,menu,drawer_search,actions'
-      endif
-    else
-      if shop.customer_accounts_enabled
-        assign order = 'drawer_search,logo,localization,menu,search,actions'
-      else
-        assign order = 'logo,localization,menu,search,drawer_search,actions'
-      endif
-    endif
-  else
-    if section.settings.search_position == 'left'
-      if shop.customer_accounts_enabled
-        assign order = 'drawer_search,logo,search,menu,localization,actions'
-      else
-        assign order = 'logo,search,menu,localization,drawer_search,actions'
-      endif
-    endif
-  endif
+  assign order = 'logo,menu,localization,search,actions'
   capture search
-    render 'search', style: search_style, class: search_class, display_style: section.settings.actions_display_style
+    render 'search', class: search_class, display_style: section.settings.actions_display_style
   endcapture
 
-  # Skip drawer search under specific conditions:
-  # Always render if search_row is bottom
-  # Don't render when shop.customer_accounts_enabled is false and search_position is left and search_style is not none
-  assign skip_drawer_search = false
-  if shop.customer_accounts_enabled == false and section.settings.search_position == 'left' and search_style != 'none'
-    assign skip_drawer_search = true
-  endif
-
-  if section.settings.search_row == 'bottom' or search_style != 'none' and skip_drawer_search == false
-    # Mobile search duplicate for when search is not in the right order for mobile layout
-    capture drawer_search
-      render 'search', class: 'search-action--hidden-on-menu', style: search_style, display_style: section.settings.actions_display_style
-    endcapture
-  endif
+  assign drawer_search = ''
 
   assign show_language = section.settings.show_language
   if localization.available_languages.size <= 1
@@ -1261,30 +1221,6 @@
   "settings": [
     {
       "type": "header",
-      "content": "t:content.logo"
-    },
-    {
-      "type": "select",
-      "id": "logo_position",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.direction_start"
-        },
-        {
-          "value": "center",
-          "label": "t:options.direction_center"
-        },
-        {
-          "value": "right",
-          "label": "t:options.direction_end"
-        }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "header",
       "content": "t:content.menu"
     },
     {
@@ -1357,11 +1293,15 @@
           "label": "t:options.direction_start"
         },
         {
+          "value": "center",
+          "label": "t:options.direction_center"
+        },
+        {
           "value": "right",
           "label": "t:options.direction_end"
         }
       ],
-      "default": "right",
+      "default": "center",
       "visible_if": "{{ section.settings.show_search }}"
     },
     {
@@ -1762,13 +1702,6 @@
       "default": false
     },
     {
-      "type": "checkbox",
-      "id": "home_inverse_logo",
-      "label": "t:settings.inverse_logo",
-      "default": false,
-      "visible_if": "{{ section.settings.enable_transparent_header_home }}"
-    },
-    {
       "type": "color",
       "id": "text_color_transparent_home",
       "label": "t:settings.text_color_transparent",
@@ -1786,13 +1719,6 @@
       "default": false
     },
     {
-      "type": "checkbox",
-      "id": "product_inverse_logo",
-      "label": "t:settings.inverse_logo",
-      "default": false,
-      "visible_if": "{{ section.settings.enable_transparent_header_product }}"
-    },
-    {
       "type": "color",
       "id": "text_color_transparent_product",
       "label": "t:settings.text_color_transparent",
@@ -1808,13 +1734,6 @@
       "id": "enable_transparent_header_collection",
       "label": "t:settings.transparent_background",
       "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "collection_inverse_logo",
-      "label": "t:settings.inverse_logo",
-      "default": false,
-      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
     },
     {
       "type": "color",

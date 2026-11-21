@@ -1,0 +1,190 @@
+{% doc %}
+  Renders the "People Also Bought" recommendation section on Best Seller and New Arrival collection pages.
+  Follows the exact card styling, responsive grid, and brand aesthetic of Samyak Hair Accessories.
+{% enddoc %}
+
+{% liquid
+  assign is_target = false
+  assign handle_lower = collection.handle | downcase
+  assign title_lower = collection.title | downcase
+  if handle_lower contains 'best-seller' or handle_lower contains 'best_seller' or handle_lower contains 'bestseller' or handle_lower contains 'new-arrival' or handle_lower contains 'new_arrival' or handle_lower contains 'newarrival' or title_lower contains 'best seller' or title_lower contains 'new arrival'
+    assign is_target = true
+  endif
+  if section.settings.always_show
+    assign is_target = true
+  endif
+%}
+
+{% if is_target %}
+  {% render 'product-card-styles' %}
+  {% render 'price-styles' %}
+
+  <div class="samyak-pab-section" aria-labelledby="people-also-bought-title">
+    <div class="samyak-pab-container">
+      <div class="samyak-section-golden-heading" style="margin-bottom: 28px;">
+        <span class="samyak-golden-line"></span>
+        <h2 class="samyak-golden-title" id="people-also-bought-title">People Also Bought</h2>
+        <span class="samyak-golden-line"></span>
+      </div>
+
+      {% liquid
+        assign current_ids = collection.products | map: 'id'
+        assign count = 0
+        assign limit = section.settings.products_to_show | default: 4
+      %}
+
+      <ul class="samyak-pab-grid" role="list">
+        {% for prod in collections['all'].products %}
+          {% unless current_ids contains prod.id %}
+            {% if prod.available %}
+              <li class="samyak-pab-item">
+                <article class="product-card">
+                  <div class="product-card__content product-grid__card">
+                    <div class="card-gallery">
+                      <a href="{{ prod.url }}" class="product-media-container" aria-label="{{ prod.title | escape }}">
+                        {% if prod.featured_media %}
+                          <img
+                            src="{{ prod.featured_media | image_url: width: 600 }}"
+                            alt="{{ prod.featured_media.alt | default: prod.title | escape }}"
+                            loading="lazy"
+                            width="{{ prod.featured_media.width }}"
+                            height="{{ prod.featured_media.height }}"
+                            class="product-media__image"
+                          >
+                        {% else %}
+                          {{ 'product-1' | placeholder_svg_tag: 'product-media__image' }}
+                        {% endif %}
+                      </a>
+                    </div>
+                    <div class="product-info-wrap">
+                      <h3 class="product-title">
+                        <a href="{{ prod.url }}">{{ prod.title | escape }}</a>
+                      </h3>
+                      <div class="price">
+                        <span class="price-item price-item--regular">
+                          {{ prod.price | money }}
+                        </span>
+                        {% if prod.compare_at_price > prod.price %}
+                          <s class="price-item price-item--compare-at">
+                            {{ prod.compare_at_price | money }}
+                          </s>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </li>
+              {% assign count = count | plus: 1 %}
+              {% if count >= limit %}
+                {% break %}
+              {% endif %}
+            {% endif %}
+          {% endunless %}
+        {% endfor %}
+
+        {% comment %} Fallback: if all products were already in the collection, take first available products {% endcomment %}
+        {% if count == 0 %}
+          {% for prod in collections['all'].products limit: limit %}
+            <li class="samyak-pab-item">
+              <article class="product-card">
+                <div class="product-card__content product-grid__card">
+                  <div class="card-gallery">
+                    <a href="{{ prod.url }}" class="product-media-container" aria-label="{{ prod.title | escape }}">
+                      {% if prod.featured_media %}
+                        <img
+                          src="{{ prod.featured_media | image_url: width: 600 }}"
+                          alt="{{ prod.featured_media.alt | default: prod.title | escape }}"
+                          loading="lazy"
+                          width="{{ prod.featured_media.width }}"
+                          height="{{ prod.featured_media.height }}"
+                          class="product-media__image"
+                        >
+                      {% else %}
+                        {{ 'product-1' | placeholder_svg_tag: 'product-media__image' }}
+                      {% endif %}
+                    </a>
+                  </div>
+                  <div class="product-info-wrap">
+                    <h3 class="product-title">
+                      <a href="{{ prod.url }}">{{ prod.title | escape }}</a>
+                    </h3>
+                    <div class="price">
+                      <span class="price-item price-item--regular">
+                        {{ prod.price | money }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <style>
+    .samyak-pab-section {
+      width: 100%;
+      padding-block: 48px 36px;
+      background: #FFFFFF;
+      border-top: 1px solid #ECE8E1;
+    }
+    .samyak-pab-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-inline: clamp(16px, 4vw, 32px);
+    }
+    .samyak-pab-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px 16px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    @media (max-width: 1023px) {
+      .samyak-pab-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 16px;
+      }
+    }
+    @media (max-width: 767px) {
+      .samyak-pab-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px 12px;
+      }
+    }
+    .samyak-pab-item {
+      height: 100%;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "People Also Bought",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "always_show",
+      "label": "Show on all collections",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "People Also Bought"
+    }
+  ]
+}
+{% endschema %}

@@ -8,7 +8,43 @@
 {% render 'text-component-shimmer-styles' %}
 {% render 'cart-typography-styles' %}
 
+{%- liquid
+  assign wholesale_min_threshold = 200000
+  assign cart_total = cart.total_price
+  if cart_total < wholesale_min_threshold
+    assign threshold_diff = wholesale_min_threshold | minus: cart_total
+    assign progress_percent = cart_total | times: 100 | divided_by: wholesale_min_threshold
+    assign is_wholesale_met = false
+  else
+    assign threshold_diff = 0
+    assign progress_percent = 100
+    assign is_wholesale_met = true
+  endif
+-%}
+
 <div class="cart-totals">
+  {% unless cart.empty? %}
+    <div class="cart-wholesale-bar" data-threshold="{{ wholesale_min_threshold }}" data-current="{{ cart_total }}">
+      <div class="cart-wholesale-bar__header">
+        {% if is_wholesale_met %}
+          <span class="cart-wholesale-bar__status cart-wholesale-bar__status--met">
+            <svg class="cart-wholesale-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <strong>Wholesale Minimum Order (₹2,000) reached!</strong>
+          </span>
+        {% else %}
+          <span class="cart-wholesale-bar__status">
+            Wholesale MOQ: Add <strong>{{ threshold_diff | money }}</strong> more to reach <strong>₹2,000</strong>
+          </span>
+        {% endif %}
+      </div>
+      <div class="cart-wholesale-bar__track" role="progressbar" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="Wholesale minimum order progress">
+        <div class="cart-wholesale-bar__progress" style="width: {{ progress_percent }}%;"></div>
+      </div>
+      {% unless is_wholesale_met %}
+        <p class="cart-wholesale-bar__hint">Minimum order value of ₹2,000 required for wholesale dispatch & GST billing.</p>
+      {% endunless %}
+    </div>
+  {% endunless %}
   {% # We need to keep this node in place to allow morphing to work properly # %}
   <div class="cart-totals__original-container cart-primary-typography">
     {%- if cart.cart_level_discount_applications.size > 0 -%}
@@ -253,20 +289,35 @@
 </div>
 
 <div class="cart__ctas">
-  <button
-    type="submit"
-    id="checkout"
-    class="cart__checkout-button button"
-    name="checkout"
-    {% if cart == empty %}
-      disabled
-    {% endif %}
-    form="cart-form"
-  >
-    <span class="button-text">
-      {{ 'content.checkout' | t }}
-    </span>
-  </button>
+  {% unless is_wholesale_met or cart == empty %}
+    <div class="cart-wholesale-warning" role="alert">
+      <span>Wholesale MOQ is <strong>₹2,000</strong>. Add <strong>{{ threshold_diff | money }}</strong> more to checkout.</span>
+    </div>
+  {% endunless %}
+
+  <div class="cart__ctas-dual">
+    <a
+      href="{{ routes.cart_url }}"
+      class="button cart-drawer__view-cart cart__view-cart-button"
+    >
+      VIEW CART
+    </a>
+
+    <button
+      type="submit"
+      id="checkout"
+      class="cart__checkout-button button"
+      name="checkout"
+      {% if cart == empty or is_wholesale_met == false %}
+        disabled
+      {% endif %}
+      form="cart-form"
+    >
+      <span class="button-text">
+        {{ 'content.checkout' | t }}
+      </span>
+    </button>
+  </div>
 
   {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
     <div
@@ -609,5 +660,82 @@
     .cart-summary--extend {
       height: 100%;
     }
+  }
+
+  .cart-wholesale-bar {
+    width: 100%;
+    margin-block-end: var(--margin-md);
+    padding: var(--padding-sm) var(--padding-md);
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+    border: 1px solid rgb(var(--color-foreground-rgb) / 0.08);
+    border-radius: var(--card-corner-radius, 8px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+  }
+
+  .cart-wholesale-bar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size--xs);
+    line-height: 1.3;
+  }
+
+  .cart-wholesale-bar__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-foreground);
+  }
+
+  .cart-wholesale-bar__status--met {
+    color: #107C41;
+    font-weight: 600;
+  }
+
+  .cart-wholesale-icon {
+    flex-shrink: 0;
+  }
+
+  .cart-wholesale-bar__track {
+    width: 100%;
+    height: 6px;
+    background: rgb(var(--color-foreground-rgb) / 0.12);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .cart-wholesale-bar__progress {
+    height: 100%;
+    background: linear-gradient(90deg, #113B32, #1D5C4F);
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+  }
+
+  .cart-wholesale-bar__hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-foreground-subdued);
+    line-height: 1.25;
+  }
+
+  .cart-wholesale-warning {
+    width: 100%;
+    padding: 8px 12px;
+    margin-block-end: var(--margin-xs);
+    background: #FFF5F5;
+    border: 1px solid #FED7D7;
+    border-radius: var(--card-corner-radius, 8px);
+    font-size: var(--font-size--xs);
+    color: #C53030;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .cart__checkout-button[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed !important;
+    pointer-events: none;
   }
 {% endstylesheet %}

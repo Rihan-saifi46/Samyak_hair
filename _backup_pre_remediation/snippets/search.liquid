@@ -1,0 +1,152 @@
+{%- doc -%}
+  Center Zone Component for Samyak Hair Accessories Header.
+  Stacks 2 rows:
+  - Top Row: Centered rectangular search input (width: 440px, height: 36px, transparent bg, border: 1px solid #C8C3B8, radius: 3px, placeholder: "Search", outline search icon on right).
+  - Bottom Row: Uppercase navigation links (gap: 22px, font-size: 11px, weight: 500, letter-spacing: 0.08em, HOME active with #8C734B and 1.5px solid #9E825C bottom underline).
+{%- enddoc -%}
+
+<div class="samyak-hdr-center-zone">
+  <!-- Top Row: Rectangular Search Input -->
+  <form action="{{ routes.search_url }}" method="get" role="search" class="samyak-hdr-search-form">
+    <input
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="Search"
+      class="samyak-hdr-search-input"
+      aria-label="{{ 'content.search_input_label' | t }}"
+      autocomplete="off"
+    >
+    <input type="hidden" name="type" value="product">
+    <input type="hidden" name="options[prefix]" value="last">
+
+    <button
+      type="submit"
+      class="samyak-hdr-search-btn"
+      aria-label="{{ 'content.search' | t }}"
+      title="Search"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5C5A54" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </form>
+
+  <!-- Bottom Row: Navigation Links -->
+  <nav class="samyak-hdr-nav-links" aria-label="Main Navigation">
+    <a href="{{ routes.root_url }}" class="samyak-nav-item is-active">HOME</a>
+    <a href="/collections/new-arrivals" class="samyak-nav-item">NEW ARRIVALS</a>
+    <a href="{{ routes.all_products_collection_url }}" class="samyak-nav-item">SHOP ALL</a>
+    <a href="/collections" class="samyak-nav-item">SHOP BY CATEGORY</a>
+    <a href="/collections/korean-hair-claws" class="samyak-nav-item">KOREAN COLLECTION</a>
+    <a href="/pages/wholesale-bulk" class="samyak-nav-item">BULK &amp; RESELLERS</a>
+    <a href="/pages/reviews" class="samyak-nav-item">REVIEWS</a>
+  </nav>
+</div>
+
+<style>
+  .samyak-hdr-center-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Search Box */
+  .samyak-hdr-search-form {
+    display: flex;
+    align-items: center;
+    width: 440px;
+    max-width: 100%;
+    height: 36px;
+    background: transparent;
+    border: 1px solid #C8C3B8;
+    border-radius: 3px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .samyak-hdr-search-form:focus-within {
+    border-color: #8C734B;
+    box-shadow: 0 0 0 1px #8C734B;
+  }
+
+  .samyak-hdr-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 12px;
+    color: #181A19;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .samyak-hdr-search-input::placeholder {
+    color: #7A7770;
+    font-size: 12px;
+  }
+
+  .samyak-hdr-search-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Nav Links */
+  .samyak-hdr-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 12px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .samyak-nav-item {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2B2D2C;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 3px;
+    transition: color 0.15s ease;
+  }
+
+  .samyak-nav-item:hover {
+    color: #8C734B;
+  }
+
+  .samyak-nav-item.is-active {
+    color: #8C734B;
+    border-bottom: 1.5px solid #9E825C;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .samyak-hdr-search-form {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .samyak-hdr-nav-links {
+      display: none;
+    }
+  }
+</style>

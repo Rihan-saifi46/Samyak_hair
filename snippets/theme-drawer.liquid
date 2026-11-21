@@ -58,13 +58,10 @@
       drawer.dispatchEvent(new CustomEvent('theme-drawer:restoring'));
     }
 
-    // Apply squeeze immediately, bypassing the margin transition.
-    // Only squeeze if at least one drawer was actually restored — saved
-    // drawer IDs may not exist on every page (e.g. cart-drawer on /cart).
+    // Squeeze disabled: Keep main page container completely stable
     var pageWrapper = document.querySelector('.page-wrapper');
-    if (pageWrapper && dialogs.length > 0) {
-      pageWrapper.style.transition = 'none';
-      pageWrapper.classList.add('page-wrapper--drawer-open');
+    if (pageWrapper) {
+      pageWrapper.classList.remove('page-wrapper--drawer-open');
     }
 
     // Re-enable transitions after one paint so the instant state is rendered first.
@@ -85,24 +82,14 @@
   const pageWrapper = document.querySelector('.page-wrapper');
   const squeezeQuery = window.matchMedia('(min-width: 990px)');
 
-  // ── Squeeze coordination ──
-  // Listens to all drawers. Only squeezes on wide viewports.
+  // ── Squeeze coordination (Disabled for clean overlay drawer behavior) ──
   document.addEventListener('theme-drawer:open', () => {
-    if (squeezeQuery.matches) {
-      pageWrapper?.classList.add('page-wrapper--drawer-open');
-    }
+    // Squeeze disabled so drawer floats cleanly on top without layout shift
+    pageWrapper?.classList.remove('page-wrapper--drawer-open');
   });
 
   document.addEventListener('theme-drawer:close', () => {
-    const openDrawer = document.querySelector('theme-drawer[open]');
-    if (!openDrawer) {
-      pageWrapper?.classList.remove('page-wrapper--drawer-open');
-    }
-  });
-
-  squeezeQuery.addEventListener('change', () => {
-    const openDrawer = document.querySelector('theme-drawer[open]');
-    pageWrapper?.classList.toggle('page-wrapper--drawer-open', Boolean(openDrawer) && squeezeQuery.matches);
+    pageWrapper?.classList.remove('page-wrapper--drawer-open');
   });
 
   // ── State persistence ──

@@ -4,6 +4,38 @@
 
 {% capture children %}
   {% unless product == blank %}
+    <!-- Top-Right Wishlist Button -->
+    <button
+      type="button"
+      class="samyak-wishlist-btn"
+      data-product-id="{{ product.id }}"
+      data-product-handle="{{ product.handle }}"
+      data-product-title="{{ product.title | escape }}"
+      data-product-price="₹{{ product.price | money_without_currency }}"
+      data-product-image="{{ product.featured_image | image_url: width: 400 }}"
+      data-product-url="{{ product.url }}"
+      aria-label="Save {{ product.title | escape }} to Wishlist"
+      title="Save to Wishlist"
+    >
+      <svg class="samyak-heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    </button>
+
+    <!-- Bottom-Left Floating QUICK SHOP Pill Button -->
+    <button
+      type="button"
+      class="samyak-quick-shop-pill-btn"
+      data-quick-shop-trigger
+      data-product-id="{{ product.id }}"
+      data-product-handle="{{ product.handle }}"
+      data-product-image="{{ product.featured_image | image_url: width: 800 }}"
+      data-product-title="{{ product.title | escape }}"
+      aria-label="Quick Shop {{ product.title | escape }}"
+    >
+      QUICK SHOP
+    </button>
+
     {%- if product.available == false or product.compare_at_price > product.price -%}
       <div
         class="product-badges product-badges--{{ settings.badge_position }}"
@@ -26,22 +58,10 @@
         </div>
       </div>
     {%- endif -%}
-    {% if product.available and settings.quick_add or settings.mobile_quick_add %}
-      {% render 'quick-add', product: product, section_id: section.id %}
-    {% endif %}
   {% endunless %}
 {% endcapture %}
 
 {% render 'card-gallery', children: children %}
-
-{% # Title for the zoomed out grid view %}
-<h3 class="product-grid-view-zoom-out--details">
-  {%- if product == blank -%}
-    {{- 'content.product_card_placeholder' | t -}}
-  {%- else -%}
-    {{- product.title -}}
-  {%- endif -%}
-</h3>
 
 {% render 'product-card-gallery-zoom-details-styles' %}
 {% render 'product-badges-styles' %}

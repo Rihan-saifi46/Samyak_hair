@@ -72,8 +72,8 @@ html[scroll-lock] {
 }
 
 .page-wrapper--drawer-open {
-  margin-inline-end: var(--theme-drawer-width, var(--sidebar-width));
-  transition-timing-function: var(--animation-timing-fade-in);
+  margin-inline-end: 0 !important;
+  margin-right: 0 !important;
 }
 
 img,

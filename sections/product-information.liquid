@@ -4,22 +4,6 @@
   {{ closest.product | structured_data }}
 </script>
 
-{% capture media_gallery %}
-  {%- content_for 'block',
-    type: '_product-media-gallery',
-    id: 'media-gallery',
-    closest.product: closest.product
-  -%}
-{% endcapture %}
-
-{% capture product_details %}
-  {% content_for 'block',
-    type: '_product-details',
-    id: 'product-details',
-    closest.product: closest.product
-  %}
-{% endcapture %}
-
 {% capture additional_blocks %}
   {% content_for 'blocks' %}
 {% endcapture %}
@@ -174,14 +158,28 @@
   {% render 'add-to-cart-button-styles' %}
 {% endif %}
 
-{% render 'product-information-content',
-  product: closest.product,
-  section_id: section.id,
-  settings: section.settings,
-  media_gallery: media_gallery,
-  product_details: product_details,
-  additional_blocks: additional_blocks
-%}
+{% if section.settings.enable_custom_wholesale_pdp == false %}
+  <div class="product-information">
+    {%- content_for 'block',
+      type: '_product-media-gallery',
+      id: 'media-gallery',
+      closest.product: closest.product
+    -%}
+    {% content_for 'block',
+      type: '_product-details',
+      id: 'product-details',
+      closest.product: closest.product
+    %}
+    {{ additional_blocks }}
+  </div>
+{% else %}
+  {% render 'wholesale-pdp',
+    product: closest.product,
+    section_id: section.id,
+    settings: section.settings,
+    additional_blocks: additional_blocks
+  %}
+{% endif %}
 
 {% stylesheet %}
   .sticky-add-to-cart__bar {
@@ -387,6 +385,12 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_custom_wholesale_pdp",
+      "label": "Enable wholesale editorial PDP",
+      "default": true
+    },
     {
       "type": "header",
       "content": "t:content.layout"

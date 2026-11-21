@@ -1,0 +1,206 @@
+{%- doc -%}
+  Renders the customer reviews section for the product details page.
+  Follows Shopify review app standards and provides an authentic empty state
+  when genuine customer review data is not yet present.
+{%- enddoc -%}
+
+<div
+  class="section samyak-reviews-section-wrapper"
+  style="
+    {% if section.settings.background_color != blank %}
+      background-color: {{ section.settings.background_color }};
+    {% endif %}
+    padding-block-start: {{ section.settings.padding_block_start }}px;
+    padding-block-end: {{ section.settings.padding_block_end }}px;
+  "
+>
+  {% render 'homepage-reviews' %}
+
+  {% liquid
+    assign product_obj = closest.product | default: product
+  %}
+  <!-- Standard Shopify Product Review App Hook if app is active -->
+  <div id="shopify-product-reviews" data-id="{{ product_obj.id }}">
+    {{ product_obj.metafields.spr.reviews }}
+  </div>
+
+  <!-- Theme Editor App Blocks Passthrough -->
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .samyak-reviews-section-wrapper {
+    background: #FAF8F5;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .samyak-reviews-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .samyak-reviews-section-wrapper .samyak-section-golden-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    margin-bottom: 28px !important;
+  }
+
+  .samyak-reviews-section-wrapper .samyak-golden-line {
+    flex: 1 1 0% !important;
+    max-width: 180px !important;
+    height: 1px !important;
+    background: #C5A280 !important;
+    opacity: 0.8 !important;
+    display: inline-block !important;
+  }
+
+  .samyak-reviews-section-wrapper .samyak-golden-title {
+    font-family: var(--font-serif, 'Cormorant Garamond', 'Playfair Display', serif) !important;
+    font-size: clamp(22px, 3vw, 28px) !important;
+    font-weight: 500 !important;
+    color: #113B32 !important;
+    margin: 0 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .samyak-genuine-reviews-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px;
+    background: #FFFFFF;
+    border: 1px solid #ECE8E1;
+    border-radius: 8px;
+  }
+
+  .samyak-genuine-rating-number {
+    font-size: 38px;
+    font-weight: 700;
+    color: #113B32;
+    line-height: 1;
+  }
+
+  .samyak-genuine-stars .samyak-star {
+    font-size: 22px;
+    color: #D6D1C7;
+  }
+
+  .samyak-genuine-stars .samyak-star.is-active {
+    color: #FFB800 !important;
+  }
+
+  .samyak-genuine-count {
+    font-size: 13.5px;
+    color: #5C615E;
+  }
+
+  .samyak-reviews-empty-box {
+    background: #FFFFFF;
+    border: 1px solid #ECE8E1;
+    border-radius: 8px;
+    padding: 36px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .samyak-empty-stars-row .samyak-star {
+    font-size: 24px;
+    color: #D6D1C7;
+    margin: 0 2px;
+  }
+
+  .samyak-empty-reviews-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #113B32;
+    margin: 0;
+  }
+
+  .samyak-empty-reviews-text {
+    font-size: 13.5px;
+    color: #5C615E;
+    margin: 0 0 8px 0;
+  }
+
+  .samyak-write-review-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    background: #113B32;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .samyak-write-review-btn:hover {
+    background: #0C2B24;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    .samyak-reviews-section-wrapper .samyak-golden-line {
+      max-width: 50px !important;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FAF8F5"
+    },
+    {
+      "type": "range",
+      "id": "padding_block_start",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_block_end",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews"
+    }
+  ]
+}
+{% endschema %}

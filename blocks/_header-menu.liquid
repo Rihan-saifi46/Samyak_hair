@@ -66,8 +66,6 @@
   {% else %}
     {% liquid
       assign block_settings = block.settings
-      assign menu_content_type = block_settings.menu_style | default: 'text'
-      assign image_border_radius = block_settings.image_border_radius
 
       render 'contrast-override', background_color: block_settings.background_color, text_color: block_settings.text_color, section_id: block.id
 
@@ -84,136 +82,151 @@
       if parent_background_color.rgb == current_background_color.rgb
         assign background_color_classes = background_color_classes | append: ' background-matches-parent'
       endif
-
-      if block_settings.menu_style == 'featured_collections'
-        assign ratio = block_settings.featured_collections_aspect_ratio
-      elsif block_settings.menu_style == 'featured_products'
-        assign ratio = block_settings.featured_products_aspect_ratio
-      endif
     %}
-
-    {% capture children %}
-      {% for link in block_settings.menu.links %}
-        <li
-          class="menu-list__list-item"
-          on:blur="/deactivate"
-          on:pointerenter="/activate"
-          on:pointerleave="/deactivate"
-        >
-          {%- if link.links != blank -%}
-            <span class="menu-list__trigger">
-          {%- endif -%}
-          <a
-            href="{{ link.url }}"
-            data-skip-node-update="true"
-            class="menu-list__link{% if link.active %} menu-list__link--active{% endif %}"
-            {% if link.current %}
-              aria-current="page"
-            {% endif %}
-            ref="menuitem"
-          >
-            <span class="menu-list__link-title">{{- link.title -}}</span>
-          </a>
-          {%- if link.links != blank -%}
-            <button
-              type="button"
-              class="menu-list__disclosure button-unstyled"
-              aria-controls="submenu-{{ forloop.index }}"
-              aria-expanded="false"
-              ref="disclosure[]"
-              data-skip-node-update
-              on:click="/toggle"
-            >
-              <span class="visually-hidden">{{ 'accessibility.show_submenu' | t: title: link.title }}</span>
-              <svg
-                class="menu-list__disclosure-icon"
-                aria-hidden="true"
-                focusable="false"
-                viewBox="0 0 10 6"
-              >
-                {%- render 'icon', icon: 'caret' -%}
-              </svg>
-            </button>
-            </span>
-            {%- comment -%}
-              Collapsed by default via `inert`: keeps the submenu out of the tab order
-              and the accessibility tree until it is opened. Toggled in header-menu.js.
-            {%- endcomment -%}
-            <div class="menu-list__submenu{{ background_color_classes }}" ref="submenu[]" data-skip-node-update inert>
-              <div
-                id="submenu-{{ forloop.index }}"
-                class="menu-list__submenu-inner"
-                style="{% render 'submenu-font-styles', settings: block_settings %}"
-              >
-                {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
-                <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
-                  <div
-                    class="mega-menu__grid"
-                    data-menu-grid-id="{{ list_id }}"
-                  >
-                    {% render 'mega-menu-list',
-                      parent_link: link,
-                      id: list_id,
-                      section: section,
-                      grid_columns_count: 6,
-                      grid_columns_count_tablet: 4,
-                      grid_columns_count_collection_images: 8,
-                      menu_content_type: menu_content_type,
-                      content_aspect_ratio: ratio,
-                      image_border_radius: image_border_radius
-                    %}
-                  </div>
-                </div>
-              </div>
-            </div>
-          {%- endif -%}
-        </li>
-      {% endfor %}
-      <li
-        class="menu-list__list-item"
-        slot="more"
-        on:blur="/deactivate"
-        on:pointerenter="/activate"
-        on:pointerleave="/deactivate"
-      >
-        <button
-          class="menu-list__link button-unstyled"
-          aria-haspopup="true"
-          aria-expanded="false"
-          ref="menuitem"
-          on:click="/toggle"
-          data-testid="header-menu-more-button"
-          data-skip-node-update
-        >
-          <span class="menu-list__link-title">{{ 'actions.more' | t }}</span>
-        </button>
-      </li>
-    {% endcapture %}
 
     <header-menu
       ref="headerMenu"
-      class="header-menu"
+      class="header-menu samyak-navbar-tier"
       {{ block.shopify_attributes }}
       data-hydration-key="header-menu"
       data-skip-node-update
     >
-      <div class="header-menu__inner">
-        <nav
-          class="menu-list"
-          aria-label="{{ 'accessibility.header_navigation_label' | t }}"
-          style="{% render 'menu-font-styles', settings: block_settings, menu_type: 'mega_menu' %}"
-        >
-          {% assign class = 'overflow-menu' | append: background_color_classes %}
-          {% render 'overflow-list',
-            class: class,
-            ref: 'overflowMenu',
-            children: children,
-            minimum-items: 2,
-            data-testid: 'header-menu-overflow-list',
-            attributes: 'data-skip-node-update'
-          %}
-        </nav>
-      </div>
+      <nav class="samyak-hnav-nav" aria-label="Main Store Navigation">
+        <ul class="samyak-hnav-ul">
+          <!-- 1. Home -->
+          <li class="samyak-hnav-li">
+            <a href="{{ routes.root_url }}" class="samyak-hnav-a{% if request.path == routes.root_url %} is-active{% endif %}">Home</a>
+          </li>
+
+          <!-- 2. Featured Collection ▾ (Non-clickable dropdown trigger with Best Seller & New Arrival) -->
+          <li class="samyak-hnav-li samyak-has-drop samyak-featured-dropdown">
+            <a
+              href="javascript:void(0)"
+              role="button"
+              class="samyak-hnav-a samyak-dropdown-trigger"
+              aria-haspopup="true"
+              aria-expanded="false"
+              tabindex="0"
+              onclick="event.preventDefault();"
+              style="cursor: default;"
+              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.parentElement.classList.toggle('is-open');}"
+            >
+              Featured Collection
+            </a>
+            <div class="samyak-nav-drop-single">
+              <ul class="samyak-single-list">
+                <li>
+                  <a href="/collections/best-seller">
+                    <span>Best Seller</span>
+                    <span class="samyak-pill-badge">Popular</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/collections/new-arrival">
+                    <span>New Arrival</span>
+                    <span class="samyak-pill-badge">New</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- 3. Shop All -->
+          <li class="samyak-hnav-li">
+            <a href="{{ routes.all_products_collection_url }}" class="samyak-hnav-a">Shop All</a>
+          </li>
+
+          <!-- 4. Shop by Category ▾ (Non-clickable dropdown trigger) -->
+          <li class="samyak-hnav-li samyak-has-drop">
+            <a
+              href="javascript:void(0)"
+              role="button"
+              class="samyak-hnav-a samyak-dropdown-trigger"
+              aria-haspopup="true"
+              aria-expanded="false"
+              tabindex="0"
+              onclick="event.preventDefault();"
+              style="cursor: default;"
+              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.parentElement.classList.toggle('is-open');}"
+            >
+              Shop by Category
+            </a>
+            <div class="samyak-nav-mega">
+              <div class="samyak-mega-cols">
+                <div class="samyak-mega-col">
+                  <a href="{{ routes.all_products_collection_url }}" class="samyak-mega-head">Claw Clips &amp; Clutchers</a>
+                  <ul class="samyak-mega-list">
+                    <li><a href="{{ routes.all_products_collection_url }}">Korean Metal Hair Claws</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Pastel Matte Clutchers</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Jumbo Volume Claws</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Aesthetic Butterfly Clips</a></li>
+                  </ul>
+                </div>
+                <div class="samyak-mega-col">
+                  <a href="{{ routes.all_products_collection_url }}" class="samyak-mega-head">Scrunchies &amp; Rubbers</a>
+                  <ul class="samyak-mega-list">
+                    <li><a href="{{ routes.all_products_collection_url }}">Blush Satin Scrunchies</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Casual Daily Wear</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">100pc Wholesale Bunches</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Organza &amp; Velvet Scrunchies</a></li>
+                  </ul>
+                </div>
+                <div class="samyak-mega-col">
+                  <a href="{{ routes.all_products_collection_url }}" class="samyak-mega-head">Hair Bands &amp; Headbands</a>
+                  <ul class="samyak-mega-list">
+                    <li><a href="{{ routes.all_products_collection_url }}">Fabric Ruffle Hairbands</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Korean Pearl Headbands</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Padded Velvet Bands</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Stone &amp; Crystal Bands</a></li>
+                  </ul>
+                </div>
+                <div class="samyak-mega-col">
+                  <a href="{{ routes.all_products_collection_url }}" class="samyak-mega-head">Kids &amp; Baby Accessories</a>
+                  <ul class="samyak-mega-list">
+                    <li><a href="{{ routes.all_products_collection_url }}">Cartoon Rubber Bands</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Glitter Bow Hairpins</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Kids Gift Box Sets</a></li>
+                    <li><a href="{{ routes.all_products_collection_url }}">Baby Soft Hair Bands</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- 5. Korean Collection ▾ -->
+          <li class="samyak-hnav-li samyak-has-drop">
+            <a href="{{ routes.all_products_collection_url }}" class="samyak-hnav-a">
+              Korean Collection
+            </a>
+            <div class="samyak-nav-drop-single">
+              <ul class="samyak-single-list">
+                <li><a href="{{ routes.all_products_collection_url }}"><span>Korean Metal Hair Claws</span> <span class="samyak-pill-badge">Trending</span></a></li>
+                <li><a href="{{ routes.all_products_collection_url }}"><span>Pastel Acrylic Barrettes</span> <span class="samyak-pill-badge">Hot</span></a></li>
+                <li><a href="{{ routes.all_products_collection_url }}"><span>Pearl &amp; Crystal Hairpins</span></a></li>
+                <li><a href="{{ routes.all_products_collection_url }}"><span>Minimalist French Clip Sets</span></a></li>
+                <li><a href="{{ routes.all_products_collection_url }}"><span>Matte Geometric Hair Pins</span></a></li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- 6. Bulk & Resellers (Highlight in brand deep green #113B32 with 600 weight) -->
+          <li class="samyak-hnav-li">
+            <a href="https://wa.me/919667844434?text=Hi%20Samyak%20Wholesale%2C%20I%20am%20a%20reseller%2Fretailer%20and%20want%20to%20inquire%20about%20bulk%20rates" class="samyak-hnav-a samyak-b2b-highlight" target="_blank" rel="noopener">
+              Bulk &amp; Resellers
+            </a>
+          </li>
+
+          <!-- 7. FAQs -->
+          <li class="samyak-hnav-li">
+            <a href="/#faq-section" class="samyak-hnav-a">FAQs</a>
+          </li>
+
+          <!-- 8. Reviews -->
+          <li class="samyak-hnav-li">
+            <a href="/#reviews-section" class="samyak-hnav-a">Reviews</a>
+          </li>
+        </ul>
+      </nav>
 
       <script
         src="{{ 'header-menu.js' | asset_url }}"

@@ -1,0 +1,125 @@
+{% doc %}
+  Renders the social and WhatsApp wholesale connect banner for Samyak Hair Accessories wholesale homepage.
+{% enddoc %}
+
+<div class="samyak-connect-banner">
+  <div class="samyak-connect-banner__container">
+    <div class="samyak-connect-grid">
+      <a href="https://www.instagram.com/samyak_hair_accessories/" target="_blank" rel="noopener noreferrer" class="samyak-connect-card samyak-connect-card--ig" aria-label="Follow Samyak Hair Accessories on Instagram">
+        <svg class="samyak-connect-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="8" y="8" width="48" height="48" rx="14" stroke="white" stroke-width="4"/>
+          <circle cx="32" cy="32" r="11" stroke="white" stroke-width="4"/>
+          <circle cx="47" cy="17" r="3" fill="white"/>
+        </svg>
+        <div class="samyak-connect-text">
+          <span class="samyak-connect-eyebrow">DAILY NEW STOCK ARRIVALS</span>
+          <span class="samyak-connect-title">Follow Us on Instagram</span>
+          <span class="samyak-connect-handle">@samyak_hair_accessories</span>
+        </div>
+      </a>
+
+      <a href="https://wa.me/919667844434?text=Hi%20Samyak%20Hair%20Accessories%2C%20please%20send%20your%20latest%20wholesale%20catalog." target="_blank" rel="noopener noreferrer" class="samyak-connect-card samyak-connect-card--wa" aria-label="Chat with Samyak Wholesale on WhatsApp">
+        <svg class="samyak-connect-icon" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.586-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.054-1.928-.485-1.554-.648-2.56-2.222-2.637-2.325-.078-.103-.628-.838-.628-1.599 0-.761.397-1.135.539-1.29.142-.155.312-.193.416-.193.104 0 .208.001.3.006.097.005.228-.037.357.272.13.312.445 1.092.484 1.172.039.08.065.174.013.278-.052.104-.078.169-.156.26-.078.091-.163.203-.233.273-.078.077-.16.162-.069.318.091.156.403.666.865 1.077.595.53 1.098.694 1.254.772.156.078.247.065.338-.039.091-.104.39-.455.494-.611.104-.156.208-.13.35-.078.143.052.91.43 1.066.508.156.078.26.117.299.182.039.065.039.377-.105.782z"/>
+        </svg>
+        <div class="samyak-connect-text">
+          <span class="samyak-connect-eyebrow">DIRECT CATALOG & ORDERS</span>
+          <span class="samyak-connect-title">WhatsApp Wholesale Support</span>
+          <span class="samyak-connect-handle">+91 9667844434</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .samyak-connect-banner {
+    width: 100%;
+    padding-block: 24px 48px;
+    background: #F7F5EE;
+  }
+
+  .samyak-connect-banner__container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+  }
+
+  .samyak-connect-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .samyak-connect-card {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2.5vw, 24px);
+    padding: 24px clamp(20px, 3vw, 32px);
+    border-radius: 14px;
+    color: #ffffff;
+    text-decoration: none;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .samyak-connect-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .samyak-connect-card--ig {
+    background: linear-gradient(110deg, #ffd600 0%, #ff7a00 25%, #f50057 55%, #c13584 75%, #833ab4 100%);
+  }
+
+  .samyak-connect-card--wa {
+    background: linear-gradient(110deg, #128C7E 0%, #25D366 100%);
+  }
+
+  .samyak-connect-icon {
+    display: block;
+    width: clamp(38px, 6vw, 46px);
+    height: clamp(38px, 6vw, 46px);
+    flex: 0 0 clamp(38px, 6vw, 46px);
+  }
+
+  .samyak-connect-text {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .samyak-connect-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 0.9;
+    text-transform: uppercase;
+  }
+
+  .samyak-connect-title {
+    font-size: clamp(16px, 2.2vw, 20px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 2px 0 3px;
+  }
+
+  .samyak-connect-handle {
+    font-size: clamp(13px, 1.8vw, 15px);
+    opacity: 0.95;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .samyak-connect-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .samyak-connect-card {
+      padding: 18px 20px;
+    }
+  }
+</style>

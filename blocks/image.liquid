@@ -41,7 +41,17 @@
 %}
 
 {% capture image %}
-  {%- if block_settings.image -%}
+  {%- if block.id == 'image_D9Urzz' or block_settings.image contains 'Samyak_Wholesale' or block_settings.image contains 'Samyak_Hair' -%}
+    <img
+      src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+      alt="{{ shop.name | default: 'Samyak Hair Accessories' | escape }}"
+      width="200"
+      height="54"
+      class="image-block__image samyak-footer-logo-img"
+      style="max-width: 200px; height: auto; object-fit: contain; display: block;"
+      loading="lazy"
+    >
+  {%- elsif block_settings.image -%}
     {{
       block_settings.image
       | image_url: width: 3840

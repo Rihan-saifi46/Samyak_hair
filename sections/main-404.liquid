@@ -6,6 +6,9 @@
   endif
 %}
 
+{% if request.path contains 'wishlist' %}
+  {% section 'main-wishlist' %}
+{% else %}
 <div
   class="section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
 ></div>
@@ -33,6 +36,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 {% schema %}
 {

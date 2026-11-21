@@ -1,94 +1,150 @@
 {% doc %}
-  Renders a responsive header row with three columns (left, center, right).
-  Organizes header elements based on their configured position and row placement
+  Renders the 3-zone integrated header row for Samyak Hair Accessories.
+  - Left Zone: Drawer trigger (mobile/tablet) + Stylized emerald & gold Brand Logo.
+  - Center Zone: 2-Row Stacked Search + Navigation Links.
+  - Right Zone: Action Icons (Bag, Heart, Profile).
+  - Background: #F6F4EE, Padding: 16px 36px 14px.
 
-  @param {string} row - The row identifier ('top' or 'bottom')
-  @param {string} order - Comma-separated list of item names defining the order of elements
-  @param {object} settings - Section settings object containing position and row settings for each item
-  @param {string} [first] - Optional captured HTML for the first item (typically drawer menu for top row)
-  @param {string} [logo] - Captured HTML for the logo element
-  @param {string} [menu] - Captured HTML for the menu navigation
-  @param {string} [actions] - Captured HTML for header actions (cart, account buttons, etc.)
-  @param {string} [localization] - Captured HTML for language/country selector
-  @param {string} [search] - Captured HTML for search input
-  @param {string} [drawer_search] - Captured HTML for drawer-based search
+  @param {string} [first] - The mobile menu drawer or first element
+  @param {string} [logo] - The brand logo
+  @param {string} [search] - The search bar and desktop navigation
+  @param {string} [actions] - Action icons (bag, wishlist, profile)
+  @param {string} [row] - Row identifier ('top' or 'bottom')
+  @param {string} [order] - Layout column ordering
+  @param {object} [settings] - Section settings object
+  @param {string} [menu] - Menu block markup
+  @param {string} [localization] - Localization block markup
+  @param {string} [drawer_search] - Drawer search markup
 {% enddoc %}
 
 {%- liquid
-  assign order = order | split: ','
-  assign left = ''
-  assign center = ''
-  assign right = ''
-
-  if first != blank
-    assign left = 'first '
+  if row == 'top'
+    assign show_row = true
+  else
+    assign show_row = false
   endif
-
-  for item in order
-    assign column_key = item | append: '_position'
-    assign row_key = item | append: '_row'
-    assign item_row = settings[row_key] | default: 'top'
-    assign item_column = settings[column_key] | default: 'left'
-
-    case item
-      when 'actions'
-        assign item_column = 'right'
-    endcase
-
-    if item_row == row
-      case item_column
-        when 'left'
-          assign left = left | append: item | append: ' '
-        when 'center'
-          assign center = center | append: item | append: ' '
-        else
-          assign right = right | append: item | append: ' '
-      endcase
-    endif
-  endfor
-
-  assign columns = 'left,center,right' | split: ','
 -%}
 
-{%- for column in columns -%}
-  {%- capture items_for_column -%}
-    {% case column %}
-      {% when 'left' %}
-        {{ left }}
-      {% when 'center' %}
-        {{ center }}
-      {% else %}
-        {{ right }}
-    {% endcase %}
-  {%- endcapture -%}
-
-  {%- assign items_array = items_for_column | strip | split: ' ' | compact -%}
-
-  {%- if items_array.size > 0 -%}
-    <div
-      class="header__column header__column--{{ column }}"
-      data-testid="header-{{ row }}-{{ column }}"
-    >
-      {% for key in items_array %}
-        {% unless key == blank %}
-          {% case key %}
-            {% when 'first' %}
-              {{ first }}
-            {% when 'logo' %}
-              {{ logo }}
-            {% when 'menu' %}
-              {{ menu }}
-            {% when 'localization' %}
-              {{ localization }}
-            {% when 'search' %}
-              {{ search }}
-            {% when 'drawer_search' %}
-              {{ drawer_search }}
-            {% when 'actions' %}
-              {{ actions }}
-          {% endcase %}
-        {% endunless %}
-      {% endfor %}
+{%- if show_row -%}
+  <div class="samyak-header-3zone-bar">
+    <!-- Left Zone: Drawer Trigger (Mobile) + Brand Logo -->
+    <div class="samyak-hdr-col samyak-hdr-col--left">
+      {%- if first != blank -%}
+        <div class="samyak-hdr-drawer-trigger">
+          {{ first }}
+        </div>
+      {%- endif -%}
+      {{ logo }}
     </div>
-  {%- endif -%}
-{%- endfor -%}
+
+    <!-- Center Zone: 2-Row Stacked Search + Nav Links -->
+    <div class="samyak-hdr-col samyak-hdr-col--center">
+      {{ search }}
+    </div>
+
+    <!-- Right Zone: Action Icons -->
+    <div class="samyak-hdr-col samyak-hdr-col--right">
+      {{ actions }}
+    </div>
+  </div>
+
+  <style>
+    .header__row--top,
+    .samyak-header-3zone-bar {
+      background-color: #F6F4EE !important;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .samyak-header-3zone-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      padding: 16px 36px 14px;
+      gap: 24px;
+      max-width: 100%;
+    }
+
+    .samyak-hdr-col--left {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-shrink: 0;
+    }
+
+    .samyak-hdr-drawer-trigger {
+      display: none;
+    }
+
+    .samyak-hdr-col--center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .samyak-hdr-col--right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    #header-component,
+    .header-section {
+      background-color: #F6F4EE !important;
+      border-bottom: 1px solid rgba(200, 195, 184, 0.45);
+    }
+
+    .header__row--bottom {
+      display: none !important;
+    }
+
+    @media screen and (max-width: 1024px) {
+      .samyak-hdr-drawer-trigger {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+
+      .samyak-hdr-drawer-trigger .header__drawer {
+        display: block;
+      }
+
+      .samyak-hdr-drawer-trigger .header__icon--summary {
+        padding: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #113B32;
+        border: none;
+        background: transparent;
+      }
+
+      .samyak-hdr-drawer-trigger .header-drawer-icon {
+        width: 22px;
+        height: 22px;
+        display: block;
+      }
+
+      .samyak-hdr-drawer-trigger .header-drawer-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .samyak-header-3zone-bar {
+        padding: 12px 18px;
+        gap: 14px;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .samyak-header-3zone-bar {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+    }
+  </style>
+{%- endif -%}

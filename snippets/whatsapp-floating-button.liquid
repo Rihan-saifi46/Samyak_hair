@@ -1,0 +1,129 @@
+{% doc %}
+  Renders a floating WhatsApp button for instant wholesale inquiries and bulk order support.
+{% enddoc %}
+
+<aside class="whatsapp-floating" aria-label="WhatsApp Wholesale Support">
+  <a
+    href="https://wa.me/919667844434?text=Hi%20Samyak%20Hair%20Accessories%2C%20I%20am%20interested%20in%20placing%20a%20wholesale%20order."
+    class="whatsapp-floating__link"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Chat with Samyak Hair Accessories Wholesale on WhatsApp (+91 96678 44434)"
+  >
+    <span class="whatsapp-floating__tooltip" aria-hidden="true">Order on WhatsApp</span>
+    <span class="whatsapp-floating__icon-wrapper">
+      <svg
+        class="whatsapp-floating__icon"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M16 2C8.268 2 2 8.268 2 16c0 2.658.742 5.228 2.152 7.46L2.05 29.56a.8.8 0 00.99.99l6.326-2.032A13.935 13.935 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm-1.07 22.842c-2.348 0-4.636-.665-6.618-1.924l-.475-.302-3.87 1.242 1.25-3.754-.33-.492a11.942 11.942 0 01-1.887-6.612c0-6.617 5.383-12 12-12s12 5.383 12 12-5.383 11.842-12.07 11.842zm6.608-8.917c-.362-.181-2.145-1.058-2.477-1.18-.332-.12-.573-.18-.815.182-.24.362-.934 1.18-1.145 1.421-.211.241-.422.271-.784.09-.362-.18-1.528-.563-2.91-1.796-1.077-.96-1.803-2.147-2.015-2.51-.21-.361-.022-.556.159-.736.162-.162.362-.422.543-.633.181-.21.24-.361.362-.602.12-.24.06-.452-.03-.633-.09-.181-.814-1.962-1.116-2.686-.293-.705-.591-.61-.814-.622-.211-.01-.453-.012-.694-.012-.242 0-.634.09-.966.452-.332.362-1.267 1.237-1.267 3.016 0 1.78 1.297 3.498 1.478 3.74.181.241 2.552 3.896 6.183 5.464.864.373 1.538.596 2.064.763.868.276 1.658.237 2.283.144.697-.104 2.145-.876 2.447-1.722.301-.845.301-1.57.211-1.722-.09-.15-.332-.24-.694-.422z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  </a>
+</aside>
+
+<style>
+  .whatsapp-floating {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 500 !important;
+    pointer-events: none;
+  }
+
+  .whatsapp-floating__link {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #ffffff;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .whatsapp-floating__link:hover {
+    transform: translateY(-3px) scale(1.03);
+  }
+
+  .whatsapp-floating__icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(37, 211, 102, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    position: relative;
+    transition: box-shadow 0.25s ease, background-color 0.2s ease;
+  }
+
+  .whatsapp-floating__link:hover .whatsapp-floating__icon-wrapper {
+    background: #20BA5A;
+    box-shadow: 0 6px 24px rgba(37, 211, 102, 0.55), 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .whatsapp-floating__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .whatsapp-floating__tooltip {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: var(--font-body--family, sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .whatsapp-floating__link:hover .whatsapp-floating__tooltip,
+  .whatsapp-floating__link:focus-visible .whatsapp-floating__tooltip {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .whatsapp-floating__link:focus-visible {
+    outline: 3px solid #113B32;
+    outline-offset: 4px;
+    border-radius: 50%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .whatsapp-floating {
+      bottom: 84px; /* Stays comfortably above mobile sticky add-to-cart bars */
+      right: 18px;
+    }
+
+    .whatsapp-floating__icon-wrapper {
+      width: 50px;
+      height: 50px;
+    }
+
+    .whatsapp-floating__icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .whatsapp-floating__tooltip {
+      display: none; /* Tooltip omitted on touch screens for clean footprint */
+    }
+  }
+</style>

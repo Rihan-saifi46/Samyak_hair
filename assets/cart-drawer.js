@@ -35,6 +35,7 @@ class CartDrawerComponent extends Component {
     this.#themeDrawer?.addEventListener(DrawerOpenEvent.eventName, this.#handleDrawerOpen);
     this.addEventListener(ThemeEvents.cartSectionRestored, this.#handleCartSectionRestored);
     this.addEventListener('click', this.#handleInstallmentsClick, true);
+    this.addEventListener('click', this.#handleViewCartClick);
 
     // The restore path sets [open] before this module loads, so the
     // theme-drawer:open event will have already fired. Use the attribute
@@ -50,7 +51,24 @@ class CartDrawerComponent extends Component {
     this.#themeDrawer?.removeEventListener(DrawerOpenEvent.eventName, this.#handleDrawerOpen);
     this.removeEventListener(ThemeEvents.cartSectionRestored, this.#handleCartSectionRestored);
     this.removeEventListener('click', this.#handleInstallmentsClick, true);
+    this.removeEventListener('click', this.#handleViewCartClick);
   }
+
+  /**
+   * Handles clicking the VIEW CART button to navigate directly to the cart page.
+   * @param {MouseEvent} event
+   */
+  #handleViewCartClick = (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const viewCartLink = target?.closest('a.cart-drawer__view-cart, a.cart__view-cart-button, a[href$="/cart"]');
+    if (viewCartLink) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.#themeDrawer?.close();
+      const href = viewCartLink.getAttribute('href') || '/cart';
+      window.location.href = href;
+    }
+  };
 
   /**
    * Recomputes the sticky summary after a back/forward cache restore re-renders the cart items.
@@ -156,7 +174,7 @@ class CartDrawerComponent extends Component {
     const drawerHeight = dialog.getBoundingClientRect().height;
     const summaryHeight = summary.getBoundingClientRect().height;
     const ratio = summaryHeight / drawerHeight;
-    dialog.setAttribute('cart-summary-sticky', ratio > this.#summaryThreshold ? 'false' : 'true');
+    dialog.setAttribute('cart-summary-sticky', 'false');
   }
 }
 

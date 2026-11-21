@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Coverflow Perspective Carousel Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f7f7f7;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* 3D STACKED PERSPECTIVE CAROUSEL STYLES */
+    .sc-section {
+      background-color: #FFFFFF;
+      padding: 80px 40px;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .sc-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .sc-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .sc-heading {
+      font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+      font-size: 34px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #113B32;
+      margin: 0 0 14px;
+      line-height: 1.2;
+    }
+
+    .sc-subheading {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: #666666;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .sc-carousel-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 480px;
+    }
+
+    .sc-stage {
+      position: relative;
+      width: 100%;
+      height: 460px;
+      perspective: 1200px;
+      perspective-origin: center center;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sc-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 340px;
+      height: 430px;
+      margin-left: -170px;
+      margin-top: -215px;
+      border-radius: 2px;
+      overflow: hidden;
+      display: block;
+      text-decoration: none;
+      transform-origin: center center;
+      transform-style: preserve-3d;
+      will-change: transform, opacity, box-shadow;
+      transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1),
+                  opacity 0.55s cubic-bezier(0.25, 1, 0.5, 1),
+                  box-shadow 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+      user-select: none;
+      -webkit-user-drag: none;
+      background-color: #1a1a1a;
+    }
+
+    /* Center Active Card (index === activeIndex) */
+    .sc-card[data-offset="0"] {
+      transform: translateX(0px) scale(1) rotateY(0deg);
+      z-index: 30;
+      opacity: 1;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Immediate Adjacent Left Card (-1) */
+    .sc-card[data-offset="-1"] {
+      transform: translateX(-240px) scale(0.86) rotateY(14deg);
+      z-index: 20;
+      opacity: 0.92;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Immediate Adjacent Right Card (+1) */
+    .sc-card[data-offset="1"] {
+      transform: translateX(240px) scale(0.86) rotateY(-14deg);
+      z-index: 20;
+      opacity: 0.92;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Outer Edge Far Left Card (-2) */
+    .sc-card[data-offset="-2"] {
+      transform: translateX(-430px) scale(0.72) rotateY(22deg);
+      z-index: 10;
+      opacity: 0.45;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Outer Edge Far Right Card (+2) */
+    .sc-card[data-offset="2"] {
+      transform: translateX(430px) scale(0.72) rotateY(-22deg);
+      z-index: 10;
+      opacity: 0.45;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Hidden fallback */
+    .sc-card[data-offset="99"],
+    .sc-card:not([data-offset="0"]):not([data-offset="1"]):not([data-offset="-1"]):not([data-offset="2"]):not([data-offset="-2"]) {
+      transform: translateX(0px) scale(0.6) rotateY(0deg);
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Card Image */
+    .sc-card__media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sc-card__photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .sc-card[data-offset="0"]:hover .sc-card__photo {
+      transform: scale(1.04);
+    }
+
+    /* Dark Gradient Vignette */
+    .sc-card__overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 45%);
+    }
+
+    /* Category Title Label */
+    .sc-card__content {
+      position: absolute;
+      bottom: 28px;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      text-align: center;
+      pointer-events: none;
+      padding: 0 16px;
+    }
+
+    .sc-card__title {
+      display: inline-block;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.85);
+      padding-bottom: 4px;
+      transition: border-color 0.3s ease, letter-spacing 0.3s ease;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .sc-card[data-offset="0"]:hover .sc-card__title {
+      border-color: #FFFFFF;
+      letter-spacing: 2px;
+    }
+
+    /* Floating Navigation Controls */
+    .sc-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1A1A1A;
+      cursor: pointer;
+      z-index: 50;
+      padding: 0;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, color 0.25s ease, background 0.25s ease;
+    }
+
+    .sc-nav-btn:hover {
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+      color: #113B32;
+    }
+
+    .sc-nav-btn:active {
+      transform: translateY(-50%) scale(0.96);
+    }
+
+    .sc-nav-btn:focus-visible {
+      outline: 2px solid #113B32;
+      outline-offset: 2px;
+    }
+
+    .sc-nav-prev {
+      left: 32px;
+    }
+
+    .sc-nav-next {
+      right: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      .sc-card[data-offset="-2"] {
+        transform: translateX(-360px) scale(0.72) rotateY(20deg);
+      }
+      .sc-card[data-offset="2"] {
+        transform: translateX(360px) scale(0.72) rotateY(-20deg);
+      }
+      .sc-card[data-offset="-1"] {
+        transform: translateX(-200px) scale(0.86) rotateY(12deg);
+      }
+      .sc-card[data-offset="1"] {
+        transform: translateX(200px) scale(0.86) rotateY(-12deg);
+      }
+      .sc-nav-prev {
+        left: 16px;
+      }
+      .sc-nav-next {
+        right: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sc-section {
+        padding: 60px 16px;
+      }
+
+      .sc-heading {
+        font-size: 26px;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+      }
+
+      .sc-subheading {
+        font-size: 13px;
+        max-width: 380px;
+        padding: 0 10px;
+      }
+
+      .sc-carousel-wrapper {
+        min-height: 380px;
+        margin-top: 32px;
+      }
+
+      .sc-stage {
+        height: 360px;
+      }
+
+      .sc-card {
+        width: 260px;
+        height: 340px;
+        margin-left: -130px;
+        margin-top: -170px;
+      }
+
+      .sc-card[data-offset="0"] {
+        transform: translateX(0px) scale(1) rotateY(0deg);
+      }
+
+      .sc-card[data-offset="-1"] {
+        transform: translateX(-110px) scale(0.86) rotateY(14deg);
+      }
+
+      .sc-card[data-offset="1"] {
+        transform: translateX(110px) scale(0.86) rotateY(-14deg);
+      }
+
+      .sc-card[data-offset="-2"] {
+        transform: translateX(-190px) scale(0.72) rotateY(22deg);
+      }
+
+      .sc-card[data-offset="2"] {
+        transform: translateX(190px) scale(0.72) rotateY(-22deg);
+      }
+
+      .sc-card__title {
+        font-size: 12px;
+        letter-spacing: 1.2px;
+      }
+
+      .sc-nav-btn {
+        width: 38px;
+        height: 38px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      }
+
+      .sc-nav-prev {
+        left: 8px;
+      }
+
+      .sc-nav-next {
+        right: 8px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .sc-card {
+        width: 230px;
+        height: 300px;
+        margin-left: -115px;
+        margin-top: -150px;
+      }
+
+      .sc-stage {
+        height: 320px;
+      }
+
+      .sc-card[data-offset="-1"] {
+        transform: translateX(-90px) scale(0.86) rotateY(14deg);
+      }
+
+      .sc-card[data-offset="1"] {
+        transform: translateX(90px) scale(0.86) rotateY(-14deg);
+      }
+
+      .sc-card[data-offset="-2"] {
+        transform: translateX(-160px) scale(0.72) rotateY(22deg);
+      }
+
+      .sc-card[data-offset="2"] {
+        transform: translateX(160px) scale(0.72) rotateY(-22deg);
+      }
+
+      .sc-nav-btn {
+        width: 34px;
+        height: 34px;
+      }
+
+      .sc-nav-prev {
+        left: 4px;
+      }
+
+      .sc-nav-next {
+        right: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="sc-section" id="sc-section-test" aria-label="Collections Showcase">
+    <div class="sc-container">
+      <header class="sc-header">
+        <h2 class="sc-heading" id="sc-heading-test">FOR EVERY YOU</h2>
+        <p class="sc-subheading">For every mood, moment, and milestone — there is a piece that speaks your style.</p>
+      </header>
+
+      <div class="sc-carousel-wrapper">
+        <button type="button" class="sc-nav-btn sc-nav-prev" aria-label="Previous Collection">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="sc-stage" role="region" aria-roledescription="carousel" aria-labelledby="sc-heading-test">
+          <!-- Card 0: Center Active -->
+          <a href="#clips" class="sc-card" data-index="0" data-offset="0" aria-label="Hair Clips / Clutchers" tabindex="0">
+            <div class="sc-card__media">
+              <img src="https://cdn.impression4u.com/storage/1744/home-category-1-gold-pearl-chain-clutcher.webp" alt="Wholesale Metal Hair Clips & Clutchers" class="sc-card__photo">
+            </div>
+            <div class="sc-card__overlay"></div>
+            <div class="sc-card__content">
+              <span class="sc-card__title">HAIR CLIPS / CLUTCHERS</span>
+            </div>
+          </a>
+
+          <!-- Card 1: Immediate Right -->
+          <a href="#hair-band" class="sc-card" data-index="1" data-offset="1" aria-label="Hair Band" tabindex="-1">
+            <div class="sc-card__media">
+              <img src="https://cdn.impression4u.com/storage/1748/home-category-5-flower-beaded-hair-clip.webp" alt="Wholesale Hair Bands" class="sc-card__photo">
+            </div>
+            <div class="sc-card__overlay"></div>
+            <div class="sc-card__content">
+              <span class="sc-card__title">HAIR BAND</span>
+            </div>
+          </a>
+
+          <!-- Card 2: Far Right -->
+          <a href="#kids" class="sc-card" data-index="2" data-offset="2" aria-label="Kids" tabindex="-1">
+            <div class="sc-card__media">
+              <img src="https://cdn.impression4u.com/storage/1750/home-category-7-kids-hair-clip-combo.webp" alt="Wholesale Kids Hair Accessories" class="sc-card__photo">
+            </div>
+            <div class="sc-card__overlay"></div>
+            <div class="sc-card__content">
+              <span class="sc-card__title">KIDS</span>
+            </div>
+          </a>
+
+          <!-- Card 3: Far Left -->
+          <a href="#false-hair" class="sc-card" data-index="3" data-offset="-2" aria-label="False Hair" tabindex="-1">
+            <div class="sc-card__media">
+              <img src="https://cdn.impression4u.com/storage/1751/home-category-8-pink-satin-hairband.webp" alt="Wholesale False Hair & Extensions" class="sc-card__photo">
+            </div>
+            <div class="sc-card__overlay"></div>
+            <div class="sc-card__content">
+              <span class="sc-card__title">FALSE HAIR</span>
+            </div>
+          </a>
+
+          <!-- Card 4: Immediate Left -->
+          <a href="#scrunchies" class="sc-card" data-index="4" data-offset="-1" aria-label="Scrunchies & Rubbers" tabindex="-1">
+            <div class="sc-card__media">
+              <img src="https://cdn.impression4u.com/storage/1752/home-category-9-blush-satin-scrunchie.webp" alt="Wholesale Scrunchies & Rubbers" class="sc-card__photo">
+            </div>
+            <div class="sc-card__overlay"></div>
+            <div class="sc-card__content">
+              <span class="sc-card__title">SCRUNCHIES & RUBBERS</span>
+            </div>
+          </a>
+        </div>
+
+        <button type="button" class="sc-nav-btn sc-nav-next" aria-label="Next Collection">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      function initSamyakCoverflow(container) {
+        if (!container || container.getAttribute('data-sc-initialized') === 'true') return;
+        container.setAttribute('data-sc-initialized', 'true');
+
+        var cards = Array.from(container.querySelectorAll('.sc-card'));
+        var prevBtn = container.querySelector('.sc-nav-prev');
+        var nextBtn = container.querySelector('.sc-nav-next');
+        var stage = container.querySelector('.sc-stage');
+        var total = cards.length;
+        if (total === 0) return;
+
+        var activeIndex = 0;
+        var isSwiping = false;
+
+        function updateCards() {
+          cards.forEach(function(card, i) {
+            var diff = (i - activeIndex + total) % total;
+            var offset = diff > 2 ? diff - total : diff;
+            card.setAttribute('data-offset', offset);
+
+            if (offset === 0) {
+              card.setAttribute('aria-hidden', 'false');
+              card.setAttribute('tabindex', '0');
+            } else {
+              card.setAttribute('aria-hidden', 'true');
+              card.setAttribute('tabindex', '-1');
+            }
+          });
+        }
+
+        function setActive(idx) {
+          activeIndex = ((idx % total) + total) % total;
+          updateCards();
+        }
+
+        function next() {
+          setActive(activeIndex + 1);
+        }
+
+        function prev() {
+          setActive(activeIndex - 1);
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            next();
+          });
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            prev();
+          });
+        }
+
+        cards.forEach(function(card, idx) {
+          card.addEventListener('click', function(e) {
+            if (isSwiping) {
+              e.preventDefault();
+              return;
+            }
+            var currentOffset = parseInt(card.getAttribute('data-offset'), 10);
+            if (currentOffset !== 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              setActive(idx);
+            }
+          });
+        });
+
+        container.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowLeft') {
+            prev();
+          } else if (e.key === 'ArrowRight') {
+            next();
+          }
+        });
+
+        if (stage) {
+          var touchStartX = 0;
+          var touchStartY = 0;
+          var touchEndX = 0;
+          var touchEndY = 0;
+
+          stage.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) {
+              touchStartX = e.touches[0].clientX;
+              touchStartY = e.touches[0].clientY;
+              isSwiping = false;
+            }
+          }, { passive: true });
+
+          stage.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 1) {
+              var currentX = e.touches[0].clientX;
+              var currentY = e.touches[0].clientY;
+              var deltaX = currentX - touchStartX;
+              var deltaY = currentY - touchStartY;
+              if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                isSwiping = true;
+              }
+            }
+          }, { passive: true });
+
+          stage.addEventListener('touchend', function(e) {
+            if (e.changedTouches.length === 1) {
+              touchEndX = e.changedTouches[0].clientX;
+              touchEndY = e.changedTouches[0].clientY;
+              var diffX = touchEndX - touchStartX;
+              var diffY = touchEndY - touchStartY;
+
+              if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                if (diffX < 0) {
+                  next();
+                } else {
+                  prev();
+                }
+              }
+
+              setTimeout(function() {
+                isSwiping = false;
+              }, 60);
+            }
+          }, { passive: true });
+        }
+
+        updateCards();
+      }
+
+      function initAll() {
+        document.querySelectorAll('.sc-section').forEach(initSamyakCoverflow);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAll);
+      } else {
+        initAll();
+      }
+    })();
+  </script>
+</body>
+</html>

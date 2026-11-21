@@ -1,0 +1,451 @@
+{% comment %}
+  Section: Three Worlds of Beauty
+  Renders the 3-column luxury showcase cards featuring Best Sellers, New Arrivals, and Trending Products.
+  Structure matches reference design:
+  - Center card is elevated (higher up)
+  - Left & Right cards start lower down (staggered offset)
+  - "BROWSE COLLECTIONS →" button is placed cleanly BELOW the center banner image (not covering it).
+{% endcomment %}
+
+{% liquid
+  assign col1 = section.settings.card_1_collection
+  if col1 == blank
+    if collections['best-sellers'] != blank
+      assign col1 = collections['best-sellers']
+    elsif collections['best-seller'] != blank
+      assign col1 = collections['best-seller']
+    elsif collections['best-selling'] != blank
+      assign col1 = collections['best-selling']
+    elsif collections['best-selling-products'] != blank
+      assign col1 = collections['best-selling-products']
+    endif
+  endif
+  assign link1 = section.settings.card_1_link | default: col1.url | default: '/collections/best-sellers'
+
+  assign col2 = section.settings.card_2_collection
+  if col2 == blank
+    if collections['new-arrivals'] != blank
+      assign col2 = collections['new-arrivals']
+    elsif collections['new-arrival'] != blank
+      assign col2 = collections['new-arrival']
+    elsif collections['new'] != blank
+      assign col2 = collections['new']
+    endif
+  endif
+  assign link2 = section.settings.card_2_link | default: col2.url | default: '/collections/new-arrivals'
+
+  assign col3 = section.settings.card_3_collection
+  if col3 == blank
+    if collections['trending-products'] != blank
+      assign col3 = collections['trending-products']
+    elsif collections['trending'] != blank
+      assign col3 = collections['trending']
+    elsif collections['hair-accessories'] != blank
+      assign col3 = collections['hair-accessories']
+    elsif collections['metal-claw'] != blank
+      assign col3 = collections['metal-claw']
+    endif
+  endif
+  assign link3 = section.settings.card_3_link | default: col3.url | default: '/collections/trending-products'
+
+  if section.settings.card_1_image != blank
+    assign img1 = section.settings.card_1_image | image_url: width: 900
+  else
+    assign img1 = 'banner-best-sellers.jpg' | asset_url
+  endif
+
+  if section.settings.card_2_image != blank
+    assign img2 = section.settings.card_2_image | image_url: width: 900
+  else
+    assign img2 = 'banner-new-arrivals.jpg' | asset_url
+  endif
+
+  if section.settings.card_3_image != blank
+    assign img3 = section.settings.card_3_image | image_url: width: 900
+  else
+    assign img3 = 'banner-trending.jpg' | asset_url
+  endif
+%}
+
+<section
+  class="three-worlds-section"
+  id="three-worlds-{{ section.id }}"
+  style="
+    {% if section.settings.background_color != blank %}
+      background-color: {{ section.settings.background_color }};
+    {% endif %}
+    padding-block-start: {{ section.settings.padding_top }}px;
+    padding-block-end: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="three-worlds-container">
+    <div class="three-worlds-header">
+      {% if section.settings.heading != blank %}
+        <h2 class="three-worlds-title">{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p class="three-worlds-subtitle">{{ section.settings.subheading }}</p>
+      {% endif %}
+    </div>
+
+    <div class="three-worlds-grid">
+      {% comment %} Card 1: Left (Best Sellers) - Shifted downward {% endcomment %}
+      <div class="three-worlds-col three-worlds-col--side three-worlds-col--left">
+        <a
+          href="{{ link1 }}"
+          class="three-worlds-card three-worlds-card--1"
+          aria-label="Best Sellers Collection"
+        >
+          <div class="three-worlds-card-media">
+            <img
+              src="{{ img1 }}"
+              alt="Best Sellers"
+              loading="lazy"
+              width="764"
+              height="1024"
+            >
+          </div>
+        </a>
+      </div>
+
+      {% comment %} Card 2: Center (New Arrivals) - Elevated higher with CTA button below {% endcomment %}
+      <div class="three-worlds-col three-worlds-col--center">
+        <a
+          href="{{ link2 }}"
+          class="three-worlds-card three-worlds-card--2"
+          aria-label="New Arrivals Collection"
+        >
+          <div class="three-worlds-card-media">
+            <img
+              src="{{ img2 }}"
+              alt="New Arrivals"
+              loading="lazy"
+              width="764"
+              height="1024"
+            >
+          </div>
+        </a>
+
+        {% if section.settings.card_2_btn_text != blank %}
+          <a
+            href="{{ link2 }}"
+            class="three-worlds-browse-btn"
+            aria-label="{{ section.settings.card_2_btn_text }}"
+          >
+            <span>{{ section.settings.card_2_btn_text }}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+
+      {% comment %} Card 3: Right (Trending Products) - Shifted downward {% endcomment %}
+      <div class="three-worlds-col three-worlds-col--side three-worlds-col--right">
+        <a
+          href="{{ link3 }}"
+          class="three-worlds-card three-worlds-card--3"
+          aria-label="Trending Products Collection"
+        >
+          <div class="three-worlds-card-media">
+            <img
+              src="{{ img3 }}"
+              alt="Trending Products"
+              loading="lazy"
+              width="764"
+              height="1024"
+            >
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .three-worlds-section {
+    background-color: #FCFAF7;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .three-worlds-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 36px);
+    box-sizing: border-box;
+  }
+
+  .three-worlds-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto clamp(24px, 3.5vw, 40px);
+  }
+
+  .three-worlds-title {
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: clamp(28px, 3.8vw, 44px);
+    font-weight: 500;
+    color: #113B32;
+    margin: 0 0 10px;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+  }
+
+  .three-worlds-subtitle {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', -apple-system, sans-serif);
+    font-size: clamp(14px, 1.35vw, 17px);
+    color: #666E6A;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* 3 Columns Grid with Staggered Center Elevation */
+  .three-worlds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(18px, 2.5vw, 36px);
+    align-items: start;
+  }
+
+  .three-worlds-col {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Left and Right side columns start lower */
+  .three-worlds-col--side {
+    margin-top: clamp(32px, 4vw, 56px);
+  }
+
+  /* Center column starts higher up (closer to header) */
+  .three-worlds-col--center {
+    margin-top: 0;
+    align-items: center;
+  }
+
+  /* Card base styling */
+  .three-worlds-card {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #FFFFFF;
+    box-shadow: 0 10px 30px rgba(180, 140, 130, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .three-worlds-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 48px rgba(160, 110, 100, 0.22), 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  .three-worlds-card-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 764 / 1024;
+    overflow: hidden;
+    border-radius: 24px;
+    background: #F5EFEB;
+  }
+
+  .three-worlds-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .three-worlds-card:hover .three-worlds-card-media img {
+    transform: scale(1.035);
+  }
+
+  /* Separate Browse Collections Button — positioned cleanly BELOW center card */
+  .three-worlds-browse-btn {
+    margin-top: clamp(18px, 2.2vw, 28px);
+    background: #113B32;
+    color: #FFFFFF !important;
+    text-decoration: none !important;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', -apple-system, sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 13px 32px;
+    border-radius: 30px;
+    box-shadow: 0 4px 16px rgba(17, 59, 50, 0.25);
+    white-space: nowrap;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .three-worlds-browse-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .three-worlds-browse-btn:hover {
+    background: #09231E;
+    box-shadow: 0 8px 24px rgba(17, 59, 50, 0.45);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .three-worlds-browse-btn:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 860px) {
+    .three-worlds-grid {
+      grid-template-columns: 1fr;
+      max-width: 440px;
+      margin: 0 auto;
+      gap: 28px;
+    }
+
+    .three-worlds-col--side {
+      margin-top: 0;
+    }
+
+    .three-worlds-card {
+      border-radius: 20px;
+    }
+
+    .three-worlds-card-media {
+      border-radius: 20px;
+    }
+
+    .three-worlds-browse-btn {
+      margin-top: 18px;
+      padding: 12px 26px;
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Three Worlds of Beauty",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Three Worlds of Beauty"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Every world, a story. Every piece, a masterpiece."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FCFAF7"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 55
+    },
+    {
+      "type": "header",
+      "content": "Card 1 (Left - Best Sellers)"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_1_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "collection",
+      "id": "card_1_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "url",
+      "id": "card_1_link",
+      "label": "Custom URL Link (Optional)"
+    },
+    {
+      "type": "header",
+      "content": "Card 2 (Middle - New Arrivals)"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_2_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "collection",
+      "id": "card_2_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "url",
+      "id": "card_2_link",
+      "label": "Custom URL Link (Optional)"
+    },
+    {
+      "type": "text",
+      "id": "card_2_btn_text",
+      "label": "Button Text",
+      "default": "BROWSE COLLECTIONS"
+    },
+    {
+      "type": "header",
+      "content": "Card 3 (Right - Trending Products)"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_3_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "collection",
+      "id": "card_3_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "url",
+      "id": "card_3_link",
+      "label": "Custom URL Link (Optional)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Three Worlds of Beauty"
+    }
+  ]
+}
+{% endschema %}

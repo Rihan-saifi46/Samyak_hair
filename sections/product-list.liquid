@@ -29,13 +29,115 @@
     {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
   </div>
 
+  {% liquid
+    assign is_best_selling_sec = false
+    assign is_new_arrival_sec = false
+    if section.id contains 'FQ6CgE'
+      assign is_best_selling_sec = true
+    elsif section.id contains 'EaYijr'
+      assign is_new_arrival_sec = true
+    endif
+
+    assign active_collection = section.settings.collection
+    if is_best_selling_sec
+      if active_collection == blank or active_collection.handle == 'all' or active_collection.products_count == 0
+        if collections['best-sellers'] != blank and collections['best-sellers'].products_count > 0
+          assign active_collection = collections['best-sellers']
+        elsif collections['best-seller'] != blank and collections['best-seller'].products_count > 0
+          assign active_collection = collections['best-seller']
+        elsif collections['best-selling'] != blank and collections['best-selling'].products_count > 0
+          assign active_collection = collections['best-selling']
+        elsif collections['best-selling-products'] != blank and collections['best-selling-products'].products_count > 0
+          assign active_collection = collections['best-selling-products']
+        elsif collections['bestsellers'] != blank and collections['bestsellers'].products_count > 0
+          assign active_collection = collections['bestsellers']
+        endif
+      endif
+    elsif is_new_arrival_sec
+      if active_collection == blank or active_collection.handle == 'all' or active_collection.products_count == 0
+        if collections['new-arrivals'] != blank and collections['new-arrivals'].products_count > 0
+          assign active_collection = collections['new-arrivals']
+        elsif collections['new-arrival'] != blank and collections['new-arrival'].products_count > 0
+          assign active_collection = collections['new-arrival']
+        endif
+      endif
+    endif
+
+    if active_collection == blank
+      assign active_collection = section.settings.collection | default: collections['all']
+    endif
+  %}
+
   {% capture list_items %}
-    {% if section.settings.collection != blank and shop.products_count != 0 %}
-      {% paginate section.settings.collection.products by max_items %}
-        {% for product in section.settings.collection.products limit: max_items %}
-        <div
-          class="resource-list__item"
-        >
+    {% assign item_count = 0 %}
+    {% assign rendered_ids = '' %}
+
+    {% if is_best_selling_sec %}
+      {% for prod in collections['all'].products %}
+        {% if item_count >= max_items %}{% break %}{% endif %}
+        {% assign has_best_tag = false %}
+        {% for t in prod.tags %}
+          {% assign t_down = t | downcase | strip %}
+          {% if t_down == 'best-seller' or t_down == 'bestseller' or t_down == 'best seller' or t_down == 'best-sellers' %}
+            {% assign has_best_tag = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% if has_best_tag %}
+          {% assign p_id_str = prod.id | append: ',' %}
+          {% unless rendered_ids contains p_id_str %}
+            {% assign rendered_ids = rendered_ids | append: p_id_str %}
+            {% if item_count > 0 %}<!--@list/split-->{% endif %}
+            <div class="resource-list__item">
+              {% content_for 'block',
+                type: '_product-card',
+                id: 'static-product-card',
+                closest.product: prod,
+                product_view_context: 'collection'
+              %}
+            </div>
+            {% assign item_count = item_count | plus: 1 %}
+          {% endunless %}
+        {% endif %}
+      {% endfor %}
+    {% elsif is_new_arrival_sec %}
+      {% for prod in collections['all'].products %}
+        {% if item_count >= max_items %}{% break %}{% endif %}
+        {% assign has_new_tag = false %}
+        {% for t in prod.tags %}
+          {% assign t_down = t | downcase | strip %}
+          {% if t_down == 'new-arrival' or t_down == 'newarrival' or t_down == 'new arrival' or t_down == 'new-arrivals' %}
+            {% assign has_new_tag = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% if has_new_tag %}
+          {% assign p_id_str = prod.id | append: ',' %}
+          {% unless rendered_ids contains p_id_str %}
+            {% assign rendered_ids = rendered_ids | append: p_id_str %}
+            {% if item_count > 0 %}<!--@list/split-->{% endif %}
+            <div class="resource-list__item">
+              {% content_for 'block',
+                type: '_product-card',
+                id: 'static-product-card',
+                closest.product: prod,
+                product_view_context: 'collection'
+              %}
+            </div>
+            {% assign item_count = item_count | plus: 1 %}
+          {% endunless %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% if active_collection != blank and item_count < max_items %}
+      {% for product in active_collection.products %}
+        {% if item_count >= max_items %}{% break %}{% endif %}
+        {% assign p_id_str = product.id | append: ',' %}
+        {% unless rendered_ids contains p_id_str %}
+          {% assign rendered_ids = rendered_ids | append: p_id_str %}
+          {% if item_count > 0 %}<!--@list/split-->{% endif %}
+          <div class="resource-list__item">
             {% content_for 'block',
               type: '_product-card',
               id: 'static-product-card',
@@ -43,23 +145,17 @@
               product_view_context: 'collection'
             %}
           </div>
-
-          {% unless forloop.last %}
-            <!--@list/split-->
-          {% endunless %}
-        {% endfor %}
-      {% endpaginate %}
-    {% else %}
-      {% for i in (1..max_items) %}
-        <div
-          class="resource-list__item"
-        >
-            {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: null %}
-        </div>
-
-        {% unless forloop.last %}
-          <!--@list/split-->
+          {% assign item_count = item_count | plus: 1 %}
         {% endunless %}
+      {% endfor %}
+    {% endif %}
+
+    {% if item_count == 0 %}
+      {% for i in (1..max_items) %}
+        {% if forloop.index > 1 %}<!--@list/split-->{% endif %}
+        <div class="resource-list__item">
+          {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: null %}
+        </div>
       {% endfor %}
     {% endif %}
   {% endcapture %}

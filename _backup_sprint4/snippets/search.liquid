@@ -1,0 +1,258 @@
+{%- doc -%}
+  Center Zone Component for Samyak Hair Accessories Header.
+  Stacks 2 rows:
+  - Top Row: Centered rectangular search input (width: 440px, height: 36px, transparent bg, border: 1px solid #C8C3B8, radius: 3px, placeholder: "Search", outline search icon on right).
+  - Bottom Row: Uppercase navigation links (gap: 22px, font-size: 11px, weight: 500, letter-spacing: 0.08em, HOME active with #8C734B and 1.5px solid #9E825C bottom underline).
+{%- enddoc -%}
+
+<div class="samyak-hdr-center-zone">
+  <!-- Top Row: Rectangular Search Input -->
+  <form action="{{ routes.search_url }}" method="get" role="search" class="samyak-hdr-search-form">
+    <input
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="Search"
+      class="samyak-hdr-search-input"
+      aria-label="{{ 'content.search_input_label' | t }}"
+      autocomplete="off"
+    >
+    <input type="hidden" name="type" value="product">
+    <input type="hidden" name="options[prefix]" value="last">
+
+    <button
+      type="submit"
+      class="samyak-hdr-search-btn"
+      aria-label="{{ 'content.search' | t }}"
+      title="Search"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5C5A54" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </form>
+
+  <!-- Bottom Row: Dynamic Navigation Links from Shopify Admin -->
+  <nav class="samyak-hdr-nav-links" aria-label="Main Navigation">
+    {%- assign header_linklist = linklists['main-menu'] -%}
+    {%- if header_linklist != blank and header_linklist.links.size > 0 -%}
+      {%- for link in header_linklist.links -%}
+        {%- assign is_link_active = false -%}
+        {%- if link.active or link.child_active or request.path == link.url -%}
+          {%- assign is_link_active = true -%}
+        {%- elsif link.url == routes.root_url and request.page_type == 'index' -%}
+          {%- assign is_link_active = true -%}
+        {%- endif -%}
+
+        {%- if link.links.size > 0 -%}
+          <div class="samyak-nav-dropdown-wrap">
+            <a
+              href="{{ link.url }}"
+              class="samyak-nav-item{% if is_link_active %} is-active{% endif %}"
+              aria-haspopup="true"
+              aria-expanded="false"
+              {% if is_link_active %}aria-current="page"{% endif %}
+            >
+              {{ link.title | upcase }}
+              <svg class="samyak-dropdown-arrow" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </a>
+            <ul class="samyak-nav-dropdown-menu" role="menu">
+              {%- for child_link in link.links -%}
+                <li role="none">
+                  <a href="{{ child_link.url }}" class="samyak-nav-dropdown-item{% if child_link.active %} is-active{% endif %}" role="menuitem">
+                    {{ child_link.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- else -%}
+          <a
+            href="{{ link.url }}"
+            class="samyak-nav-item{% if is_link_active %} is-active{% endif %}"
+            {% if is_link_active %}aria-current="page"{% endif %}
+          >
+            {{ link.title | upcase }}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      <!-- Default Fallback Links when menu is unpopulated -->
+      <a href="{{ routes.root_url }}" class="samyak-nav-item{% if request.page_type == 'index' %} is-active{% endif %}">HOME</a>
+      <a href="/collections/new-arrivals" class="samyak-nav-item{% if request.path == '/collections/new-arrivals' %} is-active{% endif %}">NEW ARRIVALS</a>
+      <a href="{{ routes.all_products_collection_url }}" class="samyak-nav-item{% if request.path == routes.all_products_collection_url %} is-active{% endif %}">SHOP ALL</a>
+      <a href="{{ routes.collections_url }}" class="samyak-nav-item{% if request.path == routes.collections_url %} is-active{% endif %}">SHOP BY CATEGORY</a>
+      <a href="/collections/korean-hair-claws" class="samyak-nav-item{% if request.path == '/collections/korean-hair-claws' %} is-active{% endif %}">KOREAN COLLECTION</a>
+      <a href="/pages/wholesale-bulk" class="samyak-nav-item{% if request.path == '/pages/wholesale-bulk' %} is-active{% endif %}">BULK &amp; RESELLERS</a>
+      <a href="/pages/reviews" class="samyak-nav-item{% if request.path == '/pages/reviews' %} is-active{% endif %}">REVIEWS</a>
+    {%- endif -%}
+  </nav>
+</div>
+
+<style>
+  .samyak-hdr-center-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Search Box */
+  .samyak-hdr-search-form {
+    display: flex;
+    align-items: center;
+    width: 440px;
+    max-width: 100%;
+    height: 36px;
+    background: transparent;
+    border: 1px solid #C8C3B8;
+    border-radius: 3px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .samyak-hdr-search-form:focus-within {
+    border-color: #8C734B;
+    box-shadow: 0 0 0 1px #8C734B;
+  }
+
+  .samyak-hdr-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 12px;
+    color: #181A19;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .samyak-hdr-search-input::placeholder {
+    color: #7A7770;
+    font-size: 12px;
+  }
+
+  .samyak-hdr-search-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Nav Links */
+  .samyak-hdr-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 12px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .samyak-nav-item {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2B2D2C;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 3px;
+    transition: color 0.15s ease;
+  }
+
+  .samyak-nav-item:hover {
+    color: #8C734B;
+  }
+
+  .samyak-nav-item.is-active {
+    color: #8C734B;
+    border-bottom: 1.5px solid #9E825C;
+  }
+
+  .samyak-nav-dropdown-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .samyak-dropdown-arrow {
+    margin-left: 4px;
+    transition: transform 0.2s ease;
+  }
+
+  .samyak-nav-dropdown-wrap:hover .samyak-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .samyak-nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 190px;
+    background: #FFFFFF;
+    border: 1px solid #E4E0D6;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    list-style: none;
+    padding: 6px 0;
+    margin-top: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 100;
+  }
+
+  .samyak-nav-dropdown-wrap:hover .samyak-nav-dropdown-menu,
+  .samyak-nav-dropdown-wrap:focus-within .samyak-nav-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .samyak-nav-dropdown-item {
+    display: block;
+    padding: 9px 16px;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: #2B2D2C;
+    text-decoration: none;
+    text-align: left;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .samyak-nav-dropdown-item:hover,
+  .samyak-nav-dropdown-item.is-active {
+    background: #FAF8F2;
+    color: #8C734B;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .samyak-hdr-search-form {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .samyak-hdr-nav-links {
+      display: none;
+    }
+  }
+</style>
