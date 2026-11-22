@@ -23,9 +23,6 @@
   <div id="shopify-product-reviews" data-id="{{ product_obj.id }}">
     {{ product_obj.metafields.spr.reviews }}
   </div>
-
-  <!-- Theme Editor App Blocks Passthrough -->
-  {% content_for 'blocks' %}
 </div>
 
 {% stylesheet %}
@@ -190,11 +187,6 @@
       "unit": "px",
       "label": "Bottom padding",
       "default": 56
-    }
-  ],
-  "blocks": [
-    {
-      "type": "@app"
     }
   ],
   "presets": [

@@ -10,43 +10,43 @@
 {% liquid
   assign col1 = section.settings.card_1_collection
   if col1 == blank
-    if collections['best-sellers'] != blank
-      assign col1 = collections['best-sellers']
-    elsif collections['best-seller'] != blank
+    if collections['best-seller'] != blank
       assign col1 = collections['best-seller']
+    elsif collections['best-sellers'] != blank
+      assign col1 = collections['best-sellers']
     elsif collections['best-selling'] != blank
       assign col1 = collections['best-selling']
     elsif collections['best-selling-products'] != blank
       assign col1 = collections['best-selling-products']
     endif
   endif
-  assign link1 = section.settings.card_1_link | default: col1.url | default: '/collections/best-sellers'
+  assign link1 = section.settings.card_1_link | default: col1.url | default: '/collections/best-seller'
 
   assign col2 = section.settings.card_2_collection
   if col2 == blank
-    if collections['new-arrivals'] != blank
-      assign col2 = collections['new-arrivals']
-    elsif collections['new-arrival'] != blank
+    if collections['new-arrival'] != blank
       assign col2 = collections['new-arrival']
+    elsif collections['new-arrivals'] != blank
+      assign col2 = collections['new-arrivals']
     elsif collections['new'] != blank
       assign col2 = collections['new']
     endif
   endif
-  assign link2 = section.settings.card_2_link | default: col2.url | default: '/collections/new-arrivals'
+  assign link2 = section.settings.card_2_link | default: col2.url | default: '/collections/new-arrival'
 
   assign col3 = section.settings.card_3_collection
   if col3 == blank
-    if collections['trending-products'] != blank
-      assign col3 = collections['trending-products']
-    elsif collections['trending'] != blank
+    if collections['trending'] != blank
       assign col3 = collections['trending']
+    elsif collections['trending-products'] != blank
+      assign col3 = collections['trending-products']
     elsif collections['hair-accessories'] != blank
       assign col3 = collections['hair-accessories']
-    elsif collections['metal-claw'] != blank
-      assign col3 = collections['metal-claw']
+    elsif collections['claw-clip'] != blank
+      assign col3 = collections['claw-clip']
     endif
   endif
-  assign link3 = section.settings.card_3_link | default: col3.url | default: '/collections/trending-products'
+  assign link3 = section.settings.card_3_link | default: col3.url | default: '/collections/all'
 
   if section.settings.card_1_image != blank
     assign img1 = section.settings.card_1_image | image_url: width: 900
@@ -70,6 +70,7 @@
 <section
   class="three-worlds-section"
   id="three-worlds-{{ section.id }}"
+  data-active-index="1"
   style="
     {% if section.settings.background_color != blank %}
       background-color: {{ section.settings.background_color }};
@@ -88,9 +89,10 @@
       {% endif %}
     </div>
 
-    <div class="three-worlds-grid">
-      {% comment %} Card 1: Left (Best Sellers) - Shifted downward {% endcomment %}
-      <div class="three-worlds-col three-worlds-col--side three-worlds-col--left">
+    <!-- 3D Peek Carousel (Mobile) & 3-Column Luxury Grid (Desktop) -->
+    <div class="three-worlds-grid" id="three-worlds-grid-{{ section.id }}">
+      {% comment %} Card 1: Left (Best Sellers) - Shifted downward on desktop {% endcomment %}
+      <div class="three-worlds-col three-worlds-col--side three-worlds-col--left is-peek-left" data-index="0" data-url="{{ link1 }}">
         <a
           href="{{ link1 }}"
           class="three-worlds-card three-worlds-card--1"
@@ -109,7 +111,7 @@
       </div>
 
       {% comment %} Card 2: Center (New Arrivals) - Elevated higher with CTA button below {% endcomment %}
-      <div class="three-worlds-col three-worlds-col--center">
+      <div class="three-worlds-col three-worlds-col--center is-active" data-index="1" data-url="{{ link2 }}">
         <a
           href="{{ link2 }}"
           class="three-worlds-card three-worlds-card--2"
@@ -129,7 +131,7 @@
         {% if section.settings.card_2_btn_text != blank %}
           <a
             href="{{ link2 }}"
-            class="three-worlds-browse-btn"
+            class="three-worlds-browse-btn three-worlds-browse-btn--desktop"
             aria-label="{{ section.settings.card_2_btn_text }}"
           >
             <span>{{ section.settings.card_2_btn_text }}</span>
@@ -141,8 +143,8 @@
         {% endif %}
       </div>
 
-      {% comment %} Card 3: Right (Trending Products) - Shifted downward {% endcomment %}
-      <div class="three-worlds-col three-worlds-col--side three-worlds-col--right">
+      {% comment %} Card 3: Right (Trending Products) - Shifted downward on desktop {% endcomment %}
+      <div class="three-worlds-col three-worlds-col--side three-worlds-col--right is-peek-right" data-index="2" data-url="{{ link3 }}">
         <a
           href="{{ link3 }}"
           class="three-worlds-card three-worlds-card--3"
@@ -160,8 +162,200 @@
         </a>
       </div>
     </div>
+
+    <!-- Mobile Navigation Controls Row (matches swastikjewel.in mobile layout) -->
+    <div class="three-worlds-mobile-controls">
+      <div class="three-worlds-nav-row">
+        <button
+          type="button"
+          class="three-worlds-nav-btn three-worlds-nav-prev"
+          aria-label="Previous Slide"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="three-worlds-pagination-wrap">
+          <div class="three-worlds-counter">
+            <span class="three-worlds-current">02</span>
+            <span class="three-worlds-sep">/</span>
+            <span class="three-worlds-total">03</span>
+          </div>
+          <div class="three-worlds-dashes">
+            <span class="three-worlds-dash" data-dot="0"></span>
+            <span class="three-worlds-dash is-active" data-dot="1"></span>
+            <span class="three-worlds-dash" data-dot="2"></span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="three-worlds-nav-btn three-worlds-nav-next"
+          aria-label="Next Slide"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      {% if section.settings.card_2_btn_text != blank %}
+        <div class="three-worlds-mobile-cta">
+          <a
+            href="{{ link2 }}"
+            class="three-worlds-browse-btn three-worlds-browse-btn--mobile"
+            aria-label="{{ section.settings.card_2_btn_text }}"
+          >
+            <span>{{ section.settings.card_2_btn_text }}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </section>
+
+<script>
+  (function() {
+    function initThreeWorldsSlider(sectionEl) {
+      if (!sectionEl || sectionEl.getAttribute('data-tw-init') === 'true') return;
+      sectionEl.setAttribute('data-tw-init', 'true');
+
+      var grid = sectionEl.querySelector('.three-worlds-grid');
+      var cols = Array.from(sectionEl.querySelectorAll('.three-worlds-col'));
+      var prevBtn = sectionEl.querySelector('.three-worlds-nav-prev');
+      var nextBtn = sectionEl.querySelector('.three-worlds-nav-next');
+      var currentLabel = sectionEl.querySelector('.three-worlds-current');
+      var dashes = Array.from(sectionEl.querySelectorAll('.three-worlds-dash'));
+      var mobileCta = sectionEl.querySelector('.three-worlds-browse-btn--mobile');
+
+      if (!grid || cols.length !== 3) return;
+
+      var activeIdx = 1; // Center card (New Arrivals) is active by default
+      var isSwiping = false;
+
+      function updateSlider() {
+        cols.forEach(function(col, i) {
+          col.classList.remove('is-active', 'is-peek-left', 'is-peek-right');
+          if (i === activeIdx) {
+            col.classList.add('is-active');
+            if (mobileCta) {
+              var url = col.getAttribute('data-url');
+              if (url) mobileCta.setAttribute('href', url);
+            }
+          } else if ((i + 1) % 3 === activeIdx) {
+            // Card immediately to the left
+            col.classList.add('is-peek-left');
+          } else {
+            // Card immediately to the right
+            col.classList.add('is-peek-right');
+          }
+        });
+
+        if (currentLabel) {
+          var num = activeIdx + 1;
+          currentLabel.textContent = num < 10 ? '0' + num : num;
+        }
+
+        dashes.forEach(function(dash, i) {
+          if (i === activeIdx) {
+            dash.classList.add('is-active');
+          } else {
+            dash.classList.remove('is-active');
+          }
+        });
+      }
+
+      function goTo(idx) {
+        activeIdx = ((idx % 3) + 3) % 3;
+        updateSlider();
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          goTo(activeIdx - 1);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          goTo(activeIdx + 1);
+        });
+      }
+
+      // Clicking peeking side cards activates them
+      cols.forEach(function(col, i) {
+        col.addEventListener('click', function(e) {
+          if (window.innerWidth <= 768 && i !== activeIdx) {
+            e.preventDefault();
+            goTo(i);
+          }
+        });
+      });
+
+      // Touch swipe gestures
+      var touchStartX = 0;
+      var touchStartY = 0;
+
+      grid.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          isSwiping = false;
+        }
+      }, { passive: true });
+
+      grid.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1) {
+          var diffX = e.touches[0].clientX - touchStartX;
+          var diffY = e.touches[0].clientY - touchStartY;
+          if (Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+            isSwiping = true;
+          }
+        }
+      }, { passive: true });
+
+      grid.addEventListener('touchend', function(e) {
+        if (e.changedTouches.length === 1) {
+          var diffX = e.changedTouches[0].clientX - touchStartX;
+          var diffY = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+            if (diffX < 0) {
+              goTo(activeIdx + 1);
+            } else {
+              goTo(activeIdx - 1);
+            }
+          }
+        }
+      }, { passive: true });
+
+      updateSlider();
+    }
+
+    function initAll() {
+      document.querySelectorAll('.three-worlds-section').forEach(initThreeWorldsSlider);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
+    }
+
+    document.addEventListener('shopify:section:load', function(e) {
+      if (e.target) {
+        var sec = e.target.querySelector('.three-worlds-section') || (e.target.classList.contains('three-worlds-section') ? e.target : null);
+        if (sec) initThreeWorldsSlider(sec);
+      }
+    });
+  })();
+</script>
 
 {% stylesheet %}
   .three-worlds-section {
@@ -172,31 +366,31 @@
   }
 
   .three-worlds-container {
-    max-width: 1280px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding-inline: clamp(16px, 4vw, 36px);
+    padding-inline: clamp(16px, 3.5vw, 32px);
     box-sizing: border-box;
   }
 
   .three-worlds-header {
     text-align: center;
     max-width: 800px;
-    margin: 0 auto clamp(24px, 3.5vw, 40px);
+    margin: 0 auto clamp(20px, 3vw, 36px);
   }
 
   .three-worlds-title {
     font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
-    font-size: clamp(28px, 3.8vw, 44px);
+    font-size: clamp(26px, 3.5vw, 40px);
     font-weight: 500;
     color: #113B32;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     line-height: 1.25;
     letter-spacing: 0.01em;
   }
 
   .three-worlds-subtitle {
     font-family: var(--font-body--family, 'Plus Jakarta Sans', -apple-system, sans-serif);
-    font-size: clamp(14px, 1.35vw, 17px);
+    font-size: clamp(13.5px, 1.25vw, 16px);
     color: #666E6A;
     margin: 0;
     line-height: 1.5;
@@ -207,7 +401,7 @@
   .three-worlds-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: clamp(18px, 2.5vw, 36px);
+    gap: clamp(14px, 2vw, 26px);
     align-items: start;
   }
 
@@ -220,7 +414,7 @@
 
   /* Left and Right side columns start lower */
   .three-worlds-col--side {
-    margin-top: clamp(32px, 4vw, 56px);
+    margin-top: clamp(20px, 2.5vw, 36px);
   }
 
   /* Center column starts higher up (closer to header) */
@@ -234,10 +428,10 @@
     display: block;
     width: 100%;
     text-decoration: none;
-    border-radius: 24px;
+    border-radius: 20px;
     overflow: hidden;
     background: #FFFFFF;
-    box-shadow: 0 10px 30px rgba(180, 140, 130, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 26px rgba(180, 140, 130, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     cursor: pointer;
@@ -245,16 +439,17 @@
   }
 
   .three-worlds-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 22px 48px rgba(160, 110, 100, 0.22), 0 4px 14px rgba(0, 0, 0, 0.06);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(160, 110, 100, 0.20), 0 4px 14px rgba(0, 0, 0, 0.06);
   }
 
   .three-worlds-card-media {
     position: relative;
     width: 100%;
-    aspect-ratio: 764 / 1024;
+    aspect-ratio: 4 / 4.7;
+    max-height: clamp(280px, 30vw, 385px);
     overflow: hidden;
-    border-radius: 24px;
+    border-radius: 20px;
     background: #F5EFEB;
   }
 
@@ -262,6 +457,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -307,31 +503,209 @@
     transform: translateX(4px);
   }
 
-  /* Mobile responsiveness */
-  @media (max-width: 860px) {
-    .three-worlds-grid {
-      grid-template-columns: 1fr;
-      max-width: 440px;
-      margin: 0 auto;
-      gap: 28px;
+  .three-worlds-mobile-controls {
+    display: none;
+  }
+
+  /* Mobile responsiveness matching swastikjewel.in 3D Peek Carousel */
+  @media screen and (max-width: 768px) {
+    .three-worlds-section {
+      overflow: hidden;
+      padding-block: 40px 32px !important;
     }
 
-    .three-worlds-col--side {
-      margin-top: 0;
+    .three-worlds-container {
+      padding-inline: 0;
+      max-width: 100%;
+    }
+
+    .three-worlds-header {
+      padding-inline: 20px;
+      margin-bottom: 24px;
+    }
+
+    .three-worlds-title {
+      font-size: 26px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .three-worlds-subtitle {
+      font-size: 13.5px;
+    }
+
+    /* Transform grid into absolute-positioned 3D carousel stage on mobile */
+    .three-worlds-grid {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 350px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .three-worlds-col {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 270px;
+      max-width: 76vw;
+      margin-top: 0 !important;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                  opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                  box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform, opacity;
+      user-select: none;
     }
 
     .three-worlds-card {
       border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     }
 
     .three-worlds-card-media {
       border-radius: 20px;
+      aspect-ratio: 4 / 4.8;
+      max-height: 340px;
     }
 
-    .three-worlds-browse-btn {
-      margin-top: 18px;
-      padding: 12px 26px;
-      font-size: 12px;
+    /* Active Center Card (Index === activeIdx) */
+    .three-worlds-col.is-active {
+      transform: translate3d(-50%, -50%, 0) scale(1);
+      opacity: 1;
+      z-index: 5;
+      pointer-events: auto;
+    }
+
+    /* Left Peeking Card */
+    .three-worlds-col.is-peek-left {
+      transform: translate3d(calc(-142%), calc(-50% + 12px), 0) scale(0.85);
+      opacity: 0.8;
+      z-index: 2;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Right Peeking Card */
+    .three-worlds-col.is-peek-right {
+      transform: translate3d(calc(42%), calc(-50% + 12px), 0) scale(0.85);
+      opacity: 0.8;
+      z-index: 2;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Hide desktop CTA button inside center column on mobile */
+    .three-worlds-browse-btn--desktop {
+      display: none !important;
+    }
+
+    /* Show mobile controls row */
+    .three-worlds-mobile-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 24px;
+      padding-inline: 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .three-worlds-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .three-worlds-nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #113B32;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 0;
+    }
+
+    .three-worlds-nav-btn:active {
+      transform: scale(0.94);
+    }
+
+    .three-worlds-pagination-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 70px;
+    }
+
+    .three-worlds-counter {
+      font-family: var(--font-body--family, sans-serif);
+      font-size: 14px;
+      color: #666E6A;
+      letter-spacing: 0.05em;
+    }
+
+    .three-worlds-current {
+      font-weight: 700;
+      color: #113B32;
+    }
+
+    .three-worlds-sep {
+      margin: 0 3px;
+      opacity: 0.6;
+    }
+
+    .three-worlds-dashes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .three-worlds-dash {
+      width: 22px;
+      height: 2.5px;
+      border-radius: 999px;
+      background: #D8D3C8;
+      transition: background 0.3s ease, width 0.3s ease;
+    }
+
+    .three-worlds-dash.is-active {
+      background: #113B32;
+      width: 28px;
+    }
+
+    .three-worlds-mobile-cta {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .three-worlds-browse-btn--mobile {
+      width: 100%;
+      text-align: center;
+      margin-top: 0;
+      padding: 14px 28px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      border-radius: 30px;
+      background: #113B32;
+      color: #FFFFFF !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none !important;
+      box-shadow: 0 4px 16px rgba(17, 59, 50, 0.25);
     }
   }
 {% endstylesheet %}

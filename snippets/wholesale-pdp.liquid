@@ -57,226 +57,262 @@
 <div class="samyak-pdp-wrapper" data-section-id="{{ section_id }}">
   <!-- 1. Top Navigation Breadcrumb Bar -->
   <div class="samyak-pdp-top-bar">
-    <a href="{{ back_url }}" class="samyak-pdp-back-pill" aria-label="Back to {{ back_title }}">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M15 18l-6-6 6-6"/>
-      </svg>
-      <span>Back to {{ back_title }}</span>
-    </a>
-
     <nav class="samyak-pdp-breadcrumbs" aria-label="Breadcrumb">
-      <a href="{{ routes.root_url }}">Home</a>
-      <span class="samyak-bc-sep">›</span>
+      <a href="{{ routes.root_url }}" class="samyak-bc-home" aria-label="Home">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      </a>
+      <span class="samyak-bc-sep">/</span>
       <a href="{{ back_url }}">{{ back_title }}</a>
-      <span class="samyak-bc-sep">›</span>
+      <span class="samyak-bc-sep">/</span>
       <span class="samyak-bc-current">{{ product.title }}</span>
     </nav>
   </div>
 
-  <!-- 2. Two-Column Product Grid -->
+  <!-- 2. Two-Column Product Grid with Synchronized Card Heights -->
   <div class="samyak-pdp-grid">
-    <!-- LEFT COLUMN: Sticky Product Gallery -->
+    <!-- LEFT COLUMN: Product Image Card -->
     <div class="samyak-pdp-gallery-col">
-      <div class="samyak-pdp-gallery-sticky">
-        <!-- Main Product Image Box -->
-        <div class="samyak-pdp-main-img-box" id="samyak-main-img-box">
-          {% if featured_image %}
-            <img
-              id="samyak-pdp-main-img"
-              src="{{ featured_image | image_url: width: 1200 }}"
-              alt="{{ featured_image.alt | default: product.title | escape }}"
-              width="{{ featured_image.width }}"
-              height="{{ featured_image.height }}"
-              class="samyak-pdp-main-img"
-              loading="eager"
-              fetchpriority="high"
-            >
-          {% else %}
-            {{ 'product-1' | placeholder_svg_tag: 'samyak-pdp-placeholder-svg' }}
-          {% endif %}
+      <div class="samyak-pdp-main-img-box" id="samyak-main-img-box">
+        <!-- Floating circular Wishlist button in top-right corner -->
+        <button
+          type="button"
+          class="samyak-pdp-img-wishlist-btn samyak-wishlist-btn"
+          id="samyak-pdp-wishlist-btn"
+          data-product-id="{{ product.id }}"
+          aria-label="Save to Wishlist"
+          title="Save to Wishlist"
+        >
+          <svg class="samyak-pdp-heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
 
-          <!-- Floating circular zoom/expand button in bottom-right corner -->
-          <button
-            type="button"
-            class="samyak-pdp-zoom-btn"
-            id="samyak-pdp-zoom-btn"
-            aria-label="Zoom product image"
-            title="Click to view full image"
+        {% if featured_image %}
+          <img
+            id="samyak-pdp-main-img"
+            src="{{ featured_image | image_url: width: 1200 }}"
+            alt="{{ featured_image.alt | default: product.title | escape }}"
+            width="{{ featured_image.width }}"
+            height="{{ featured_image.height }}"
+            class="samyak-pdp-main-img"
+            loading="eager"
+            fetchpriority="high"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#181A19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="7"/>
-              <path d="M21 21l-4.35-4.35"/>
-              <path d="M11 8v6M8 11h6"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Thumbnail Strip -->
-        {% if product.media.size > 1 %}
-          <div class="samyak-pdp-thumbnails-strip" id="samyak-pdp-thumbnails" role="tablist" aria-label="Product Thumbnails">
-            {% for media in product.media %}
-              {% assign is_active = false %}
-              {% if media.id == featured_image.id or forloop.first and featured_image == blank %}
-                {% assign is_active = true %}
-              {% endif %}
-              <button
-                type="button"
-                role="tab"
-                class="samyak-pdp-thumb{% if is_active %} is-active{% endif %}"
-                data-media-id="{{ media.id }}"
-                data-full-url="{{ media | image_url: width: 1200 }}"
-                data-alt="{{ media.alt | default: product.title | escape }}"
-                aria-selected="{% if is_active %}true{% else %}false{% endif %}"
-                aria-label="Thumbnail {{ forloop.index }} of {{ product.media.size }}"
-              >
-                <img
-                  src="{{ media | image_url: width: 160 }}"
-                  alt="{{ media.alt | default: product.title | escape }}"
-                  width="64"
-                  height="76"
-                  loading="lazy"
-                >
-              </button>
-            {% endfor %}
-          </div>
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'samyak-pdp-placeholder-svg' }}
         {% endif %}
 
-        <!-- Image Disclaimer Box -->
-        <div class="samyak-pdp-disclaimer-box">
-          <span class="samyak-disclaimer-icon" aria-hidden="true">ⓘ</span>
-          <span class="samyak-disclaimer-text">
-            Product colors and finish may vary slightly due to studio lighting. Supplied in sealed wholesale packs.
-          </span>
-        </div>
+        <!-- Floating circular Zoom/Expand button in bottom-right corner -->
+        <button
+          type="button"
+          class="samyak-pdp-zoom-btn"
+          id="samyak-pdp-zoom-btn"
+          aria-label="Zoom product image"
+          title="Click to view full image"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.35-4.35"/>
+            <line x1="11" y1="8" x2="11" y2="14"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </button>
       </div>
+
+      <!-- Compact Thumbnails (if multiple images exist) -->
+      {% if product.media.size > 1 %}
+        <div class="samyak-pdp-thumbnails-strip" id="samyak-pdp-thumbnails" role="tablist" aria-label="Product Thumbnails">
+          {% for media in product.media %}
+            {% assign is_active = false %}
+            {% if media.id == featured_image.id or forloop.first and featured_image == blank %}
+              {% assign is_active = true %}
+            {% endif %}
+            <button
+              type="button"
+              role="tab"
+              class="samyak-pdp-thumb{% if is_active %} is-active{% endif %}"
+              data-media-id="{{ media.id }}"
+              data-full-url="{{ media | image_url: width: 1200 }}"
+              data-alt="{{ media.alt | default: product.title | escape }}"
+              aria-selected="{% if is_active %}true{% else %}false{% endif %}"
+              aria-label="Thumbnail {{ forloop.index }} of {{ product.media.size }}"
+            >
+              <img
+                src="{{ media | image_url: width: 140 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                width="52"
+                height="52"
+                loading="lazy"
+              >
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
 
-    <!-- RIGHT COLUMN: Product Configuration & Actions -->
+    <!-- RIGHT COLUMN: Product Configuration & Actions in Rounded White Card -->
     <div class="samyak-pdp-info-col">
-      <!-- 1. Product Name -->
-      <h1 class="samyak-pdp-title">{{ product.title }}</h1>
-
-      <!-- 2. Product Price -->
-      <div class="samyak-pdp-price-row" id="samyak-pdp-price-row">
-        <span class="samyak-pdp-current-price" id="samyak-pdp-price-display">
-          {{ current_variant.price | money }} <span class="samyak-price-unit">/ Pack</span>
-        </span>
-        {% if current_variant.compare_at_price > current_variant.price %}
-          <span class="samyak-pdp-compare-price" id="samyak-pdp-compare-price">
-            {{ current_variant.compare_at_price | money }}
-          </span>
-        {% endif %}
-      </div>
-
-      <!-- 3. Product description / short introduction -->
-      {% if product.description != blank %}
-        <div class="samyak-pdp-short-intro">
-          {{ product.description | strip_html | truncatewords: 32 }}
+      <div class="samyak-pdp-info-card">
+        <!-- Floral Watermark in top-right corner -->
+        <div class="samyak-pdp-floral-watermark" aria-hidden="true">
+          <svg width="110" height="110" viewBox="0 0 100 100" fill="none">
+            <path d="M100 0 C70 12 52 42 46 75 C44 60 40 42 16 36 C42 30 68 15 100 0 Z" fill="#EADCCB" opacity="0.45"/>
+            <path d="M100 22 C80 32 66 52 62 86 C60 72 52 56 32 50 C52 44 72 32 100 22 Z" fill="#EADCCB" opacity="0.3"/>
+          </svg>
         </div>
-      {% endif %}
 
-      <!-- 4. Form & Variant / Pack Selector & Quantity -->
-      <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" id="samyak-pdp-form" class="samyak-pdp-form">
-        <input type="hidden" name="id" id="samyak-pdp-variant-id" value="{{ current_variant.id }}">
-        <input type="hidden" name="quantity" id="samyak-pdp-qty-field" value="1">
+        <div class="samyak-pdp-info-top">
+          <!-- 1. Product Title -->
+          <h1 class="samyak-pdp-title">{{ product.title }}</h1>
 
-        <!-- Available Options or Variants (Rendered only if actual variants exist) -->
-        {% if product.variants.size > 1 %}
-          <div class="samyak-pdp-variants-section">
-            <label class="samyak-pdp-section-label">AVAILABLE OPTIONS / VARIANTS</label>
-            <div class="samyak-pdp-swatches-row" role="radiogroup" aria-label="Select Variant">
-              {% for variant in product.variants %}
-                {% assign is_selected = false %}
-                {% if variant.id == current_variant.id %}
-                  {% assign is_selected = true %}
-                {% endif %}
-                <button
-                  type="button"
-                  role="radio"
-                  class="samyak-pdp-swatch{% if is_selected %} is-selected{% endif %}{% unless variant.available %} is-sold-out{% endunless %}"
-                  data-variant-id="{{ variant.id }}"
-                  data-price="{{ variant.price | money }}"
-                  data-raw-price="{{ variant.price }}"
-                  data-compare-price="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
-                  data-available="{{ variant.available }}"
-                  data-media-id="{{ variant.featured_media.id | default: '' }}"
-                  data-img-url="{{ variant.featured_image | image_url: width: 1200 | default: '' }}"
-                  aria-checked="{% if is_selected %}true{% else %}false{% endif %}"
-                >
-                  {{ variant.title }}
-                </button>
-              {% endfor %}
+          <!-- 2. Product Price -->
+          <div class="samyak-pdp-price-row" id="samyak-pdp-price-row">
+            <span class="samyak-pdp-current-price" id="samyak-pdp-price-display">
+              {{ current_variant.price | money }}
+            </span>
+            <span class="samyak-pdp-price-sep">|</span>
+            <span class="samyak-pdp-price-unit">Per Pc</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="samyak-pdp-compare-price" id="samyak-pdp-compare-price">
+                {{ current_variant.compare_at_price | money }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 3. Form & Controls -->
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" id="samyak-pdp-form" class="samyak-pdp-form">
+          <input type="hidden" name="id" id="samyak-pdp-variant-id" value="{{ current_variant.id }}">
+          <input type="hidden" name="quantity" id="samyak-pdp-qty-field" value="1">
+
+          <!-- Available Options or Variants (if variants exist) -->
+          {% if product.variants.size > 1 %}
+            <div class="samyak-pdp-variants-section">
+              <label class="samyak-pdp-section-label">AVAILABLE OPTIONS / VARIANTS</label>
+              <div class="samyak-pdp-swatches-row" role="radiogroup" aria-label="Select Variant">
+                {% for variant in product.variants %}
+                  {% assign is_selected = false %}
+                  {% if variant.id == current_variant.id %}
+                    {% assign is_selected = true %}
+                  {% endif %}
+                  <button
+                    type="button"
+                    role="radio"
+                    class="samyak-pdp-swatch{% if is_selected %} is-selected{% endif %}{% unless variant.available %} is-sold-out{% endunless %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-price="{{ variant.price | money }}"
+                    data-raw-price="{{ variant.price }}"
+                    data-compare-price="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+                    data-available="{{ variant.available }}"
+                    data-media-id="{{ variant.featured_media.id | default: '' }}"
+                    data-img-url="{{ variant.featured_image | image_url: width: 1200 | default: '' }}"
+                    aria-checked="{% if is_selected %}true{% else %}false{% endif %}"
+                  >
+                    {{ variant.title }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- 4. Quantity Stepper Row -->
+          <div class="samyak-pdp-qty-row">
+            <span class="samyak-pdp-qty-label">QUANTITY</span>
+            <div class="samyak-pdp-qty-pill" aria-label="Product Quantity Stepper">
+              <button type="button" class="samyak-qty-btn" id="samyak-qty-dec" aria-label="Decrease quantity">−</button>
+              <span class="samyak-qty-number" id="samyak-qty-number">1</span>
+              <button type="button" class="samyak-qty-btn" id="samyak-qty-inc" aria-label="Increase quantity">+</button>
             </div>
           </div>
-        {% endif %}
 
-        <!-- Quantity Stepper -->
-        <div class="samyak-pdp-quantity-section">
-          <label class="samyak-pdp-section-label">QUANTITY</label>
-          <div class="samyak-pdp-qty-stepper" aria-label="Product Quantity Stepper">
-            <button type="button" class="samyak-qty-btn" id="samyak-qty-dec" aria-label="Decrease quantity">−</button>
-            <span class="samyak-qty-number" id="samyak-qty-number">1</span>
-            <button type="button" class="samyak-qty-btn" id="samyak-qty-inc" aria-label="Increase quantity">+</button>
+          <!-- 5. Stock & Dispatch Status Row -->
+          <div class="samyak-pdp-stock-dispatch-row" id="samyak-pdp-stock-status">
+            <div class="samyak-pdp-stock-item">
+              <span class="samyak-stock-dot {% if current_variant.available %}is-in-stock{% else %}is-out-of-stock{% endif %}"></span>
+              <span class="samyak-stock-text" id="samyak-stock-text">
+                {% if current_variant.available %}In Stock{% else %}Out of Stock{% endif %}
+              </span>
+            </div>
+            <div class="samyak-pdp-dispatch-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+              <span>Ready to dispatch (2-3 days)</span>
+            </div>
+          </div>
+
+          <!-- 6. Action Buttons: ADD TO CART + BUY NOW Side-by-Side -->
+          <div class="samyak-pdp-actions">
+            <button
+              type="submit"
+              class="samyak-pdp-btn-atc"
+              id="samyak-pdp-btn-atc"
+              {% unless current_variant.available %}disabled{% endunless %}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span id="samyak-pdp-atc-label">
+                {% if current_variant.available %}ADD TO CART{% else %}SOLD OUT{% endif %}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="samyak-pdp-btn-buynow"
+              id="samyak-pdp-btn-buynow"
+              {% unless current_variant.available %}disabled{% endunless %}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>BUY NOW</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- 7. Trust Badges Row -->
+        <div class="samyak-pdp-trust-badges">
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <span>Secure Checkout</span>
+          </div>
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span>Fast Delivery</span>
+          </div>
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <polyline points="23 20 23 14 17 14"></polyline>
+              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+            </svg>
+            <span>Easy Returns</span>
           </div>
         </div>
 
-        <!-- 5. Availability / stock status -->
-        <div class="samyak-pdp-stock-status" id="samyak-pdp-stock-status">
-          {% if current_variant.available %}
-            <span class="samyak-stock-dot is-in-stock"></span>
-            <span class="samyak-stock-text" id="samyak-stock-text">In Stock • Ready to dispatch (24–48 hrs)</span>
-          {% else %}
-            <span class="samyak-stock-dot is-out-of-stock"></span>
-            <span class="samyak-stock-text" id="samyak-stock-text">Currently Out of Stock</span>
-          {% endif %}
-        </div>
-
-        <!-- 6 & 7. Action Buttons (Add to Cart + Buy Now) -->
-        <div class="samyak-pdp-actions">
-          <button
-            type="submit"
-            class="samyak-pdp-btn-atc"
-            id="samyak-pdp-btn-atc"
-            {% unless current_variant.available %}disabled{% endunless %}
-          >
-            <span id="samyak-pdp-atc-label">
-              {% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            class="samyak-pdp-btn-buynow"
-            id="samyak-pdp-btn-buynow"
-            {% unless current_variant.available %}disabled{% endunless %}
-          >
-            Buy Now
-          </button>
-        </div>
-
-        <!-- 8. Wishlist Option -->
-        <div class="samyak-pdp-wishlist-row">
-          <button
-            type="button"
-            class="samyak-pdp-wishlist-action-btn samyak-wishlist-btn"
-            id="samyak-pdp-wishlist-btn"
-            data-product-id="{{ product.id }}"
-            aria-label="Save to Wishlist"
-          >
-            <svg class="samyak-pdp-heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            <span id="samyak-pdp-wishlist-text">Save to Wishlist</span>
-          </button>
-        </div>
-      </form>
-
-      {% if additional_blocks != blank %}
-        <!-- Theme Editor App Blocks & Merchant Widgets -->
-        <div class="samyak-pdp-additional-blocks-wrapper" data-theme-editor-blocks>
-          {{ additional_blocks }}
-        </div>
-      {% endif %}
+        {% if additional_blocks != blank %}
+          <!-- Theme Editor App Blocks & Merchant Widgets -->
+          <div class="samyak-pdp-additional-blocks-wrapper" data-theme-editor-blocks>
+            {{ additional_blocks }}
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 
@@ -335,45 +371,36 @@
 
   /* 1. Top Breadcrumb Bar */
   .samyak-pdp-top-bar {
-    max-width: 1320px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 24px 24px 14px;
+    padding: 24px 20px 14px;
     box-sizing: border-box;
   }
 
-  .samyak-pdp-back-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #181A19;
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-
-  .samyak-pdp-back-pill:hover {
-    background: #FFFFFF;
-    border-color: #113B32;
-    color: #113B32;
-  }
-
   .samyak-pdp-breadcrumbs {
-    margin-top: 10px;
-    font-size: 11px;
-    color: #5C615E;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    font-size: 12px;
+    color: #6B7280;
     flex-wrap: wrap;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', -apple-system, sans-serif);
+  }
+
+  .samyak-bc-home {
+    display: inline-flex;
+    align-items: center;
+    color: #113B32;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .samyak-bc-home:hover {
+    opacity: 0.75;
   }
 
   .samyak-pdp-breadcrumbs a {
-    color: #5C615E;
+    color: #6B7280;
     text-decoration: none;
     transition: color 0.15s ease;
   }
@@ -384,65 +411,59 @@
   }
 
   .samyak-bc-sep {
-    color: #A3A8A5;
-    font-size: 11px;
+    color: #D1D5DB;
+    font-size: 13px;
   }
 
   .samyak-bc-current {
-    color: #181A19;
+    color: #113B32;
     font-weight: 500;
   }
 
-  /* 2. Two-Column Grid */
+  /* 2. Two-Column Grid with Equal Card Heights */
   .samyak-pdp-grid {
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: 48px;
-    max-width: 1320px;
+    grid-template-columns: 1fr 1.12fr;
+    gap: clamp(16px, 2.5vw, 32px);
+    max-width: 960px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 16px;
     box-sizing: border-box;
-    align-items: start;
+    align-items: stretch;
   }
 
-  /* LEFT COLUMN: Gallery */
+  /* LEFT COLUMN: Gallery Matching Right Box Height Exactly */
   .samyak-pdp-gallery-col {
     position: relative;
-  }
-
-  .samyak-pdp-gallery-sticky {
-    position: sticky;
-    top: 110px;
-    align-self: start;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
   }
 
   .samyak-pdp-main-img-box {
-    border-radius: 10px;
-    width: 100%;
-    max-width: 440px;
-    max-height: 440px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    background: #FAF8F5;
     position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #ECE8E1;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-    padding: 16px;
+    padding: 0;
     box-sizing: border-box;
   }
 
   .samyak-pdp-main-img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     display: block;
-    margin: auto;
     transition: opacity 0.25s ease;
   }
 
@@ -452,46 +473,77 @@
     opacity: 0.4;
   }
 
+  /* Floating Wishlist Button on Top-Right of Main Image */
+  .samyak-pdp-img-wishlist-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    padding: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .samyak-pdp-img-wishlist-btn:hover {
+    background: #FAF7F2;
+    transform: scale(1.08);
+  }
+
+  .samyak-pdp-img-wishlist-btn.is-active svg {
+    fill: #E53E3E !important;
+    stroke: #E53E3E !important;
+  }
+
+  /* Floating Zoom Button on Bottom-Right of Main Image */
   .samyak-pdp-zoom-btn {
     position: absolute;
-    bottom: 14px;
-    right: 14px;
-    width: 34px;
-    height: 34px;
+    bottom: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.15s ease, background-color 0.15s ease;
-    z-index: 2;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    z-index: 5;
   }
 
   .samyak-pdp-zoom-btn:hover {
-    background: #FFFFFF;
+    background: #FAF7F2;
     transform: scale(1.08);
   }
 
   .samyak-pdp-thumbnails-strip {
     display: flex;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 8px;
+    margin-top: 10px;
     overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: thin;
+    padding-bottom: 2px;
+    justify-content: center;
   }
 
   .samyak-pdp-thumb {
-    width: 64px;
-    height: 76px;
-    min-width: 64px;
-    border-radius: 6px;
-    border: 1px solid #E4E0D6;
-    background: #EFECE4;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 8px;
+    border: 1px solid #ECE6DF;
+    background: #FAF7F2;
     padding: 0;
     overflow: hidden;
     cursor: pointer;
@@ -509,7 +561,6 @@
 
   .samyak-pdp-thumb:hover {
     border-color: #113B32;
-    transform: translateY(-1px);
   }
 
   .samyak-pdp-thumb.is-active {
@@ -517,170 +568,108 @@
     box-shadow: 0 2px 6px rgba(17, 59, 50, 0.15);
   }
 
-  .samyak-pdp-disclaimer-box {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border: 1px solid #E4E0D6;
-    border-radius: 8px;
-    background: #FCFBF7;
-    font-size: 10.5px;
-    color: #5C615E;
-    line-height: 1.45;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    box-sizing: border-box;
-  }
-
-  .samyak-disclaimer-icon {
-    color: #113B32;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  /* RIGHT COLUMN: Details & Controls */
+  /* RIGHT COLUMN: Product Information Card Defining Natural Height */
   .samyak-pdp-info-col {
     display: flex;
     flex-direction: column;
   }
 
+  .samyak-pdp-info-card {
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-floral-watermark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
   .samyak-pdp-title {
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    font-size: 34px;
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: clamp(21px, 2.1vw, 26px);
     font-weight: 500;
     color: #113B32;
-    line-height: 1.15;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
   }
 
   .samyak-pdp-price-row {
-    font-size: 16px;
-    font-weight: 600;
-    color: #181A19;
-    margin: 0 0 18px 0;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 8px;
+    margin: 0 0 16px 0;
+    position: relative;
+    z-index: 1;
   }
 
-  .samyak-price-unit {
-    font-size: 13px;
+  .samyak-pdp-current-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  .samyak-pdp-price-sep {
+    color: #D1D5DB;
+    font-size: 16px;
+    margin: 0 2px;
+  }
+
+  .samyak-pdp-price-unit {
+    font-size: 13.5px;
     font-weight: 400;
-    color: #5C615E;
+    color: #6B7280;
   }
 
   .samyak-pdp-compare-price {
     font-size: 14px;
-    color: #8C928F;
+    color: #9CA3AF;
     text-decoration: line-through;
     font-weight: 400;
+    margin-left: 6px;
   }
 
-  /* Callout Strips */
-  .samyak-pdp-callout-strip-1 {
-    background: #EFECE4;
-    border-left: 2.5px solid #113B32;
-    padding: 9px 14px;
-    font-size: 11.5px;
-    color: #181A19;
-    border-radius: 0 6px 6px 0;
-    font-weight: 500;
-    margin-bottom: 8px;
+  /* Quantity Stepper Row */
+  .samyak-pdp-qty-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 14px 0;
   }
 
-  .samyak-pdp-callout-strip-2 {
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    border-radius: 6px;
-    padding: 9px 14px;
-    font-size: 11.5px;
-    color: #2E6F40;
-    font-weight: 500;
-  }
-
-  /* Section Labels */
-  .samyak-pdp-section-label {
-    font-size: 10px;
+  .samyak-pdp-qty-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-    color: #5C615E;
-    display: block;
-    margin-bottom: 8px;
   }
 
-  /* Variant Swatches */
-  .samyak-pdp-variants-section {
-    margin-top: 22px;
-  }
-
-  .samyak-pdp-swatches-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .samyak-pdp-swatch {
-    background: #FCFBF7;
-    color: #181A19;
-    font-weight: 500;
-    font-size: 12px;
-    min-width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    padding: 0 16px;
-    border: 1px solid #E4E0D6;
-    cursor: pointer;
+  .samyak-pdp-qty-pill {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-  }
-
-  .samyak-pdp-swatch:hover:not(.is-sold-out) {
-    border-color: #113B32;
+    gap: 14px;
+    border: 1px solid #E5E0D8;
     background: #FFFFFF;
-  }
-
-  .samyak-pdp-swatch.is-selected {
-    background: #113B32 !important;
-    color: #FFFFFF !important;
-    border-color: #113B32 !important;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(17, 59, 50, 0.2);
-  }
-
-  .samyak-pdp-swatch.is-sold-out {
-    opacity: 0.5;
-    text-decoration: line-through;
-    cursor: not-allowed;
-  }
-
-  /* Quantity Stepper */
-  .samyak-pdp-quantity-section {
-    margin-top: 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .samyak-pdp-quantity-section .samyak-pdp-section-label {
-    margin-bottom: 0;
-  }
-
-  .samyak-pdp-qty-stepper {
-    border: 1px solid #E4E0D6;
-    background: #FCFBF7;
     border-radius: 999px;
-    height: 34px;
-    padding: 0 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
+    padding: 3px 12px;
   }
 
   .samyak-qty-btn {
@@ -688,45 +677,45 @@
     border: none;
     font-size: 16px;
     font-weight: 600;
-    color: #181A19;
+    color: #113B32;
     cursor: pointer;
     padding: 0 2px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.2s ease;
   }
 
   .samyak-qty-btn:hover {
-    color: #113B32;
+    opacity: 0.7;
   }
 
   .samyak-qty-number {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: #181A19;
-    min-width: 18px;
+    color: #113B32;
+    min-width: 14px;
     text-align: center;
     user-select: none;
   }
 
-  /* Product Short Introduction */
-  .samyak-pdp-short-intro {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #5C615E;
-    margin: -8px 0 14px 0;
-  }
-
-  /* Real-time Stock Availability Status */
-  .samyak-pdp-stock-status {
+  /* Stock & Dispatch Status Row */
+  .samyak-pdp-stock-dispatch-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 18px;
+    margin: 0 0 18px 0;
     font-size: 13px;
-    font-weight: 500;
-    margin-top: 14px;
-    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .samyak-pdp-stock-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #16A34A;
+    font-weight: 600;
   }
 
   .samyak-stock-dot {
@@ -735,55 +724,52 @@
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
-  }
-
-  .samyak-stock-dot.is-in-stock {
-    background: #1A8754;
-    box-shadow: 0 0 0 3px rgba(26, 135, 84, 0.2);
+    background-color: #16A34A;
   }
 
   .samyak-stock-dot.is-out-of-stock {
-    background: #DC3545;
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+    background-color: #DC2626;
   }
 
-  /* Action Buttons (Add to Cart + Buy Now Side-by-Side) */
+  .samyak-pdp-dispatch-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #4B5563;
+  }
+
+  /* Action Buttons: ADD TO CART + BUY NOW Side-by-Side */
   .samyak-pdp-actions {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 12px;
     width: 100%;
-  }
-
-  @media (max-width: 540px) {
-    .samyak-pdp-actions {
-      grid-template-columns: 1fr;
-    }
+    margin: 0 0 18px 0;
   }
 
   .samyak-pdp-btn-atc {
-    width: 100%;
-    height: 48px;
-    border-radius: 6px;
+    flex: 1;
+    height: 44px;
+    border-radius: 9px;
     background: #113B32;
     color: #FFFFFF;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 3px 10px rgba(17, 59, 50, 0.15);
+    gap: 7px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(17, 59, 50, 0.15);
   }
 
   .samyak-pdp-btn-atc:hover:not(:disabled) {
-    background: #0B2923;
+    background: #09241E;
     transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(17, 59, 50, 0.25);
   }
 
   .samyak-pdp-btn-atc:disabled {
@@ -793,28 +779,29 @@
   }
 
   .samyak-pdp-btn-buynow {
-    width: 100%;
-    height: 48px;
-    border-radius: 6px;
-    background: #C5A280;
+    flex: 1;
+    height: 44px;
+    border-radius: 9px;
+    background: #D4BA9E;
     color: #113B32;
     font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    border: 1px solid #B89370;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease, transform 0.1s ease, color 0.2s ease;
-    box-shadow: 0 3px 10px rgba(197, 162, 128, 0.2);
+    gap: 7px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(212, 186, 158, 0.25);
   }
 
   .samyak-pdp-btn-buynow:hover:not(:disabled) {
-    background: #BA9572;
-    color: #FFFFFF;
+    filter: brightness(0.96);
     transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(212, 186, 158, 0.35);
   }
 
   .samyak-pdp-btn-buynow:disabled {
@@ -823,58 +810,66 @@
     box-shadow: none;
   }
 
-  /* Wishlist Button */
-  .samyak-pdp-wishlist-row {
-    margin-top: 10px;
-    width: 100%;
-  }
-
-  .samyak-pdp-wishlist-action-btn {
-    width: 100%;
-    height: 42px;
-    border-radius: 6px;
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    color: #113B32;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+  /* Trust Badges Footer Row */
+  .samyak-pdp-trust-badges {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    justify-content: space-between;
+    border-top: 1px solid #F0ECE6;
+    padding-top: 14px;
+    margin-top: 0;
+    gap: 10px;
   }
 
-  .samyak-pdp-wishlist-action-btn:hover {
-    background: #FFFFFF;
-    border-color: #113B32;
+  .samyak-trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #4B5563;
+    font-weight: 500;
   }
 
-  .samyak-pdp-wishlist-action-btn.is-active {
-    background: #FAF3E8;
-    border-color: #C5A280;
-    color: #113B32;
-  }
+  /* Responsive Mobile Styling */
+  @media (max-width: 860px) {
+    .samyak-pdp-grid {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+      gap: 20px;
+    }
 
-  .samyak-pdp-wishlist-action-btn.is-active .samyak-pdp-heart-icon {
-    fill: #C5A280;
-    stroke: #C5A280;
+    .samyak-pdp-main-img-box {
+      aspect-ratio: 1 / 1;
+      height: 380px;
+      min-height: 280px;
+    }
+
+    .samyak-pdp-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .samyak-pdp-trust-badges {
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
   }
 
   /* SECTION 3: About This Product */
   .samyak-pdp-about-section {
-    max-width: 1000px;
-    margin: 48px auto 0;
-    padding: 0 24px;
+    max-width: 960px;
+    margin: clamp(48px, 6vw, 64px) auto 0;
+    padding: 0 16px;
     box-sizing: border-box;
   }
 
   .samyak-pdp-about-container {
-    background: #FCFBF7;
-    border: 1px solid #ECE8E1;
-    border-radius: 12px;
-    padding: 40px 36px;
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    border-radius: 16px;
+    padding: clamp(36px, 4.5vw, 48px) clamp(24px, 4vw, 40px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     box-sizing: border-box;
   }
 
@@ -883,7 +878,7 @@
     align-items: center !important;
     justify-content: center !important;
     gap: 20px !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 28px !important;
   }
 
   .samyak-pdp-about-section .samyak-golden-line {
@@ -907,13 +902,17 @@
 
   .samyak-pdp-about-body {
     font-size: 15px;
-    line-height: 1.75;
+    line-height: 1.8;
     color: #3A403D;
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   }
 
   .samyak-pdp-about-body p {
     margin: 0 0 16px 0;
+  }
+
+  .samyak-pdp-about-body p:last-child {
+    margin-bottom: 0;
   }
 
   .samyak-pdp-about-body ul {
@@ -926,315 +925,15 @@
   }
 
   @media (max-width: 768px) {
+    .samyak-pdp-about-section {
+      margin-top: 36px;
+    }
     .samyak-pdp-about-container {
-      padding: 28px 18px;
+      padding: 28px 20px;
     }
     .samyak-pdp-about-section .samyak-golden-line {
-      max-width: 50px !important;
+      max-width: 60px !important;
     }
-  }
-
-  /* Payment Badges */
-  .samyak-pdp-payments-box {
-    margin-top: 16px;
-    padding: 12px 16px;
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    border-radius: 8px;
-    text-align: center;
-  }
-
-  .samyak-payments-headline {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-weight: 600;
-    color: #5C615E;
-    margin-bottom: 8px;
-  }
-
-  .samyak-payments-badges {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .samyak-pay-badge {
-    background: #EFECE4;
-    border: 1px solid #E4E0D6;
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: 700;
-    color: #181A19;
-    letter-spacing: 0.3px;
-  }
-
-  /* 3-Column Service Strip */
-  .samyak-pdp-service-box {
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    border-radius: 8px;
-    padding: 12px 10px;
-    font-size: 10.5px;
-    color: #181A19;
-    text-align: center;
-    gap: 8px;
-  }
-
-  .samyak-service-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    line-height: 1.3;
-  }
-
-  .samyak-service-icon {
-    font-size: 14px;
-  }
-
-  /* 6. PIN Estimator Card */
-  .samyak-pdp-pin-card {
-    margin-top: 14px;
-    padding: 16px;
-    background: #FCFBF7;
-    border: 1px solid #181A19;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-    box-sizing: border-box;
-  }
-
-  .samyak-pin-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .samyak-pin-truck-badge {
-    width: 36px;
-    height: 36px;
-    background: #181A19;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .samyak-pin-header-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .samyak-pin-eyebrow {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-    color: #5C615E;
-  }
-
-  .samyak-pin-dates-display {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #181A19;
-  }
-
-  .samyak-pin-transit-matrix {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed #E4E0D6;
-  }
-
-  .samyak-transit-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .samyak-transit-badge {
-    background: #F1ECE1;
-    color: #113B32;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.3px;
-  }
-
-  .samyak-transit-couriers {
-    margin: 8px 0 0;
-    font-size: 10.5px;
-    color: #5C615E;
-    line-height: 1.4;
-  }
-
-  .samyak-pdp-additional-blocks-wrapper {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #E4E0D6;
-    width: 100%;
-  }
-
-  .samyak-pin-input-group {
-    margin-top: 12px;
-  }
-
-  .samyak-pin-field-label {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: #181A19;
-    display: block;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
-  }
-
-  .samyak-pin-input-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .samyak-pin-input {
-    flex: 1;
-    height: 40px;
-    border: 1px solid #D5D0CA;
-    border-radius: 6px;
-    padding: 0 12px;
-    font-size: 12px;
-    color: #181A19;
-    background: #FFFFFF;
-    box-sizing: border-box;
-    outline: none;
-    transition: border-color 0.2s ease;
-  }
-
-  .samyak-pin-input:focus {
-    border-color: #113B32;
-  }
-
-  .samyak-pin-btn {
-    height: 40px;
-    padding: 0 16px;
-    background: #113B32;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 6px;
-    font-size: 11.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-
-  .samyak-pin-btn:hover {
-    background: #0B2923;
-  }
-
-  .samyak-pin-feedback {
-    margin-top: 8px;
-    font-size: 11px;
-    line-height: 1.4;
-    padding: 6px 10px;
-    border-radius: 6px;
-  }
-
-  .samyak-pin-feedback.is-valid {
-    background: #E8F5E9;
-    color: #2E6F40;
-    border: 1px solid #C8E6C9;
-  }
-
-  .samyak-pin-feedback.is-invalid {
-    background: #FFEBEE;
-    color: #C62828;
-    border: 1px solid #FFCDD2;
-  }
-
-  /* 7. Collapsible Product Details Accordions */
-  .samyak-pdp-accordions-section {
-    margin-top: 22px;
-  }
-
-  .samyak-pdp-accordions-eyebrow {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-    color: #5C615E;
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  .samyak-pdp-accordions-container {
-    background: #FCFBF7;
-    border: 1px solid #E4E0D6;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .samyak-pdp-accordion-item {
-    border-bottom: 1px solid #E4E0D6;
-  }
-
-  .samyak-pdp-accordion-item:last-child {
-    border-bottom: none;
-  }
-
-  .samyak-pdp-accordion-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    cursor: pointer;
-    user-select: none;
-    list-style: none;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #181A19;
-  }
-
-  .samyak-pdp-accordion-header::-webkit-details-marker {
-    display: none;
-  }
-
-  .samyak-accordion-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .samyak-acc-icon {
-    font-size: 13px;
-  }
-
-  .samyak-accordion-toggle {
-    font-size: 16px;
-    font-weight: 600;
-    color: #5C615E;
-    transition: transform 0.2s ease;
-  }
-
-  .samyak-pdp-accordion-content {
-    padding: 0 18px 16px;
-    font-size: 12px;
-    color: #4A4F4C;
-    line-height: 1.6;
-  }
-
-  .samyak-pdp-accordion-content ul {
-    margin: 0;
-    padding-left: 18px;
-  }
-
-  .samyak-pdp-accordion-content li {
-    margin-bottom: 6px;
   }
 
   /* Lightbox Modal */
@@ -1447,7 +1146,7 @@
           if (hiddenId) hiddenId.value = variantId;
 
           if (priceDisplay && price) {
-            priceDisplay.innerHTML = price + ' <span class="samyak-price-unit">/ Pack</span>';
+            priceDisplay.textContent = price;
           }
 
           if (comparePrice) {

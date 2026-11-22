@@ -4,15 +4,7 @@
 {% enddoc %}
 
 {% liquid
-  assign is_target = false
-  assign handle_lower = collection.handle | downcase
-  assign title_lower = collection.title | downcase
-  if handle_lower contains 'best-seller' or handle_lower contains 'best_seller' or handle_lower contains 'bestseller' or handle_lower contains 'new-arrival' or handle_lower contains 'new_arrival' or handle_lower contains 'newarrival' or title_lower contains 'best seller' or title_lower contains 'new arrival'
-    assign is_target = true
-  endif
-  if section.settings.always_show
-    assign is_target = true
-  endif
+  assign is_target = true
 %}
 
 {% if is_target %}
@@ -169,7 +161,7 @@
       "type": "checkbox",
       "id": "always_show",
       "label": "Show on all collections",
-      "default": false
+      "default": true
     },
     {
       "type": "range",

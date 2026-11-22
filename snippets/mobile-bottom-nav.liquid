@@ -1,0 +1,205 @@
+{% doc %}
+  Fixed Mobile Bottom Navigation Dock (matches Swastik Jewels mobile layout).
+  Appears only on mobile devices (<= 768px).
+  Contains:
+  1. Home (/)
+  2. Search (opens search modal)
+  3. Chat (WhatsApp elevated green circular button in center)
+  4. Wishlist (opens wishlist drawer)
+  5. Bag (opens cart drawer with dynamic count badge)
+{% enddoc %}
+
+<nav class="samyak-mobile-bottom-nav" aria-label="Mobile Navigation">
+  <!-- 1. Home -->
+  <a
+    href="{{ routes.root_url }}"
+    class="samyak-mbn-item{% if request.page_type == 'index' %} is-active{% endif %}"
+    aria-label="Home"
+  >
+    <div class="samyak-mbn-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z"/>
+      </svg>
+    </div>
+    <span class="samyak-mbn-label">Home</span>
+  </a>
+
+  <!-- 2. Search -->
+  <a
+    href="{{ routes.search_url }}"
+    class="samyak-mbn-item"
+    aria-label="Search"
+    onclick="event.preventDefault(); var sm=document.querySelector('search-modal')||document.getElementById('search-modal')||document.querySelector('[id*=\'search\']'); if(sm&&typeof sm.open==='function'){sm.open();}else{window.location.href='{{ routes.search_url }}';}"
+  >
+    <div class="samyak-mbn-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <span class="samyak-mbn-label">Search</span>
+  </a>
+
+  <!-- 3. WhatsApp Chat (Prominently Elevated Green Button in Center) -->
+  <a
+    href="https://wa.me/919667844434?text=Hi%20Samyak%20Hair%20Accessories%2C%20I%20am%20interested%20in%20placing%20a%20wholesale%20order."
+    target="_blank"
+    rel="noopener noreferrer"
+    class="samyak-mbn-item samyak-mbn-item--chat"
+    aria-label="Chat with us on WhatsApp"
+  >
+    <div class="samyak-mbn-chat-btn">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="#FFFFFF">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2C8.268 2 2 8.268 2 16c0 2.658.742 5.228 2.152 7.46L2.05 29.56a.8.8 0 00.99.99l6.326-2.032A13.935 13.935 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm-1.07 22.842c-2.348 0-4.636-.665-6.618-1.924l-.475-.302-3.87 1.242 1.25-3.754-.33-.492a11.942 11.942 0 01-1.887-6.612c0-6.617 5.383-12 12-12s12 5.383 12 12-5.383 11.842-12.07 11.842zm6.608-8.917c-.362-.181-2.145-1.058-2.477-1.18-.332-.12-.573-.18-.815.182-.24.362-.934 1.18-1.145 1.421-.211.241-.422.271-.784.09-.362-.18-1.528-.563-2.91-1.796-1.077-.96-1.803-2.147-2.015-2.51-.21-.361-.022-.556.159-.736.162-.162.362-.422.543-.633.181-.21.24-.361.362-.602.12-.24.06-.452-.03-.633-.09-.181-.814-1.962-1.116-2.686-.293-.705-.591-.61-.814-.622-.211-.01-.453-.012-.694-.012-.242 0-.634.09-.966.452-.332.362-1.267 1.237-1.267 3.016 0 1.78 1.297 3.498 1.478 3.74.181.241 2.552 3.896 6.183 5.464.864.373 1.538.596 2.064.763.868.276 1.658.237 2.283.144.697-.104 2.145-.876 2.447-1.722.301-.845.301-1.57.211-1.722-.09-.15-.332-.24-.694-.422z"/>
+      </svg>
+    </div>
+    <span class="samyak-mbn-label">Chat</span>
+  </a>
+
+  <!-- 4. Wishlist -->
+  <a
+    href="/pages/wishlist"
+    class="samyak-mbn-item"
+    aria-label="Wishlist"
+    onclick="if(window.openWishlistDrawer){event.preventDefault();window.openWishlistDrawer();}"
+  >
+    <div class="samyak-mbn-icon samyak-mbn-wishlist-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21s-7-4.6-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 3.6C19 16.4 12 21 12 21Z"/>
+      </svg>
+      <span class="samyak-mbn-badge" id="samyak-mbn-wishlist-count" style="display: none;">0</span>
+    </div>
+    <span class="samyak-mbn-label">Wishlist</span>
+  </a>
+
+  <!-- 5. Bag -->
+  <a
+    href="{{ routes.cart_url }}"
+    class="samyak-mbn-item"
+    aria-label="Cart Bag"
+    onclick="var d=document.getElementById('cart-drawer');if(d&&typeof d.open==='function'){event.preventDefault();d.open();}"
+  >
+    <div class="samyak-mbn-icon samyak-mbn-cart-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8h12l1 12H5L6 8Z"/>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
+      </svg>
+      {% if cart.item_count > 0 %}
+        <span class="samyak-mbn-badge">{{ cart.item_count }}</span>
+      {% endif %}
+    </div>
+    <span class="samyak-mbn-label">Bag</span>
+  </a>
+</nav>
+
+<style>
+  .samyak-mobile-bottom-nav {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .samyak-mobile-bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 64px;
+      background: #FFFFFF;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      z-index: 9999;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 8px calc(env(safe-area-inset-bottom, 0px) + 2px);
+      box-sizing: border-box;
+    }
+
+    body {
+      padding-bottom: 68px; /* avoid content obscured by fixed bottom bar */
+    }
+
+    /* Hide the floating whatsapp widget on mobile so it doesn't overlap the bottom dock */
+    .whatsapp-floating {
+      display: none !important;
+    }
+
+    .samyak-mbn-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+      text-decoration: none;
+      color: #333936;
+      font-family: var(--font-body--family, sans-serif);
+      transition: color 0.15s ease;
+      position: relative;
+    }
+
+    .samyak-mbn-item:hover,
+    .samyak-mbn-item.is-active {
+      color: #113B32;
+    }
+
+    .samyak-mbn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 2px;
+    }
+
+    .samyak-mbn-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+
+    /* Elevated Floating WhatsApp Chat button in center */
+    .samyak-mbn-item--chat {
+      position: relative;
+      margin-top: -18px;
+    }
+
+    .samyak-mbn-chat-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #25D366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.5), 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: 3px solid #FFFFFF;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-bottom: 2px;
+    }
+
+    .samyak-mbn-item--chat:active .samyak-mbn-chat-btn {
+      transform: scale(0.94);
+    }
+
+    .samyak-mbn-badge {
+      position: absolute;
+      top: -4px;
+      right: -8px;
+      background-color: #113B32;
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 700;
+      min-width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      line-height: 1;
+    }
+  }
+</style>

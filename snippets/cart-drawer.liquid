@@ -112,18 +112,18 @@
             {%- if cart.empty? -%}
               {{ empty_cart_drawer_content }}
             {%- else -%}
-              <scroll-hint
+              <div
                 class="cart-drawer__content"
                 aria-label="{{ 'accessibility.cart' | t }}"
               >
-                <scroll-hint class="cart-drawer__items">
+                <div class="cart-drawer__items">
                   {% render 'cart-products', context: 'drawer' %}
-                </scroll-hint>
+                </div>
 
                 <div class="cart-drawer__summary">
                   {% render 'cart-summary', section_id: 'cart-drawer-section' %}
                 </div>
-              </scroll-hint>
+              </div>
             {%- endif -%}
           {% endcapture %}
           {% render 'cart-items-component',
@@ -158,23 +158,33 @@
   .cart-drawer__inner > .cart-items-component {
     flex: 1;
     min-height: 0;
-    height: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .cart-drawer__content {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    background-color: var(--color-background);
-    flex-grow: 1;
-    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    background-color: var(--color-background) !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .cart-drawer__items {
-    display: flex;
-    flex-direction: column;
-    padding-inline: var(--cart-drawer-padding);
-    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-inline: var(--cart-drawer-padding) !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    flex: none !important;
   }
 
   .cart-drawer__items .cart-items__table-row {
@@ -201,31 +211,35 @@
   .cart-drawer__summary {
     --cart-drawer-summary-padding: var(--padding-lg);
 
-    position: sticky;
-    bottom: 0;
+    position: static !important;
+    bottom: auto !important;
     z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--gap-xl);
     padding: var(--cart-drawer-summary-padding);
-    margin-top: auto;
+    margin-top: 16px !important;
+    flex: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
     background-color: var(--color-background);
-    /* stylelint-disable-next-line color-named */
-    mask-image: linear-gradient(to bottom, transparent, black var(--cart-drawer-summary-padding));
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
 
     @media screen and (min-width: 750px) {
       --cart-drawer-summary-padding: var(--padding-2xl);
     }
   }
 
-  .theme-drawer__dialog[cart-summary-sticky='false'] .cart-drawer__summary {
-    position: static;
-    mask-image: none;
+  .theme-drawer__dialog .cart-drawer__summary {
+    position: static !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
   }
 
-  .theme-drawer__dialog[cart-summary-sticky='false'] .cart-drawer__items {
-    overflow: unset;
+  .theme-drawer__dialog .cart-drawer__items {
+    overflow: visible !important;
   }
 
   .cart-actions summary {

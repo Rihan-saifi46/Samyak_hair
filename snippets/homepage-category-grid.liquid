@@ -10,11 +10,11 @@
   assign subheading_color = section.settings.subheading_color | default: '#5C615E'
   assign background_color = section.settings.background_color | default: '#F7F5EE'
 
-  assign col1 = collections['metal-claw'] | default: collections['claw-clips'] | default: collections['hair-clips'] | default: collections['frontpage']
-  assign col2 = collections['hair-band'] | default: collections['hair-bands'] | default: collections['headbands']
-  assign col3 = collections['kids-collection'] | default: collections['bows-accessories'] | default: collections['bows']
-  assign col4 = collections['hair-extensions'] | default: collections['hair-pins-brooches'] | default: collections['hair-pins']
-  assign col5 = collections['scrunchies'] | default: collections['satin-scrunchies']
+  assign col1 = collections['claw-clip'] | default: collections['metal-claw'] | default: collections['claw-clips']
+  assign col2 = collections['headband'] | default: collections['hair-band'] | default: collections['hair-bands']
+  assign col3 = collections['bows-accessories'] | default: collections['bows'] | default: collections['kids-collection']
+  assign col4 = collections['hair-pin'] | default: collections['hair-pins'] | default: collections['hair-extensions']
+  assign col5 = collections['scrunchie'] | default: collections['scrunchies'] | default: collections['satin-scrunchies']
 
   # Verified collection featured images with 5 custom jewelry/hair accessory photography assets
   assign default_img_1 = 'for-every-you-1.jpg' | asset_url
@@ -28,11 +28,12 @@
 
   assign default_imgs = default_img_1 | append: ',' | append: default_img_2 | append: ',' | append: default_img_3 | append: ',' | append: default_img_4 | append: ',' | append: default_img_5 | split: ','
 
-  assign url1 = col1.url | default: '/collections/metal-claw'
-  assign url2 = col2.url | default: '/collections/hair-band'
-  assign url3 = col3.url | default: '/collections/kids-collection'
-  assign url4 = col4.url | default: '/collections/hair-extensions'
-  assign url5 = col5.url | default: '/collections/scrunchies'
+  # Exact collection routes matching merchant Shopify admin handles
+  assign url1 = col1.url | default: '/collections/claw-clip'
+  assign url2 = col2.url | default: '/collections/headband'
+  assign url3 = col3.url | default: '/collections/all'
+  assign url4 = col4.url | default: '/collections/hair-pin'
+  assign url5 = col5.url | default: '/collections/scrunchie'
 
   assign has_custom_blocks = false
   if section.blocks.size >= 5
@@ -494,108 +495,143 @@
 
   @media (max-width: 768px) {
     .sc-section {
-      padding: 60px 16px;
+      padding: 44px 12px 36px;
+      overflow: hidden;
+    }
+
+    .sc-header {
+      margin-bottom: 24px;
     }
 
     .sc-heading {
       font-size: 26px;
       letter-spacing: 1.5px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .sc-subheading {
-      font-size: 13px;
+      font-size: 13.5px;
       max-width: 380px;
       padding: 0 10px;
+      line-height: 1.5;
     }
 
     .sc-carousel-wrapper {
       min-height: 380px;
-      margin-top: 32px;
+      margin-top: 16px;
+      position: relative;
+      width: 100%;
+      overflow: visible;
     }
 
     .sc-stage {
       height: 360px;
+      perspective: 1000px;
+      perspective-origin: center center;
     }
 
     .sc-card {
-      width: 260px;
-      height: 340px;
-      margin-left: -130px;
-      margin-top: -170px;
+      width: 265px;
+      height: 330px;
+      margin-left: -132.5px;
+      margin-top: -165px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
 
+    /* Active Center Card */
     .sc-card[data-offset="0"] {
-      transform: translateX(0px) scale(1) rotateY(0deg);
+      transform: translateX(0px) scale(1.05) rotateY(0deg);
+      z-index: 100;
+      opacity: 1;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
     }
 
+    /* Immediate Adjacent Left Card (-1) */
     .sc-card[data-offset="-1"] {
-      transform: translateX(-110px) scale(0.86) rotateY(14deg);
+      transform: translateX(-160px) scale(0.85) rotateY(24deg);
+      z-index: 90;
+      opacity: 0.8;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
     }
 
+    /* Immediate Adjacent Right Card (+1) */
     .sc-card[data-offset="1"] {
-      transform: translateX(110px) scale(0.86) rotateY(-14deg);
+      transform: translateX(160px) scale(0.85) rotateY(-24deg);
+      z-index: 90;
+      opacity: 0.8;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
     }
 
+    /* Far Left Card (-2) */
     .sc-card[data-offset="-2"] {
-      transform: translateX(-190px) scale(0.72) rotateY(22deg);
+      transform: translateX(-270px) scale(0.70) rotateY(38deg);
+      z-index: 80;
+      opacity: 0.4;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     }
 
+    /* Far Right Card (+2) */
     .sc-card[data-offset="2"] {
-      transform: translateX(190px) scale(0.72) rotateY(-22deg);
+      transform: translateX(270px) scale(0.70) rotateY(-38deg);
+      z-index: 80;
+      opacity: 0.4;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     }
 
     .sc-card__title {
-      font-size: 12px;
+      font-size: 12.5px;
       letter-spacing: 1.2px;
     }
 
     .sc-nav-btn {
-      width: 38px;
-      height: 38px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      width: 40px;
+      height: 40px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     }
 
     .sc-nav-prev {
-      left: 8px;
+      left: 6px;
     }
 
     .sc-nav-next {
-      right: 8px;
+      right: 6px;
     }
   }
 
   @media (max-width: 440px) {
     .sc-card {
-      width: 230px;
-      height: 300px;
-      margin-left: -115px;
-      margin-top: -150px;
+      width: 245px;
+      height: 310px;
+      margin-left: -122.5px;
+      margin-top: -155px;
+      border-radius: 16px;
     }
 
     .sc-stage {
-      height: 320px;
+      height: 335px;
     }
 
     .sc-card[data-offset="-1"] {
-      transform: translateX(-90px) scale(0.86) rotateY(14deg);
+      transform: translateX(-145px) scale(0.85) rotateY(24deg);
     }
 
     .sc-card[data-offset="1"] {
-      transform: translateX(90px) scale(0.86) rotateY(-14deg);
+      transform: translateX(145px) scale(0.85) rotateY(-24deg);
     }
 
     .sc-card[data-offset="-2"] {
-      transform: translateX(-160px) scale(0.72) rotateY(22deg);
+      transform: translateX(-240px) scale(0.70) rotateY(38deg);
     }
 
     .sc-card[data-offset="2"] {
-      transform: translateX(160px) scale(0.72) rotateY(-22deg);
+      transform: translateX(240px) scale(0.70) rotateY(-38deg);
     }
 
     .sc-nav-btn {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
     }
 
     .sc-nav-prev {
