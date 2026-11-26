@@ -6,12 +6,18 @@
 
 {%- liquid
   assign render_wrapper = render_wrapper | default: true, allow_false: true
+  assign render_cart_drawer = false
+  if render_wrapper == false
+    assign render_cart_drawer = true
+  elsif settings.cart_type == 'drawer' and template.name != 'cart'
+    assign render_cart_drawer = true
+  endif
 -%}
 
-{%- if settings.cart_type == 'drawer' and template.name != 'cart' -%}
+{%- if render_cart_drawer -%}
   {% if render_wrapper %}
     <div
-      id="shopify-section-cart-drawer"
+      id="shopify-section-cart-drawer-section"
       class="shopify-section"
     >
   {% endif %}
@@ -539,11 +545,14 @@
   }
 
   #cart-drawer .cart-drawer__content {
-    display: flex !important;
-    flex-direction: column !important;
+    display: block !important;
     flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
     width: 100% !important;
     background-color: #FCFBF7 !important;
   }
@@ -551,11 +560,11 @@
   #cart-drawer .cart-drawer__items,
   .drawer__cart-items-wrapper,
   .cart-items {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
     padding: 16px 22px !important;
     box-sizing: border-box !important;
     width: 100% !important;
@@ -737,22 +746,24 @@
     color: #181A19 !important;
   }
 
-  /* Part 3: Bottom Pinned Sticky Footer */
+  /* Part 3: Continuous Flow Summary */
   #cart-drawer .cart-drawer__summary,
   .drawer__footer {
-    flex: 0 0 auto !important;
-    padding: 14px 22px 20px !important;
+    flex: none !important;
+    position: static !important;
+    bottom: auto !important;
+    padding: 14px 22px 24px !important;
     border-top: 1px solid #E4E0D6 !important;
     background: #FCFBF7 !important;
     mask-image: none !important;
     -webkit-mask-image: none !important;
-    margin-top: auto !important;
+    margin-top: 14px !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 10px !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    z-index: 10 !important;
+    z-index: 1 !important;
   }
 
   #cart-drawer .cart-wholesale-bar {

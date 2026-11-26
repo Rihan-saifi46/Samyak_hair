@@ -1,0 +1,1354 @@
+{% liquid
+  assign custom_color = false
+  if section.settings.background_color != blank or section.settings.text_color != blank
+    assign custom_color = true
+    render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
+  endif
+
+  assign wholesale_min_threshold = 200000
+  assign cart_total = cart.total_price
+  if cart_total < wholesale_min_threshold
+    assign threshold_diff = wholesale_min_threshold | minus: cart_total
+    assign progress_percent = cart_total | times: 100 | divided_by: wholesale_min_threshold
+    assign is_wholesale_met = false
+  else
+    assign threshold_diff = 0
+    assign progress_percent = 100
+    assign is_wholesale_met = true
+  endif
+%}
+
+<!-- Dedicated Samyak Wholesale Shopping Bag Page -->
+<div class="samyak-cart-page-wrap">
+  <div class="samyak-cart-container">
+    <!-- Breadcrumb -->
+    <nav class="samyak-cart-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span class="samyak-crumb-sep">/</span>
+      <span class="samyak-crumb-current">Shopping Bag</span>
+    </nav>
+
+    <!-- Page Title & Item Count -->
+    <div class="samyak-cart-page-header">
+      <h1 class="samyak-cart-page-title">Your Shopping Bag</h1>
+      <p class="samyak-cart-page-subtitle">
+        You have <span id="samyak-cart-page-count-val">{{ cart.item_count }}</span> {% if cart.item_count == 1 %}item{% else %}items{% endif %} in your bag
+      </p>
+    </div>
+
+    {% if cart.item_count > 0 %}
+      <form action="{{ routes.cart_url }}" method="post" id="samyak-main-cart-form" class="samyak-cart-form-grid">
+        <!-- ================= LEFT COLUMN ================= -->
+        <div class="samyak-cart-left-col">
+          <!-- 1. Cart Items Table Card -->
+          <div class="samyak-cart-items-card">
+            <div class="samyak-cart-table-head">
+              <div class="samyak-th-col samyak-th-product">PRODUCT</div>
+              <div class="samyak-th-col samyak-th-price">PRICE</div>
+              <div class="samyak-th-col samyak-th-qty">QUANTITY</div>
+              <div class="samyak-th-col samyak-th-total">TOTAL</div>
+            </div>
+
+            <div class="samyak-cart-table-body" id="samyak-cart-table-items">
+              {% for item in cart.items %}
+                <div class="samyak-cart-row" data-line-key="{{ item.key }}" data-line-index="{{ forloop.index }}">
+                  <!-- Product Column -->
+                  <div class="samyak-td-col samyak-td-product">
+                    <div class="samyak-item-thumb-box">
+                      {% if item.image %}
+                        <img
+                          src="{{ item.image | image_url: width: 160 }}"
+                          alt="{{ item.title | escape }}"
+                          width="76"
+                          height="76"
+                          loading="lazy"
+                          class="samyak-item-img"
+                        >
+                      {% else %}
+                        <div class="samyak-item-noimg"></div>
+                      {% endif %}
+                    </div>
+                    <div class="samyak-item-meta">
+                      <a href="{{ item.url }}" class="samyak-item-name">{{ item.product.title }}</a>
+                      {% unless item.product.has_only_default_variant %}
+                        <div class="samyak-item-variants-tags">
+                          {% for option in item.options_with_values %}
+                            <span class="samyak-variant-pill">{{ option.value }}</span>
+                          {% endfor %}
+                        </div>
+                      {% endunless %}
+                    </div>
+                  </div>
+
+                  <!-- Price Column -->
+                  <div class="samyak-td-col samyak-td-price">
+                    <span class="samyak-price-val">{{ item.final_price | money }}</span>
+                  </div>
+
+                  <!-- Quantity Column -->
+                  <div class="samyak-td-col samyak-td-qty">
+                    <div class="samyak-qty-control-box">
+                      <button
+                        type="button"
+                        class="samyak-page-qty-btn"
+                        data-action="dec"
+                        data-key="{{ item.key }}"
+                        data-qty="{{ item.quantity | minus: 1 }}"
+                        aria-label="Decrease quantity"
+                      >−</button>
+                      <input
+                        type="number"
+                        name="updates[]"
+                        id="updates_{{ item.key }}"
+                        value="{{ item.quantity }}"
+                        min="0"
+                        aria-label="Quantity for {{ item.title }}"
+                        class="samyak-page-qty-input"
+                        data-key="{{ item.key }}"
+                      >
+                      <button
+                        type="button"
+                        class="samyak-page-qty-btn"
+                        data-action="inc"
+                        data-key="{{ item.key }}"
+                        data-qty="{{ item.quantity | plus: 1 }}"
+                        aria-label="Increase quantity"
+                      >+</button>
+                    </div>
+                    <button
+                      type="button"
+                      class="samyak-page-row-remove"
+                      data-action="remove"
+                      data-key="{{ item.key }}"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <!-- Total Column -->
+                  <div class="samyak-td-col samyak-td-total">
+                    <span class="samyak-line-total-val">{{ item.final_line_price | money }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- 2. Wholesale Guarantees Strip Card -->
+          <div class="samyak-cart-guarantees-card">
+            <div class="samyak-guarantee-item">
+              <div class="samyak-guarantee-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
+              <div class="samyak-guarantee-info">
+                <span class="samyak-guarantee-title">Direct Factory Quality</span>
+                <span class="samyak-guarantee-desc">100% Checked Wholesale Packs</span>
+              </div>
+            </div>
+
+            <div class="samyak-guarantee-item">
+              <div class="samyak-guarantee-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                  <path d="M21 3v5h-5"/>
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                  <path d="M8 16H3v5"/>
+                </svg>
+              </div>
+              <div class="samyak-guarantee-info">
+                <span class="samyak-guarantee-title">Transit Protection</span>
+                <span class="samyak-guarantee-desc">Easy Damaged-Piece Replacement</span>
+              </div>
+            </div>
+
+            <div class="samyak-guarantee-item">
+              <div class="samyak-guarantee-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="15" height="13"/>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/>
+                  <circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+              </div>
+              <div class="samyak-guarantee-info">
+                <span class="samyak-guarantee-title">Express Dispatch</span>
+                <span class="samyak-guarantee-desc">24–48h All-India Shipping</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= RIGHT COLUMN ================= -->
+        <div class="samyak-cart-right-col">
+          <!-- Order Summary Card -->
+          <div class="samyak-cart-summary-card">
+            <h2 class="samyak-summary-title">ORDER SUMMARY</h2>
+
+            <!-- Wholesale MOQ Progress Tracker -->
+            <div class="samyak-cart-wholesale-bar" data-threshold="{{ wholesale_min_threshold }}" data-current="{{ cart_total }}">
+              <div class="samyak-cart-wholesale-header">
+                {% if is_wholesale_met %}
+                  <span class="samyak-cart-wholesale-status is-met">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <strong>Wholesale Minimum (₹2,000) reached!</strong>
+                  </span>
+                {% else %}
+                  <span class="samyak-cart-wholesale-status">
+                    Wholesale MOQ: Add <strong>{{ threshold_diff | money }}</strong> more to reach <strong>₹2,000</strong>
+                  </span>
+                {% endif %}
+              </div>
+              <div class="samyak-cart-wholesale-track" role="progressbar" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="Wholesale minimum order progress">
+                <div class="samyak-cart-wholesale-progress" style="width: {{ progress_percent }}%;"></div>
+              </div>
+              {% unless is_wholesale_met %}
+                <p class="samyak-cart-wholesale-hint">Minimum order value of ₹2,000 required for wholesale dispatch &amp; GST invoicing.</p>
+              {% endunless %}
+            </div>
+
+            <div class="samyak-summary-row">
+              <span class="samyak-sum-label">Bag Subtotal</span>
+              <span class="samyak-sum-val" id="samyak-sum-subtotal">{{ cart.total_price | money }}</span>
+            </div>
+
+            <div class="samyak-summary-row samyak-discount-row is-hidden" id="samyak-discount-row">
+              <span class="samyak-sum-label">Coupon Discount (<span id="samyak-active-code">SAMYAK10</span>)</span>
+              <span class="samyak-sum-val samyak-discount-val" id="samyak-sum-discount">-₹0.00</span>
+            </div>
+
+            <div class="samyak-summary-row">
+              <span class="samyak-sum-label">Estimated Shipping</span>
+              <span class="samyak-sum-val samyak-free-tag">FREE</span>
+            </div>
+
+            <div class="samyak-summary-row">
+              <span class="samyak-sum-label">Applicable Taxes</span>
+              <span class="samyak-sum-val samyak-tax-tag">Included</span>
+            </div>
+
+            <div class="samyak-summary-divider"></div>
+
+            <div class="samyak-summary-row samyak-total-row">
+              <span class="samyak-total-label">Estimated Total</span>
+              <span class="samyak-total-val" id="samyak-sum-total">{{ cart.total_price | money }}</span>
+            </div>
+
+            <p class="samyak-terms-text">
+              By proceeding, you agree to our <a href="/policies/terms-of-service">Terms &amp; Conditions</a>
+            </p>
+
+            {% unless is_wholesale_met %}
+              <div class="samyak-cart-moq-warning" id="samyak-cart-moq-warning" role="alert">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C53030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span>Wholesale MOQ is <strong>₹2,000</strong>. Please add <strong>{{ threshold_diff | money }}</strong> more of inventory to proceed.</span>
+              </div>
+            {% endunless %}
+
+            <button
+              type="submit"
+              name="checkout"
+              id="samyak-checkout-submit"
+              class="samyak-proceed-checkout-btn{% unless is_wholesale_met %} is-disabled{% endunless %}"
+              {% unless is_wholesale_met %}disabled aria-disabled="true"{% endunless %}
+            >
+              PROCEED TO CHECKOUT &rarr;
+            </button>
+
+            <div class="samyak-ssl-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5C615E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span>Safe &amp; Secure 256-Bit SSL Checkout</span>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <!-- Empty Cart State -->
+      <div class="samyak-cart-empty-panel">
+        <div class="samyak-empty-icon-wrap">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#C8C3B8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8h12l1 12H5L6 8Z"/>
+            <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
+          </svg>
+        </div>
+        <h2 class="samyak-empty-title">Your shopping bag is empty</h2>
+        <p class="samyak-empty-subtitle">
+          Looks like you haven't added any wholesale hair accessories to your bag yet. Explore our factory-direct collection.
+        </p>
+        <a href="{{ routes.all_products_collection_url }}" class="samyak-empty-shop-cta">
+          EXPLORE ALL PRODUCTS &rarr;
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* Base Container & Outer Spacing */
+  .samyak-cart-page-wrap {
+    background-color: #F7F5EE;
+    min-height: 72vh;
+    padding: 28px 24px 80px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #181A19;
+  }
+
+  .samyak-cart-container {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* Breadcrumb */
+  .samyak-cart-breadcrumb {
+    font-size: 11px;
+    color: #5C615E;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .samyak-cart-breadcrumb a {
+    color: #5C615E;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .samyak-cart-breadcrumb a:hover {
+    color: #113B32;
+  }
+
+  .samyak-crumb-sep {
+    color: #C8C3B8;
+  }
+
+  .samyak-crumb-current {
+    color: #181A19;
+    font-weight: 500;
+  }
+
+  /* Page Header */
+  .samyak-cart-page-header {
+    margin-bottom: 24px;
+  }
+
+  .samyak-cart-page-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 500;
+    color: #113B32;
+    margin: 0 0 6px;
+  }
+
+  .samyak-cart-page-subtitle {
+    font-size: 13px;
+    color: #5C615E;
+    margin: 0;
+  }
+
+  /* Two-Column Grid */
+  .samyak-cart-form-grid {
+    display: grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* Left Column: Items Card */
+  .samyak-cart-items-card {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 8px;
+    padding: 22px 24px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .samyak-cart-table-head {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1fr 1fr;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #EFECE4;
+  }
+
+  .samyak-th-col {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #5C615E;
+    text-transform: uppercase;
+  }
+
+  .samyak-th-product { text-align: left; }
+  .samyak-th-price { text-align: center; }
+  .samyak-th-qty { text-align: center; }
+  .samyak-th-total { text-align: right; }
+
+  /* Table Rows */
+  .samyak-cart-row {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #EFECE4;
+  }
+
+  .samyak-cart-row:last-child {
+    border-bottom: none;
+  }
+
+  .samyak-td-product {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding-right: 12px;
+  }
+
+  .samyak-item-thumb-box {
+    width: 76px;
+    height: 76px;
+    border-radius: 6px;
+    border: 1px solid #EFECE4;
+    background: #F4F2EB;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .samyak-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .samyak-item-noimg {
+    width: 100%;
+    height: 100%;
+    background: #EAE6DC;
+  }
+
+  .samyak-item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .samyak-item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #113B32;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .samyak-item-name:hover {
+    color: #C59B42;
+  }
+
+  .samyak-item-variants-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 3px;
+  }
+
+  .samyak-variant-pill {
+    background: #F4F2EB;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+    color: #5C615E;
+    line-height: 1.3;
+  }
+
+  /* Price Column */
+  .samyak-td-price {
+    text-align: center;
+  }
+
+  .samyak-price-val {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #181A19;
+  }
+
+  /* Quantity Column */
+  .samyak-td-qty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .samyak-qty-control-box {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #D5D0CA;
+    border-radius: 4px;
+    height: 32px;
+    background: #FCFBF7;
+    overflow: hidden;
+  }
+
+  .samyak-page-qty-btn {
+    width: 28px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: #181A19;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .samyak-page-qty-btn:hover {
+    background: #EFECE4;
+  }
+
+  .samyak-page-qty-input {
+    width: 32px;
+    height: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #181A19;
+    padding: 0;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+
+  .samyak-page-qty-input::-webkit-outer-spin-button,
+  .samyak-page-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .samyak-page-row-remove {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 11px;
+    color: #5C615E;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .samyak-page-row-remove:hover {
+    color: #9E2B2B;
+  }
+
+  /* Line Total Column */
+  .samyak-td-total {
+    text-align: right;
+  }
+
+  .samyak-line-total-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  /* Wholesale Guarantees Strip Card */
+  .samyak-cart-guarantees-card {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .samyak-guarantee-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .samyak-guarantee-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FAF8F2;
+    border: 1px solid #EFECE4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .samyak-guarantee-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .samyak-guarantee-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  .samyak-guarantee-desc {
+    font-size: 11px;
+    color: #5C615E;
+    line-height: 1.25;
+  }
+
+  /* Right Column: Available Coupons Card */
+  .samyak-cart-coupons-card {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .samyak-coupon-card-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #113B32;
+    margin-bottom: 14px;
+  }
+
+  .samyak-coupon-input-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .samyak-coupon-field {
+    flex: 1;
+    border: 1px solid #D5D0CA;
+    border-radius: 4px;
+    padding: 9px 12px;
+    font-size: 12px;
+    background: #FCFBF7;
+    outline: none;
+    text-transform: uppercase;
+    transition: border-color 0.2s;
+  }
+
+  .samyak-coupon-field:focus {
+    border-color: #113B32;
+  }
+
+  .samyak-coupon-apply-action {
+    background: #113B32;
+    color: #FCFBF7;
+    border: none;
+    border-radius: 4px;
+    padding: 0 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .samyak-coupon-apply-action:hover {
+    background: #0D2C25;
+  }
+
+  .samyak-coupon-feedback {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+
+  .samyak-coupon-feedback.is-success {
+    background: #EBF5F0;
+    color: #113B32;
+    border: 1px solid #C4E2D3;
+  }
+
+  .samyak-coupon-feedback.is-error {
+    background: #FDF2F2;
+    color: #A32828;
+    border: 1px solid #F5C6C6;
+  }
+
+  .samyak-coupon-offer-box {
+    border: 1px dashed #C59B42;
+    border-radius: 6px;
+    padding: 12px 14px;
+    background: #FAF8F2;
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .samyak-offer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .samyak-offer-badge {
+    align-self: flex-start;
+    background: #FCFBF7;
+    border: 1px solid #C59B42;
+    border-radius: 3px;
+    padding: 1px 7px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #C59B42;
+    letter-spacing: 0.04em;
+  }
+
+  .samyak-offer-headline {
+    font-size: 12px;
+    font-weight: 700;
+    color: #181A19;
+    margin-top: 2px;
+  }
+
+  .samyak-offer-sub {
+    font-size: 11px;
+    color: #5C615E;
+    line-height: 1.25;
+  }
+
+  .samyak-offer-apply-btn {
+    border: 1px solid #113B32;
+    color: #113B32;
+    background: transparent;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .samyak-offer-apply-btn:hover {
+    background: #113B32;
+    color: #FCFBF7;
+  }
+
+  /* Right Column: Order Summary Card */
+  .samyak-cart-summary-card {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 8px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .samyak-summary-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #113B32;
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #EFECE4;
+  }
+
+  .samyak-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #5C615E;
+    padding: 8px 0;
+  }
+
+  .samyak-sum-val {
+    font-weight: 600;
+    color: #181A19;
+  }
+
+  .samyak-discount-val {
+    color: #113B32;
+  }
+
+  .samyak-free-tag {
+    color: #113B32;
+    font-weight: 600;
+  }
+
+  .samyak-tax-tag {
+    color: #5C615E;
+    font-weight: 500;
+  }
+
+  .samyak-summary-divider {
+    border-top: 1px solid #EFECE4;
+    margin: 12px 0 14px;
+  }
+
+  .samyak-total-row {
+    padding: 4px 0 14px;
+  }
+
+  .samyak-total-label {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  .samyak-total-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  .samyak-terms-text {
+    font-size: 10.5px;
+    color: #7A7F7C;
+    text-align: center;
+    margin: 0 0 14px;
+    line-height: 1.4;
+  }
+
+  .samyak-terms-text a {
+    color: #5C615E;
+    text-decoration: underline;
+  }
+
+  .samyak-proceed-checkout-btn {
+    width: 100%;
+    background: #C59B42;
+    color: #FCFBF7;
+    border: none;
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: block;
+    box-shadow: 0 2px 6px rgba(197, 155, 66, 0.25);
+  }
+
+  .samyak-proceed-checkout-btn:hover {
+    background: #B08834;
+  }
+
+  .samyak-proceed-checkout-btn:active {
+    transform: translateY(1px);
+  }
+
+  .samyak-proceed-checkout-btn:disabled,
+  .samyak-proceed-checkout-btn.is-disabled {
+    background: #C9C4BC !important;
+    color: #FFFFFF !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* Wholesale MOQ in Order Summary */
+  .samyak-cart-wholesale-bar {
+    background: #FAF8F2;
+    border: 1px solid #E4E0D6;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .samyak-cart-wholesale-header {
+    margin-bottom: 8px;
+  }
+
+  .samyak-cart-wholesale-status {
+    color: #181A19;
+    font-size: 12.5px;
+    line-height: 1.4;
+    display: block;
+  }
+
+  .samyak-cart-wholesale-status.is-met {
+    color: #113B32;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .samyak-cart-wholesale-track {
+    background: #EFECE4;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .samyak-cart-wholesale-progress {
+    background: #113B32;
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .samyak-cart-wholesale-hint {
+    color: #5C615E;
+    font-size: 11px;
+    margin: 6px 0 0;
+    line-height: 1.35;
+  }
+
+  .samyak-cart-moq-warning {
+    background: #FFF5F5;
+    border: 1px solid #FED7D7;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #C53030;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  @keyframes samyakShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .samyak-cart-moq-warning.is-shaking {
+    animation: samyakShake 0.5s ease-in-out;
+  }
+
+  .samyak-ssl-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #5C615E;
+    margin-top: 12px;
+  }
+
+  /* Empty Cart State */
+  .samyak-cart-empty-panel {
+    background: #FCFBF7;
+    border: 1px solid #E4E0D6;
+    border-radius: 8px;
+    padding: 60px 24px;
+    text-align: center;
+    max-width: 600px;
+    margin: 30px auto;
+  }
+
+  .samyak-empty-icon-wrap {
+    margin-bottom: 18px;
+    opacity: 0.7;
+  }
+
+  .samyak-empty-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: #113B32;
+    margin: 0 0 10px;
+  }
+
+  .samyak-empty-subtitle {
+    font-size: 13px;
+    color: #5C615E;
+    line-height: 1.5;
+    max-width: 440px;
+    margin: 0 auto 24px;
+  }
+
+  .samyak-empty-shop-cta {
+    display: inline-block;
+    background: #113B32;
+    color: #FCFBF7;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .samyak-empty-shop-cta:hover {
+    background: #0D2C25;
+  }
+
+  .is-hidden {
+    display: none !important;
+  }
+
+  /* Responsive Rules */
+  @media screen and (max-width: 960px) {
+    .samyak-cart-form-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .samyak-cart-guarantees-card {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  @media screen and (max-width: 640px) {
+    .samyak-cart-table-head {
+      display: none;
+    }
+
+    .samyak-cart-row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      position: relative;
+      padding: 16px 0;
+    }
+
+    .samyak-td-product {
+      padding-right: 0;
+    }
+
+    .samyak-td-price,
+    .samyak-td-qty,
+    .samyak-td-total {
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .samyak-td-price::before {
+      content: 'Price:';
+      font-size: 12px;
+      color: #5C615E;
+    }
+
+    .samyak-td-qty {
+      flex-direction: row;
+    }
+
+    .samyak-td-qty::before {
+      content: 'Quantity:';
+      font-size: 12px;
+      color: #5C615E;
+    }
+
+    .samyak-td-total::before {
+      content: 'Total:';
+      font-size: 12px;
+      color: #5C615E;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    var rawCartTotal = {{ cart.total_price }};
+    var activeDiscountRate = 0; // 0.10 for 10%
+    var activeCouponCode = '';
+
+    function formatMoney(cents) {
+      return '₹' + (cents / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Check existing stored coupon
+    try {
+      var savedCoupon = sessionStorage.getItem('samyak_applied_coupon');
+      if (savedCoupon === 'SAMYAK10') {
+        applyCouponCode('SAMYAK10', false);
+      }
+    } catch(e) {}
+
+    // Quantity buttons
+    var qtyButtons = document.querySelectorAll('.samyak-page-qty-btn, .samyak-page-row-remove');
+    qtyButtons.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var action = this.getAttribute('data-action');
+        var key = this.getAttribute('data-key');
+        var newQty = 0;
+
+        if (action === 'dec' || action === 'inc') {
+          newQty = parseInt(this.getAttribute('data-qty'), 10);
+        } else if (action === 'remove') {
+          newQty = 0;
+        }
+
+        if (newQty < 0) newQty = 0;
+        updateCartLineItem(key, newQty);
+      });
+    });
+
+    // Quantity manual input change
+    var qtyInputs = document.querySelectorAll('.samyak-page-qty-input');
+    qtyInputs.forEach(function(inp) {
+      inp.addEventListener('change', function() {
+        var key = this.getAttribute('data-key');
+        var newQty = parseInt(this.value, 10);
+        if (isNaN(newQty) || newQty < 0) newQty = 0;
+        updateCartLineItem(key, newQty);
+      });
+    });
+
+    function updateCartLineItem(key, quantity) {
+      fetch('/cart/change.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id: key, quantity: quantity })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(cart) {
+        // Reload page smoothly to refresh liquid line calculations or if empty
+        if (cart.item_count === 0) {
+          window.location.reload();
+          return;
+        }
+        window.location.reload();
+      })
+      .catch(function(err) {
+        console.error('Error updating cart line item:', err);
+      });
+    }
+
+    // Coupon logic
+    var couponInput = document.getElementById('samyak-coupon-input');
+    var applyBtn = document.getElementById('samyak-coupon-apply-btn');
+    var fastApplyBtn = document.getElementById('samyak-coupon-fast-apply');
+    var feedbackEl = document.getElementById('samyak-coupon-feedback');
+
+    if (applyBtn && couponInput) {
+      applyBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var code = (couponInput.value || '').trim().toUpperCase();
+        if (!code) {
+          showFeedback('Please enter a coupon code.', 'is-error');
+          return;
+        }
+        applyCouponCode(code, true);
+      });
+    }
+
+    if (fastApplyBtn) {
+      fastApplyBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var code = this.getAttribute('data-code') || 'SAMYAK10';
+        if (couponInput) couponInput.value = code;
+        applyCouponCode(code, true);
+      });
+    }
+
+    function showFeedback(msg, cls) {
+      if (!feedbackEl) return;
+      feedbackEl.textContent = msg;
+      feedbackEl.className = 'samyak-coupon-feedback ' + cls;
+      feedbackEl.classList.remove('is-hidden');
+    }
+
+    function applyCouponCode(code, showMsg) {
+      if (code === 'SAMYAK10') {
+        // Minimum order ₹2,000 (200000 cents)
+        if (rawCartTotal < 200000) {
+          if (showMsg) {
+            showFeedback('SAMYAK10 requires a minimum order value of ₹2,000.', 'is-error');
+          }
+          activeDiscountRate = 0;
+          activeCouponCode = '';
+          updateSummaryDisplay();
+          return;
+        }
+
+        activeDiscountRate = 0.10;
+        activeCouponCode = 'SAMYAK10';
+        try { sessionStorage.setItem('samyak_applied_coupon', 'SAMYAK10'); } catch(e) {}
+
+        if (showMsg) {
+          showFeedback('✓ Coupon SAMYAK10 applied! 10% wholesale discount activated.', 'is-success');
+        }
+        updateSummaryDisplay();
+      } else {
+        if (showMsg) {
+          showFeedback('Invalid coupon code. Try SAMYAK10 for 10% off.', 'is-error');
+        }
+      }
+    }
+
+    function updateSummaryDisplay() {
+      var subtotalEl = document.getElementById('samyak-sum-subtotal');
+      var discountRow = document.getElementById('samyak-discount-row');
+      var discountValEl = document.getElementById('samyak-sum-discount');
+      var activeCodeEl = document.getElementById('samyak-active-code');
+      var totalValEl = document.getElementById('samyak-sum-total');
+
+      if (subtotalEl) subtotalEl.textContent = formatMoney(rawCartTotal);
+
+      var effectiveTotal = rawCartTotal;
+      if (activeDiscountRate > 0) {
+        var discountAmount = Math.round(rawCartTotal * activeDiscountRate);
+        effectiveTotal = rawCartTotal - discountAmount;
+
+        if (discountRow) discountRow.classList.remove('is-hidden');
+        if (activeCodeEl) activeCodeEl.textContent = activeCouponCode;
+        if (discountValEl) discountValEl.textContent = '-' + formatMoney(discountAmount);
+        if (totalValEl) totalValEl.textContent = formatMoney(effectiveTotal);
+      } else {
+        if (discountRow) discountRow.classList.add('is-hidden');
+        if (totalValEl) totalValEl.textContent = formatMoney(rawCartTotal);
+      }
+
+      // Update wholesale MOQ progress & checkout button state dynamically
+      var moqProgress = document.querySelector('.samyak-cart-wholesale-progress');
+      var moqStatus = document.querySelector('.samyak-cart-wholesale-status');
+      var moqWarn = document.getElementById('samyak-cart-moq-warning');
+      var checkoutBtn = document.getElementById('samyak-checkout-submit');
+
+      if (rawCartTotal >= 200000) {
+        if (moqProgress) moqProgress.style.width = '100%';
+        if (moqStatus) {
+          moqStatus.className = 'samyak-cart-wholesale-status is-met';
+          moqStatus.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> <strong>Wholesale Minimum (₹2,000) reached!</strong>';
+        }
+        if (moqWarn) moqWarn.style.display = 'none';
+        if (checkoutBtn) {
+          checkoutBtn.disabled = false;
+          checkoutBtn.removeAttribute('aria-disabled');
+          checkoutBtn.classList.remove('is-disabled');
+        }
+      } else {
+        var pct = Math.min(100, Math.round((rawCartTotal / 200000) * 100));
+        var diff = 200000 - rawCartTotal;
+        if (moqProgress) moqProgress.style.width = pct + '%';
+        if (moqStatus) {
+          moqStatus.className = 'samyak-cart-wholesale-status';
+          moqStatus.innerHTML = 'Wholesale MOQ: Add <strong>' + formatMoney(diff) + '</strong> more to reach <strong>₹2,000</strong>';
+        }
+        if (moqWarn) moqWarn.style.display = 'flex';
+        if (checkoutBtn) {
+          checkoutBtn.disabled = true;
+          checkoutBtn.setAttribute('aria-disabled', 'true');
+          checkoutBtn.classList.add('is-disabled');
+        }
+      }
+    }
+
+    // Intercept form submission if below wholesale MOQ
+    var cartForm = document.getElementById('samyak-main-cart-form');
+    if (cartForm) {
+      cartForm.addEventListener('submit', function(e) {
+        if (rawCartTotal < 200000) {
+          e.preventDefault();
+          e.stopPropagation();
+          var warn = document.getElementById('samyak-cart-moq-warning');
+          if (warn) {
+            warn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            warn.classList.add('is-shaking');
+            setTimeout(function() { warn.classList.remove('is-shaking'); }, 600);
+          }
+          return false;
+        }
+      });
+    }
+
+    // Checkout submission handling: pass discount if applied & block sub-MOQ
+    var checkoutBtn = document.getElementById('samyak-checkout-submit');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', function(e) {
+        if (rawCartTotal < 200000) {
+          e.preventDefault();
+          e.stopPropagation();
+          var warn = document.getElementById('samyak-cart-moq-warning');
+          if (warn) {
+            warn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            warn.classList.add('is-shaking');
+            setTimeout(function() { warn.classList.remove('is-shaking'); }, 600);
+          }
+          return false;
+        }
+
+        if (activeCouponCode) {
+          // If a coupon is active, navigate directly to checkout with discount parameter
+          e.preventDefault();
+          window.location.href = '/checkout?discount=' + encodeURIComponent(activeCouponCode);
+        }
+      });
+    }
+
+    updateSummaryDisplay();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "t:names.cart",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color"
+    }
+  ]
+}
+{% endschema %}

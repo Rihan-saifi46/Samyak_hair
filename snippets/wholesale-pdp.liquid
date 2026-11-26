@@ -1251,7 +1251,7 @@
           fetch('/cart.js')
             .then(function(r) { return r.json(); })
             .then(function(cartData) {
-              var badges = document.querySelectorAll('.samyak-hdr-cart-badge');
+              var badges = document.querySelectorAll('#samyak-header-cart-count, #samyak-mbn-cart-count, .samyak-hdr-cart-btn .samyak-hdr-cart-badge');
               badges.forEach(function(b) {
                 b.textContent = cartData.item_count;
                 b.style.display = cartData.item_count > 0 ? 'flex' : 'none';
@@ -1282,7 +1282,7 @@
           fetch('/cart?section_id=cart-drawer-section')
             .then(function(r) { return r.text(); })
             .then(function(html) {
-              var container = document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
+              var container = document.getElementById('shopify-section-cart-drawer-section') || document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
               if (container) {
                 var parser = new DOMParser();
                 var doc = parser.parseFromString(html, 'text/html');
@@ -1297,7 +1297,8 @@
               if (atcBtn) atcBtn.disabled = false;
               openDrawer();
             })
-            .catch(function() {
+            .catch(function(err) {
+              console.warn('[PDP] Cart section refresh error:', err);
               if (atcLabel) atcLabel.textContent = origText;
               if (atcBtn) atcBtn.disabled = false;
               openDrawer();
@@ -1364,7 +1365,7 @@
             fetch('/cart?section_id=cart-drawer-section')
               .then(function(r) { return r.text(); })
               .then(function(html) {
-                var container = document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
+                var container = document.getElementById('shopify-section-cart-drawer-section') || document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
                 if (container) {
                   var parser = new DOMParser();
                   var doc = parser.parseFromString(html, 'text/html');
@@ -1384,7 +1385,8 @@
                   }
                 }
               })
-              .catch(function() {
+              .catch(function(err) {
+                console.warn('[PDP Buy Now] Cart section refresh error:', err);
                 var nativeDrawer = document.getElementById('cart-drawer');
                 if (nativeDrawer && typeof nativeDrawer.open === 'function') nativeDrawer.open();
               });

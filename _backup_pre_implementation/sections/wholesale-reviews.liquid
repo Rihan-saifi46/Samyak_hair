@@ -1,0 +1,20 @@
+{% render 'homepage-reviews' %}
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "always_show",
+      "label": "Show on all collections",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews"
+    }
+  ]
+}
+{% endschema %}

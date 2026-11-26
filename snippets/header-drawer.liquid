@@ -81,16 +81,30 @@
         {% endif %}
       "
     >
-      <button
-        class="button close-button menu-drawer__close-button focus-inset"
-        type="button"
-        aria-label="{{ 'actions.close' | t }}"
-        on:click="/close"
-      >
-        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
-          {{- 'icon-close-menu.svg' | inline_asset_content -}}
-        </span>
-      </button>
+      <!-- Swastik-Style Luxury Drawer Header -->
+      <div class="samyak-drawer-header-bar">
+        <a href="{{ routes.root_url }}" class="samyak-drawer-logo-link" aria-label="Samyak Hair Accessories">
+          <img
+            src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+            alt="SAMYAK HAIR ACCESSORIES"
+            class="samyak-drawer-logo-img"
+            width="140"
+            height="36"
+            loading="eager"
+          >
+        </a>
+        <button
+          class="button-unstyled close-button menu-drawer__close-button samyak-drawer-close-btn focus-inset"
+          type="button"
+          aria-label="{{ 'actions.close' | t }}"
+          on:click="/close"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
       <nav
         class="menu-drawer__navigation"
         style="
@@ -135,8 +149,10 @@
                         class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element"
                       >
                         <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
-                        <span class="svg-wrapper icon-plus">
-                          {{- 'icon-plus.svg' | inline_asset_content -}}
+                        <span class="svg-wrapper samyak-drawer-chevron">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
                         </span>
                       </summary>
                       {% liquid
@@ -397,8 +413,10 @@
                                         <span class="menu-drawer__menu-item-text wrap-text">
                                           {{- childlink.title | escape -}}
                                         </span>
-                                        <span class="svg-wrapper icon-plus">
-                                          {{- 'icon-plus.svg' | inline_asset_content -}}
+                                        <span class="svg-wrapper samyak-drawer-chevron">
+                                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                          </svg>
                                         </span>
                                       </summary>
                                       {% liquid
@@ -785,6 +803,95 @@
 </header-drawer>
 
 {% stylesheet %}
+  /* Swastik Jewels-style luxury drawer enhancements */
+  .samyak-drawer-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid #ECE7E1;
+    background: #FAF8F5;
+    flex-shrink: 0;
+  }
+
+  .samyak-drawer-logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .samyak-drawer-logo-img {
+    height: 34px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .samyak-drawer-close-btn,
+  .menu-drawer__close-button.samyak-drawer-close-btn {
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    color: #113B32 !important;
+    transition: background-color 0.2s ease !important;
+  }
+
+  .samyak-drawer-close-btn:hover,
+  .menu-drawer__close-button.samyak-drawer-close-btn:hover {
+    background-color: rgba(17, 59, 50, 0.08) !important;
+  }
+
+  .menu-drawer__menu-item--mainlist {
+    padding: 14px 20px !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: #113B32 !important;
+    border-bottom: 1px solid #F3F1EC !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-decoration: none !important;
+  }
+
+  .menu-drawer__menu-item--mainlist .samyak-drawer-chevron,
+  .menu-drawer__menu-item--mainlist .icon-caret {
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #113B32;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  details[open] > summary.menu-drawer__menu-item--mainlist .samyak-drawer-chevron,
+  details[open] > summary.menu-drawer__menu-item--mainlist .icon-caret {
+    transform: rotate(180deg);
+    color: #B88F42;
+  }
+
+  .menu-drawer__menu--childlist {
+    background: #FAF8F5 !important;
+    border-bottom: 1px solid #ECE7E1 !important;
+  }
+
+  .menu-drawer__menu-item--child {
+    padding: 10px 20px 10px 32px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #2B423A !important;
+    text-decoration: none !important;
+  }
+
   .icon-caret--forward svg {
     transform: rotate(-90deg);
   }

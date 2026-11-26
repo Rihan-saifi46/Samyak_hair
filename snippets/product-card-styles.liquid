@@ -50,12 +50,10 @@
   /* --------------------------------------------------------------------------
      IMAGE SECTION — 70% HEIGHT (Full-Bleed Top, Left & Right, Zero Padding)
      -------------------------------------------------------------------------- */
-  .product-card .card-gallery,
-  .product-card .product-media-container,
-  .product-card .card-gallery > a > .product-media-container {
+  .product-card .card-gallery {
     width: 100% !important;
     height: 70% !important;
-    min-height: 330px !important;
+    min-height: 320px !important;
     max-height: 335px !important;
     position: relative !important;
     overflow: hidden !important;
@@ -66,9 +64,7 @@
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
     flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: block !important;
     box-sizing: border-box !important;
   }
 
@@ -76,10 +72,8 @@
     .product-card {
       min-height: 440px !important;
     }
-    .product-card .card-gallery,
-    .product-card .product-media-container,
-    .product-card .card-gallery > a > .product-media-container {
-      min-height: 305px !important;
+    .product-card .card-gallery {
+      min-height: 295px !important;
       max-height: 310px !important;
     }
   }
@@ -88,24 +82,27 @@
     .product-card {
       min-height: 395px !important;
     }
-    .product-card .card-gallery,
-    .product-card .product-media-container,
-    .product-card .card-gallery > a > .product-media-container {
-      min-height: 275px !important;
+    .product-card .card-gallery {
+      min-height: 265px !important;
       max-height: 280px !important;
     }
   }
 
   .product-card .product-media-container,
+  .product-card .card-gallery > a > .product-media-container,
+  .product-card .card-gallery a.contents,
   .product-card .card-gallery .slideshow,
-  .product-card .card-gallery .slideshow__viewport {
+  .product-card .card-gallery .slideshow__viewport,
+  .product-card .card-gallery .slideshow__slide {
     height: 100% !important;
     width: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: block !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
 
   /* Full-bleed image extending edge-to-edge top, left, and right with ZERO inner padding */

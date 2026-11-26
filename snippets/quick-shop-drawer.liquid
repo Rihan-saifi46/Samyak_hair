@@ -434,45 +434,137 @@
     line-height: 1.4 !important;
   }
 
-  /* Responsive Mobile Drawer (< 768px) */
+  /* Responsive Mobile Bottom-Sheet Drawer (< 768px) */
   @media (max-width: 768px) {
     #samyak-quick-shop-modal .samyak-drawer-container,
     .samyak-quick-shop-drawer .samyak-drawer-container {
-      grid-template-columns: 1fr !important;
-      width: 100vw !important;
-      max-width: 100vw !important;
-      height: 100dvh !important;
+      top: auto !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      max-height: 85vh !important;
+      max-height: 85dvh !important;
+      border-radius: 20px 20px 0 0 !important;
+      transform: translateY(100%) !important;
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
       display: flex !important;
       flex-direction: column !important;
-      overflow-y: auto !important;
+      overflow: hidden !important;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.28) !important;
+      background: #FCFBF7 !important;
     }
 
+    #samyak-quick-shop-modal.samyak-quick-shop-drawer--open .samyak-drawer-container,
+    .samyak-quick-shop-drawer--open .samyak-drawer-container {
+      transform: translateY(0) !important;
+    }
+
+    /* Compact Mobile Showcase */
     #samyak-quick-shop-modal .samyak-drawer-showcase,
     .samyak-quick-shop-drawer .samyak-drawer-showcase {
-      height: 240px !important;
-      min-height: 240px !important;
-      flex: 0 0 240px !important;
-      padding: 16px !important;
+      height: 160px !important;
+      min-height: 160px !important;
+      flex: 0 0 160px !important;
+      padding: 10px 16px !important;
+      background: #EFECE4 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-img,
+    .samyak-quick-shop-drawer .samyak-drawer-img {
+      height: 100% !important;
+      width: auto !important;
+      max-height: 140px !important;
+      object-fit: contain !important;
+      border-radius: 8px !important;
     }
 
     #samyak-quick-shop-modal .samyak-drawer-content,
     .samyak-quick-shop-drawer .samyak-drawer-content {
-      padding: 24px 20px !important;
+      padding: 16px 20px 24px !important;
       flex: 1 1 auto !important;
-      overflow-y: visible !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-eyebrow,
+    .samyak-quick-shop-drawer .samyak-drawer-eyebrow {
+      font-size: 9px !important;
+      letter-spacing: 0.12em !important;
+      margin-bottom: 4px !important;
     }
 
     #samyak-quick-shop-modal .samyak-drawer-title,
     .samyak-quick-shop-drawer .samyak-drawer-title {
-      font-size: 24px !important;
+      font-size: 19px !important;
+      line-height: 1.25 !important;
+      margin: 0 0 6px 0 !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-price,
+    .samyak-quick-shop-drawer .samyak-drawer-price {
+      font-size: 16px !important;
+      margin-bottom: 14px !important;
+      font-weight: 700 !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-variants-section,
+    .samyak-quick-shop-drawer .samyak-drawer-variants-section {
+      margin-bottom: 14px !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-variant-label,
+    .samyak-quick-shop-drawer .samyak-drawer-variant-label {
+      font-size: 9.5px !important;
+      margin-bottom: 8px !important;
+    }
+
+    /* Wrap variant pills horizontally instead of a tall vertical column */
+    #samyak-quick-shop-modal .samyak-drawer-variants-list,
+    .samyak-quick-shop-drawer .samyak-drawer-variants-list {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-variant-btn,
+    .samyak-quick-shop-drawer .samyak-drawer-variant-btn {
+      padding: 8px 16px !important;
+      font-size: 12px !important;
+      border-radius: 999px !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-add-btn,
+    .samyak-quick-shop-drawer .samyak-drawer-add-btn {
+      margin-top: 14px !important;
+      height: 48px !important;
+      font-size: 12.5px !important;
+    }
+
+    #samyak-quick-shop-modal .samyak-drawer-pdp-link,
+    .samyak-quick-shop-drawer .samyak-drawer-pdp-link {
+      margin-top: 12px !important;
+      padding-bottom: 6px !important;
+      font-size: 11.5px !important;
     }
 
     #samyak-quick-shop-modal .samyak-drawer-close-btn,
     .samyak-quick-shop-drawer .samyak-drawer-close-btn {
-      top: 14px !important;
-      right: 14px !important;
-      background: rgba(255, 255, 255, 0.9) !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+      top: 12px !important;
+      right: 12px !important;
+      width: 32px !important;
+      height: 32px !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+      z-index: 20 !important;
     }
   }
 </style>
@@ -693,16 +785,20 @@
           addBtn.classList.add('is-added');
 
           // 1. Refresh background cart drawer section HTML via synchronized Section Rendering API
-          fetch('/cart?section_id=cart-drawer')
+          fetch('/cart?section_id=cart-drawer-section')
             .then(function(r) { return r.text(); })
             .then(function(html) {
+              var container = document.getElementById('shopify-section-cart-drawer-section') || document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
               var parser = new DOMParser();
               var doc = parser.parseFromString(html, 'text/html');
-              var newInner = doc.querySelector('.cart-drawer__inner') || doc.querySelector('cart-drawer-component') || doc.querySelector('#cart-drawer');
-              var curInner = document.querySelector('.cart-drawer__inner') || document.querySelector('cart-drawer-component') || document.querySelector('#cart-drawer');
+              var newInner = doc.querySelector('.cart-drawer__inner');
+              var curInner = container ? container.querySelector('.cart-drawer__inner') : document.querySelector('.cart-drawer__inner');
               if (newInner && curInner) {
                 curInner.innerHTML = newInner.innerHTML;
+                curInner.className = newInner.className;
               }
+              var scrollContent = document.querySelector('#cart-drawer .cart-drawer__content');
+              if (scrollContent) scrollContent.scrollTop = 0;
             })
             .catch(function(err) {
               console.warn('[QuickShop] Cart section refresh error:', err);
@@ -730,24 +826,6 @@
               document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true, detail: { cart: cart } }));
             });
 
-          // Refresh cart drawer content via Section Rendering API
-          fetch('/cart?section_id=cart-drawer-section')
-            .then(function(r) { return r.text(); })
-            .then(function(html) {
-              var container = document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
-              if (container) {
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(html, 'text/html');
-                var newInner = doc.querySelector('.cart-drawer__inner');
-                var currentInner = container.querySelector('.cart-drawer__inner');
-                if (newInner && currentInner) {
-                  currentInner.innerHTML = newInner.innerHTML;
-                  currentInner.className = newInner.className;
-                }
-              }
-            })
-            .catch(function() {});
-
           // 3. Close Quick Shop drawer and slide open native <cart-drawer>
           setTimeout(function() {
             closeDrawer();
@@ -762,6 +840,11 @@
               themeDrawer.classList.add('active');
               themeDrawer.setAttribute('open', '');
             }
+
+            requestAnimationFrame(function() {
+              var scrollContent = document.querySelector('#cart-drawer .cart-drawer__content');
+              if (scrollContent) scrollContent.scrollTop = 0;
+            });
           }, 350);
         })
         .catch(function(err) {

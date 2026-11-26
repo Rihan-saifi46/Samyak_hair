@@ -1,0 +1,1531 @@
+{%- doc -%}
+  Wholesale Product Details Page (PDP) for Samyak Wholesale.
+  Exact 2-column layout matching the reference design:
+  - Palette: #F7F5EE warm cream bg, #113B32 deep forest green primary, #C5A280 warm tan accent.
+  - Breadcrumb navigation with pill back button.
+  - Left column: sticky gallery, 4:5 aspect ratio, zoom button, thumbnail strip, disclaimer box.
+  - Right column: Cormorant/Playfair serif title, price, 2 wholesale callout strips, variant pill swatches, quantity stepper, Add to Cart & Buy It Now buttons, safe payment badges, 3-col service box, interactive PIN code estimator, and 4 product details accordions.
+
+  @param {product} product - The product object
+  @param {string} section_id - The section id
+  @param {object} settings - The section settings
+  @param {string} [additional_blocks] - Blocks captured from section
+  @param {collection} [collection] - The active or parent collection object
+{%- enddoc -%}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_image = current_variant.featured_image | default: product.featured_image
+
+  # Category detection for dynamic wholesale specifications
+  assign prod_type = product.type | downcase
+  assign prod_title = product.title | downcase
+  assign prod_tags = product.tags | join: ',' | downcase
+
+  assign is_claw = false
+  assign is_scrunchie = false
+  assign is_hairband = false
+  assign is_hairpin = false
+  assign is_jewelry = false
+
+  if prod_type contains 'claw' or prod_type contains 'clip' or prod_title contains 'claw' or prod_title contains 'clip' or prod_tags contains 'claw' or prod_tags contains 'clip'
+    assign is_claw = true
+  elsif prod_type contains 'scrunchie' or prod_type contains 'band' or prod_title contains 'scrunchie' or prod_tags contains 'scrunchie'
+    assign is_scrunchie = true
+  elsif prod_type contains 'headband' or prod_type contains 'hairband' or prod_title contains 'headband' or prod_title contains 'hairband' or prod_tags contains 'headband' or prod_tags contains 'hairband'
+    assign is_hairband = true
+  elsif prod_type contains 'pin' or prod_type contains 'barrette' or prod_title contains 'pin' or prod_title contains 'barrette' or prod_tags contains 'pin'
+    assign is_hairpin = true
+  elsif prod_type contains 'jewelry' or prod_type contains 'earring' or prod_type contains 'necklace' or prod_title contains 'jewelry' or prod_tags contains 'jewelry'
+    assign is_jewelry = true
+  else
+    assign is_claw = true
+  endif
+
+  # Collection for back button and breadcrumb
+  assign back_url = routes.all_products_collection_url
+  assign back_title = 'All Products'
+  if collection
+    assign back_url = collection.url
+    assign back_title = collection.title
+  elsif product.collections.size > 0
+    assign back_url = product.collections.first.url
+    assign back_title = product.collections.first.title
+  endif
+%}
+
+<div class="samyak-pdp-wrapper" data-section-id="{{ section_id }}">
+  <!-- 1. Top Navigation Breadcrumb Bar -->
+  <div class="samyak-pdp-top-bar">
+    <nav class="samyak-pdp-breadcrumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}" class="samyak-bc-home" aria-label="Home">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      </a>
+      <span class="samyak-bc-sep">/</span>
+      <a href="{{ back_url }}">{{ back_title }}</a>
+      <span class="samyak-bc-sep">/</span>
+      <span class="samyak-bc-current">{{ product.title }}</span>
+    </nav>
+  </div>
+
+  <!-- 2. Two-Column Product Grid with Synchronized Card Heights -->
+  <div class="samyak-pdp-grid">
+    <!-- LEFT COLUMN: Product Image Card -->
+    <div class="samyak-pdp-gallery-col">
+      <div class="samyak-pdp-main-img-box" id="samyak-main-img-box">
+        <!-- Floating circular Wishlist button in top-right corner -->
+        <button
+          type="button"
+          class="samyak-pdp-img-wishlist-btn samyak-wishlist-btn"
+          id="samyak-pdp-wishlist-btn"
+          data-product-id="{{ product.id }}"
+          aria-label="Save to Wishlist"
+          title="Save to Wishlist"
+        >
+          <svg class="samyak-pdp-heart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+
+        {% if featured_image %}
+          <img
+            id="samyak-pdp-main-img"
+            src="{{ featured_image | image_url: width: 1200 }}"
+            alt="{{ featured_image.alt | default: product.title | escape }}"
+            width="{{ featured_image.width }}"
+            height="{{ featured_image.height }}"
+            class="samyak-pdp-main-img"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'samyak-pdp-placeholder-svg' }}
+        {% endif %}
+
+        <!-- Floating circular Zoom/Expand button in bottom-right corner -->
+        <button
+          type="button"
+          class="samyak-pdp-zoom-btn"
+          id="samyak-pdp-zoom-btn"
+          aria-label="Zoom product image"
+          title="Click to view full image"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#113B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.35-4.35"/>
+            <line x1="11" y1="8" x2="11" y2="14"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Compact Thumbnails (if multiple images exist) -->
+      {% if product.media.size > 1 %}
+        <div class="samyak-pdp-thumbnails-strip" id="samyak-pdp-thumbnails" role="tablist" aria-label="Product Thumbnails">
+          {% for media in product.media %}
+            {% assign is_active = false %}
+            {% if media.id == featured_image.id or forloop.first and featured_image == blank %}
+              {% assign is_active = true %}
+            {% endif %}
+            <button
+              type="button"
+              role="tab"
+              class="samyak-pdp-thumb{% if is_active %} is-active{% endif %}"
+              data-media-id="{{ media.id }}"
+              data-full-url="{{ media | image_url: width: 1200 }}"
+              data-alt="{{ media.alt | default: product.title | escape }}"
+              aria-selected="{% if is_active %}true{% else %}false{% endif %}"
+              aria-label="Thumbnail {{ forloop.index }} of {{ product.media.size }}"
+            >
+              <img
+                src="{{ media | image_url: width: 140 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                width="52"
+                height="52"
+                loading="lazy"
+              >
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT COLUMN: Product Configuration & Actions in Rounded White Card -->
+    <div class="samyak-pdp-info-col">
+      <div class="samyak-pdp-info-card">
+        <!-- Floral Watermark in top-right corner -->
+        <div class="samyak-pdp-floral-watermark" aria-hidden="true">
+          <svg width="110" height="110" viewBox="0 0 100 100" fill="none">
+            <path d="M100 0 C70 12 52 42 46 75 C44 60 40 42 16 36 C42 30 68 15 100 0 Z" fill="#EADCCB" opacity="0.45"/>
+            <path d="M100 22 C80 32 66 52 62 86 C60 72 52 56 32 50 C52 44 72 32 100 22 Z" fill="#EADCCB" opacity="0.3"/>
+          </svg>
+        </div>
+
+        <div class="samyak-pdp-info-top">
+          <!-- 1. Product Title -->
+          <h1 class="samyak-pdp-title">{{ product.title }}</h1>
+
+          <!-- 2. Product Price -->
+          <div class="samyak-pdp-price-row" id="samyak-pdp-price-row">
+            <span class="samyak-pdp-current-price" id="samyak-pdp-price-display">
+              {{ current_variant.price | money }}
+            </span>
+            <span class="samyak-pdp-price-sep">|</span>
+            <span class="samyak-pdp-price-unit">Per Pc</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="samyak-pdp-compare-price" id="samyak-pdp-compare-price">
+                {{ current_variant.compare_at_price | money }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 3. Form & Controls -->
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" id="samyak-pdp-form" class="samyak-pdp-form">
+          <input type="hidden" name="id" id="samyak-pdp-variant-id" value="{{ current_variant.id }}">
+          <input type="hidden" name="quantity" id="samyak-pdp-qty-field" value="1">
+
+          <!-- Available Options or Variants (if variants exist) -->
+          {% if product.variants.size > 1 %}
+            <div class="samyak-pdp-variants-section">
+              <label class="samyak-pdp-section-label">AVAILABLE OPTIONS / VARIANTS</label>
+              <div class="samyak-pdp-swatches-row" role="radiogroup" aria-label="Select Variant">
+                {% for variant in product.variants %}
+                  {% assign is_selected = false %}
+                  {% if variant.id == current_variant.id %}
+                    {% assign is_selected = true %}
+                  {% endif %}
+                  <button
+                    type="button"
+                    role="radio"
+                    class="samyak-pdp-swatch{% if is_selected %} is-selected{% endif %}{% unless variant.available %} is-sold-out{% endunless %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-price="{{ variant.price | money }}"
+                    data-raw-price="{{ variant.price }}"
+                    data-compare-price="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+                    data-available="{{ variant.available }}"
+                    data-media-id="{{ variant.featured_media.id | default: '' }}"
+                    data-img-url="{{ variant.featured_image | image_url: width: 1200 | default: '' }}"
+                    aria-checked="{% if is_selected %}true{% else %}false{% endif %}"
+                  >
+                    {{ variant.title }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- 4. Quantity Stepper Row -->
+          <div class="samyak-pdp-qty-row">
+            <span class="samyak-pdp-qty-label">QUANTITY</span>
+            <div class="samyak-pdp-qty-pill" aria-label="Product Quantity Stepper">
+              <button type="button" class="samyak-qty-btn" id="samyak-qty-dec" aria-label="Decrease quantity">−</button>
+              <span class="samyak-qty-number" id="samyak-qty-number">1</span>
+              <button type="button" class="samyak-qty-btn" id="samyak-qty-inc" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          <!-- 5. Stock & Dispatch Status Row -->
+          <div class="samyak-pdp-stock-dispatch-row" id="samyak-pdp-stock-status">
+            <div class="samyak-pdp-stock-item">
+              <span class="samyak-stock-dot {% if current_variant.available %}is-in-stock{% else %}is-out-of-stock{% endif %}"></span>
+              <span class="samyak-stock-text" id="samyak-stock-text">
+                {% if current_variant.available %}In Stock{% else %}Out of Stock{% endif %}
+              </span>
+            </div>
+            <div class="samyak-pdp-dispatch-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+              <span>Ready to dispatch (2-3 days)</span>
+            </div>
+          </div>
+
+          <!-- 6. Action Buttons: ADD TO CART + BUY NOW Side-by-Side -->
+          <div class="samyak-pdp-actions">
+            <button
+              type="submit"
+              class="samyak-pdp-btn-atc"
+              id="samyak-pdp-btn-atc"
+              {% unless current_variant.available %}disabled{% endunless %}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span id="samyak-pdp-atc-label">
+                {% if current_variant.available %}ADD TO CART{% else %}SOLD OUT{% endif %}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="samyak-pdp-btn-buynow"
+              id="samyak-pdp-btn-buynow"
+              {% unless current_variant.available %}disabled{% endunless %}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>BUY NOW</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- 7. Trust Badges Row -->
+        <div class="samyak-pdp-trust-badges">
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <span>Secure Checkout</span>
+          </div>
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span>Fast Delivery</span>
+          </div>
+          <div class="samyak-trust-badge">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <polyline points="23 20 23 14 17 14"></polyline>
+              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+            </svg>
+            <span>Easy Returns</span>
+          </div>
+        </div>
+
+        {% if additional_blocks != blank %}
+          <!-- Theme Editor App Blocks & Merchant Widgets -->
+          <div class="samyak-pdp-additional-blocks-wrapper" data-theme-editor-blocks>
+            {{ additional_blocks }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: ABOUT THIS PRODUCT -->
+  <section class="samyak-pdp-about-section" id="samyak-pdp-about">
+    <div class="samyak-pdp-about-container">
+      <div class="samyak-section-golden-heading">
+        <span class="samyak-golden-line"></span>
+        <h2 class="samyak-golden-title">About This Product</h2>
+        <span class="samyak-golden-line"></span>
+      </div>
+      <div class="samyak-pdp-about-body rte">
+        {% if product.description != blank %}
+          {{ product.description }}
+        {% else %}
+          <p>
+            Premium wholesale hair accessory crafted for comfortable, secure, all-day wear. Designed with attention to detail and durability, suitable for daily styling, festive occasions, and professional salon styling.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal for Image Zoom -->
+  <div class="samyak-pdp-lightbox" id="samyak-pdp-lightbox" aria-hidden="true">
+    <div class="samyak-pdp-lightbox-overlay" id="samyak-lightbox-close-overlay"></div>
+    <div class="samyak-pdp-lightbox-inner">
+      <button type="button" class="samyak-lightbox-close-btn" id="samyak-lightbox-close-btn" aria-label="Close zoom modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <img id="samyak-lightbox-img" src="" alt="Full size preview" class="samyak-lightbox-img" width="1000" height="1000">
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ==========================================================================
+     SAMYAK WHOLESALE PDP STYLING
+     Exact Reference Matching:
+     Background: #F7F5EE | Primary: #113B32 | Secondary Accent: #C5A280
+     Cards: #FCFBF7 | Borders: #E4E0D6 | Muted Text: #5C615E | Darks: #181A19
+     ========================================================================== */
+
+  .samyak-pdp-wrapper {
+    background-color: #F7F5EE;
+    color: #181A19;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding-bottom: 60px;
+  }
+
+  /* 1. Top Breadcrumb Bar */
+  .samyak-pdp-top-bar {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 24px 20px 14px;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6B7280;
+    flex-wrap: wrap;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', -apple-system, sans-serif);
+  }
+
+  .samyak-bc-home {
+    display: inline-flex;
+    align-items: center;
+    color: #113B32;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .samyak-bc-home:hover {
+    opacity: 0.75;
+  }
+
+  .samyak-pdp-breadcrumbs a {
+    color: #6B7280;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .samyak-pdp-breadcrumbs a:hover {
+    color: #113B32;
+    text-decoration: underline;
+  }
+
+  .samyak-bc-sep {
+    color: #D1D5DB;
+    font-size: 13px;
+  }
+
+  .samyak-bc-current {
+    color: #113B32;
+    font-weight: 500;
+  }
+
+  /* 2. Two-Column Grid with Equal Card Heights */
+  .samyak-pdp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.12fr;
+    gap: clamp(16px, 2.5vw, 32px);
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+    align-items: stretch;
+  }
+
+  /* LEFT COLUMN: Gallery Matching Right Box Height Exactly */
+  .samyak-pdp-gallery-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .samyak-pdp-main-img-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-main-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: opacity 0.25s ease;
+  }
+
+  .samyak-pdp-placeholder-svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.4;
+  }
+
+  /* Floating Wishlist Button on Top-Right of Main Image */
+  .samyak-pdp-img-wishlist-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    padding: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .samyak-pdp-img-wishlist-btn:hover {
+    background: #FAF7F2;
+    transform: scale(1.08);
+  }
+
+  .samyak-pdp-img-wishlist-btn.is-active svg {
+    fill: #E53E3E !important;
+    stroke: #E53E3E !important;
+  }
+
+  /* Floating Zoom Button on Bottom-Right of Main Image */
+  .samyak-pdp-zoom-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    z-index: 5;
+  }
+
+  .samyak-pdp-zoom-btn:hover {
+    background: #FAF7F2;
+    transform: scale(1.08);
+  }
+
+  .samyak-pdp-thumbnails-strip {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    justify-content: center;
+  }
+
+  .samyak-pdp-thumb {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 8px;
+    border: 1px solid #ECE6DF;
+    background: #FAF7F2;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .samyak-pdp-thumb:hover {
+    border-color: #113B32;
+  }
+
+  .samyak-pdp-thumb.is-active {
+    border: 1.5px solid #113B32;
+    box-shadow: 0 2px 6px rgba(17, 59, 50, 0.15);
+  }
+
+  /* RIGHT COLUMN: Product Information Card Defining Natural Height */
+  .samyak-pdp-info-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .samyak-pdp-info-card {
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-floral-watermark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  .samyak-pdp-title {
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: clamp(21px, 2.1vw, 26px);
+    font-weight: 500;
+    color: #113B32;
+    line-height: 1.25;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
+  }
+
+  .samyak-pdp-price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .samyak-pdp-current-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #113B32;
+  }
+
+  .samyak-pdp-price-sep {
+    color: #D1D5DB;
+    font-size: 16px;
+    margin: 0 2px;
+  }
+
+  .samyak-pdp-price-unit {
+    font-size: 13.5px;
+    font-weight: 400;
+    color: #6B7280;
+  }
+
+  .samyak-pdp-compare-price {
+    font-size: 14px;
+    color: #9CA3AF;
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* Quantity Stepper Row */
+  .samyak-pdp-qty-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 14px 0;
+  }
+
+  .samyak-pdp-qty-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .samyak-pdp-qty-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #E5E0D8;
+    background: #FFFFFF;
+    border-radius: 999px;
+    padding: 3px 12px;
+  }
+
+  .samyak-qty-btn {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #113B32;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+  }
+
+  .samyak-qty-btn:hover {
+    opacity: 0.7;
+  }
+
+  .samyak-qty-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: #113B32;
+    min-width: 14px;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* Stock & Dispatch Status Row */
+  .samyak-pdp-stock-dispatch-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0 0 18px 0;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+
+  .samyak-pdp-stock-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #16A34A;
+    font-weight: 600;
+  }
+
+  .samyak-stock-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    background-color: #16A34A;
+  }
+
+  .samyak-stock-dot.is-out-of-stock {
+    background-color: #DC2626;
+  }
+
+  .samyak-pdp-dispatch-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #4B5563;
+  }
+
+  /* Action Buttons: ADD TO CART + BUY NOW Side-by-Side */
+  .samyak-pdp-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin: 0 0 18px 0;
+  }
+
+  .samyak-pdp-btn-atc {
+    flex: 1;
+    height: 44px;
+    border-radius: 9px;
+    background: #113B32;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(17, 59, 50, 0.15);
+  }
+
+  .samyak-pdp-btn-atc:hover:not(:disabled) {
+    background: #09241E;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(17, 59, 50, 0.25);
+  }
+
+  .samyak-pdp-btn-atc:disabled {
+    background: #A3A8A5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .samyak-pdp-btn-buynow {
+    flex: 1;
+    height: 44px;
+    border-radius: 9px;
+    background: #D4BA9E;
+    color: #113B32;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(212, 186, 158, 0.25);
+  }
+
+  .samyak-pdp-btn-buynow:hover:not(:disabled) {
+    filter: brightness(0.96);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(212, 186, 158, 0.35);
+  }
+
+  .samyak-pdp-btn-buynow:disabled {
+    background: #C9C4BC;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Trust Badges Footer Row */
+  .samyak-pdp-trust-badges {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #F0ECE6;
+    padding-top: 14px;
+    margin-top: 0;
+    gap: 10px;
+  }
+
+  .samyak-trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #4B5563;
+    font-weight: 500;
+  }
+
+  /* Responsive Mobile Styling */
+  @media (max-width: 860px) {
+    .samyak-pdp-grid {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+      gap: 20px;
+    }
+
+    .samyak-pdp-main-img-box {
+      aspect-ratio: 1 / 1;
+      height: 380px;
+      min-height: 280px;
+    }
+
+    .samyak-pdp-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .samyak-pdp-trust-badges {
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+  }
+
+  /* SECTION 3: About This Product */
+  .samyak-pdp-about-section {
+    max-width: 960px;
+    margin: clamp(48px, 6vw, 64px) auto 0;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-about-container {
+    background: #FFFFFF;
+    border: 1px solid #ECE6DF;
+    border-radius: 16px;
+    padding: clamp(36px, 4.5vw, 48px) clamp(24px, 4vw, 40px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box;
+  }
+
+  .samyak-pdp-about-section .samyak-section-golden-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    margin-bottom: 28px !important;
+  }
+
+  .samyak-pdp-about-section .samyak-golden-line {
+    flex: 1 1 0% !important;
+    max-width: 180px !important;
+    height: 1px !important;
+    background: #C5A280 !important;
+    opacity: 0.8 !important;
+    display: inline-block !important;
+  }
+
+  .samyak-pdp-about-section .samyak-golden-title {
+    font-family: var(--font-serif, 'Cormorant Garamond', 'Playfair Display', serif) !important;
+    font-size: clamp(22px, 3vw, 28px) !important;
+    font-weight: 500 !important;
+    color: #113B32 !important;
+    margin: 0 !important;
+    letter-spacing: 0.02em !important;
+    text-align: center !important;
+  }
+
+  .samyak-pdp-about-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #3A403D;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .samyak-pdp-about-body p {
+    margin: 0 0 16px 0;
+  }
+
+  .samyak-pdp-about-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .samyak-pdp-about-body ul {
+    padding-left: 24px;
+    margin: 0 0 16px 0;
+  }
+
+  .samyak-pdp-about-body li {
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .samyak-pdp-about-section {
+      margin-top: 36px;
+    }
+    .samyak-pdp-about-container {
+      padding: 28px 20px;
+    }
+    .samyak-pdp-about-section .samyak-golden-line {
+      max-width: 60px !important;
+    }
+  }
+
+  /* Lightbox Modal */
+  .samyak-pdp-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .samyak-pdp-lightbox.is-open {
+    display: flex;
+  }
+
+  .samyak-pdp-lightbox-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 24, 21, 0.85);
+    backdrop-filter: blur(4px);
+  }
+
+  .samyak-pdp-lightbox-inner {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .samyak-lightbox-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .samyak-lightbox-close-btn {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ==========================================================================
+     MOBILE RESPONSIVE (< 900px)
+     ========================================================================== */
+  @media screen and (max-width: 900px) {
+    .samyak-pdp-top-bar {
+      padding: 16px 16px 8px;
+    }
+
+    .samyak-pdp-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 0 16px 40px;
+    }
+
+    .samyak-pdp-gallery-sticky {
+      position: static;
+    }
+
+    .samyak-pdp-title {
+      font-size: 26px;
+    }
+
+    .samyak-pdp-service-box {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .samyak-service-item {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    // 2. Honest Postal Zone Transit Estimator
+    function initPinChecker() {
+      var input = document.getElementById('samyak-pin-input');
+      var btn = document.getElementById('samyak-pin-btn');
+      var feedback = document.getElementById('samyak-pin-feedback');
+      if (!input || !btn || !feedback) return;
+
+      function checkPin() {
+        var val = input.value.trim();
+        if (!/^\d{6}$/.test(val)) {
+          feedback.className = 'samyak-pin-feedback is-invalid';
+          feedback.textContent = 'Please enter a valid 6-digit Indian PIN code.';
+          feedback.style.display = 'block';
+          return;
+        }
+
+        var firstDigit = parseInt(val.charAt(0), 10);
+        // Valid Indian civilian postal zones are 1 through 8
+        if (firstDigit < 1 || firstDigit > 8) {
+          feedback.className = 'samyak-pin-feedback is-invalid';
+          feedback.textContent = 'Please enter a valid civilian Indian postal code (starting with digits 1–8).';
+          feedback.style.display = 'block';
+          return;
+        }
+
+        // Zone-based transit guidance
+        var zoneText = '2–4 Business Days';
+        var hub = 'Central Delhi';
+        if (firstDigit === 1) {
+          zoneText = '1–2 Business Days (Delhi NCR / Northern Zone)';
+        } else if (firstDigit === 2 || firstDigit === 3) {
+          zoneText = '2–3 Business Days (North / West Commercial Hubs)';
+        } else if (firstDigit === 4 || firstDigit === 5) {
+          zoneText = '2–4 Business Days (Western / Southern Metro Corridors)';
+        } else {
+          zoneText = '3–5 Business Days (Eastern / Special Coverage Zones)';
+        }
+
+        feedback.className = 'samyak-pin-feedback is-valid';
+        feedback.innerHTML = '✓ Estimated courier transit to PIN <strong>' + val + '</strong>: <strong>' + zoneText + '</strong> via Bluedart / Delhivery / DTDC.<br><small style="font-size:11px; opacity:0.85; display:block; margin-top:4px;">*Orders dispatch within 24–48 hours from ' + hub + '. Tracking link provided automatically via WhatsApp upon shipment.</small>';
+        feedback.style.display = 'block';
+      }
+
+      btn.addEventListener('click', checkPin);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkPin();
+        }
+      });
+    }
+
+    // 3. Thumbnail Gallery Switcher
+    function initThumbnails() {
+      var thumbs = document.querySelectorAll('.samyak-pdp-thumb');
+      var mainImg = document.getElementById('samyak-pdp-main-img');
+      if (!thumbs.length || !mainImg) return;
+
+      thumbs.forEach(function(thumb) {
+        thumb.addEventListener('click', function() {
+          var fullUrl = this.getAttribute('data-full-url');
+          var alt = this.getAttribute('data-alt');
+          if (fullUrl) {
+            mainImg.style.opacity = '0.3';
+            setTimeout(function() {
+              mainImg.src = fullUrl;
+              if (alt) mainImg.alt = alt;
+              mainImg.style.opacity = '1';
+            }, 100);
+          }
+
+          thumbs.forEach(function(t) {
+            t.classList.remove('is-active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          this.classList.add('is-active');
+          this.setAttribute('aria-selected', 'true');
+        });
+      });
+    }
+
+    // 4. Variant Selection & Synchronization
+    function initVariants() {
+      var swatches = document.querySelectorAll('.samyak-pdp-swatch');
+      var hiddenId = document.getElementById('samyak-pdp-variant-id');
+      var priceDisplay = document.getElementById('samyak-pdp-price-display');
+      var comparePrice = document.getElementById('samyak-pdp-compare-price');
+      var atcBtn = document.getElementById('samyak-pdp-btn-atc');
+      var atcLabel = document.getElementById('samyak-pdp-atc-label');
+      var buynowBtn = document.getElementById('samyak-pdp-btn-buynow');
+      var mainImg = document.getElementById('samyak-pdp-main-img');
+
+      if (!swatches.length) return;
+
+      swatches.forEach(function(swatch) {
+        swatch.addEventListener('click', function() {
+          if (this.classList.contains('is-sold-out') && !this.getAttribute('data-available')) {
+            // Still allow clicking to view sold out state
+          }
+
+          swatches.forEach(function(s) {
+            s.classList.remove('is-selected');
+            s.setAttribute('aria-checked', 'false');
+          });
+          this.classList.add('is-selected');
+          this.setAttribute('aria-checked', 'true');
+
+          var variantId = this.getAttribute('data-variant-id');
+          var price = this.getAttribute('data-price');
+          var compPrice = this.getAttribute('data-compare-price');
+          var available = this.getAttribute('data-available') === 'true';
+          var imgUrl = this.getAttribute('data-img-url');
+
+          if (hiddenId) hiddenId.value = variantId;
+
+          if (priceDisplay && price) {
+            priceDisplay.textContent = price;
+          }
+
+          if (comparePrice) {
+            if (compPrice) {
+              comparePrice.textContent = compPrice;
+              comparePrice.style.display = 'inline';
+            } else {
+              comparePrice.style.display = 'none';
+            }
+          }
+
+          if (atcBtn) {
+            atcBtn.disabled = !available;
+          }
+          if (buynowBtn) {
+            buynowBtn.disabled = !available;
+          }
+          if (atcLabel) {
+            atcLabel.textContent = available ? 'Add to Cart' : 'Sold Out';
+          }
+
+          var stockStatus = document.getElementById('samyak-pdp-stock-status');
+          if (stockStatus) {
+            if (available) {
+              stockStatus.innerHTML = '<span class="samyak-stock-dot is-in-stock"></span> <span class="samyak-stock-text" id="samyak-stock-text">In Stock • Ready to dispatch (24–48 hrs)</span>';
+            } else {
+              stockStatus.innerHTML = '<span class="samyak-stock-dot is-out-of-stock"></span> <span class="samyak-stock-text" id="samyak-stock-text">Currently Out of Stock</span>';
+            }
+          }
+
+          // Switch image if variant has image
+          if (imgUrl && mainImg) {
+            mainImg.src = imgUrl;
+            // Also highlight thumbnail matching media
+            var mediaId = this.getAttribute('data-media-id');
+            if (mediaId) {
+              var matchingThumb = document.querySelector('.samyak-pdp-thumb[data-media-id="' + mediaId + '"]');
+              if (matchingThumb) {
+                document.querySelectorAll('.samyak-pdp-thumb').forEach(function(t) { t.classList.remove('is-active'); });
+                matchingThumb.classList.add('is-active');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // 5. Quantity Stepper
+    function initQuantity() {
+      var dec = document.getElementById('samyak-qty-dec');
+      var inc = document.getElementById('samyak-qty-inc');
+      var num = document.getElementById('samyak-qty-number');
+      var input = document.getElementById('samyak-pdp-qty-field');
+      if (!dec || !inc || !num || !input) return;
+
+      var qty = 1;
+
+      dec.addEventListener('click', function() {
+        if (qty > 1) {
+          qty--;
+          num.textContent = qty;
+          input.value = qty;
+        }
+      });
+
+      inc.addEventListener('click', function() {
+        qty++;
+        num.textContent = qty;
+        input.value = qty;
+      });
+    }
+
+    // 5b. Add to Cart (AJAX)
+    function initAddToCart() {
+      var form = document.getElementById('samyak-pdp-form');
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var atcBtn = document.getElementById('samyak-pdp-btn-atc');
+        var atcLabel = document.getElementById('samyak-pdp-atc-label');
+        var origText = atcLabel ? atcLabel.textContent : 'Add to cart';
+
+        if (atcLabel) atcLabel.textContent = 'Adding to cart...';
+        if (atcBtn) atcBtn.disabled = true;
+
+        var formData = new FormData(form);
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) {
+          return res.json();
+        })
+        .then(function(data) {
+          if (atcLabel) atcLabel.textContent = '✓ Added to Cart!';
+          document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+          document.dispatchEvent(new CustomEvent('shopify:cart:refresh', { bubbles: true }));
+
+          // Update header cart badge
+          fetch('/cart.js')
+            .then(function(r) { return r.json(); })
+            .then(function(cartData) {
+              var badges = document.querySelectorAll('.samyak-hdr-cart-badge');
+              badges.forEach(function(b) {
+                b.textContent = cartData.item_count;
+                b.style.display = cartData.item_count > 0 ? 'flex' : 'none';
+              });
+            })
+            .catch(function() {});
+
+          function openDrawer() {
+            var nativeDrawer = document.getElementById('cart-drawer');
+            if (nativeDrawer) {
+              if (typeof nativeDrawer.open === 'function') {
+                nativeDrawer.open();
+              } else {
+                nativeDrawer.setAttribute('open', '');
+                var panel = nativeDrawer.querySelector('dialog');
+                if (panel) {
+                  if (typeof panel.showModal === 'function') {
+                    try { panel.showModal(); } catch(e) { panel.setAttribute('open', ''); }
+                  } else {
+                    panel.setAttribute('open', '');
+                  }
+                }
+              }
+            }
+          }
+
+          // Fetch Section Rendering API to update drawer items live
+          fetch('/cart?section_id=cart-drawer-section')
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+              var container = document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
+              if (container) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(html, 'text/html');
+                var newInner = doc.querySelector('.cart-drawer__inner');
+                var currentInner = container.querySelector('.cart-drawer__inner');
+                if (newInner && currentInner) {
+                  currentInner.innerHTML = newInner.innerHTML;
+                  currentInner.className = newInner.className;
+                }
+              }
+              if (atcLabel) atcLabel.textContent = origText;
+              if (atcBtn) atcBtn.disabled = false;
+              openDrawer();
+            })
+            .catch(function() {
+              if (atcLabel) atcLabel.textContent = origText;
+              if (atcBtn) atcBtn.disabled = false;
+              openDrawer();
+            });
+        })
+        .catch(function(err) {
+          console.error('ATC error:', err);
+          form.submit();
+        });
+      });
+    }
+
+    // 6. Buy It Now (Wholesale MOQ Enforcement & Direct Checkout)
+    function initBuyNow() {
+      var buynowBtn = document.getElementById('samyak-pdp-btn-buynow');
+      var hiddenId = document.getElementById('samyak-pdp-variant-id');
+      var input = document.getElementById('samyak-pdp-qty-field');
+      if (!buynowBtn) return;
+
+      buynowBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var id = hiddenId ? hiddenId.value : '';
+        var qty = input ? parseInt(input.value, 10) || 1 : 1;
+        if (!id) return;
+
+        // Determine variant raw price (Shopify money cents, e.g. 29900 = ₹299.00)
+        var swatch = document.querySelector('.samyak-pdp-swatch.is-selected');
+        var rawPrice = swatch ? parseInt(swatch.getAttribute('data-raw-price') || '0', 10) : 0;
+        if (!rawPrice) {
+          rawPrice = {{ current_variant.price | default: 0 }};
+        }
+        var lineTotal = rawPrice * qty;
+
+        // Wholesale threshold is ₹2,000 = 200,000 cents
+        if (lineTotal >= 200000) {
+          // Direct checkout allowed because this single item meets/exceeds ₹2,000
+          window.location.href = '/cart/' + id + ':' + qty + '?checkout';
+        } else {
+          // Sub-MOQ: intercepted! Add to cart and open cart drawer to guide customer to reach ₹2,000 MOQ
+          buynowBtn.disabled = true;
+          var origText = buynowBtn.textContent;
+          buynowBtn.textContent = 'ADDING TO BAG...';
+
+          var formData = new FormData();
+          formData.append('id', id);
+          formData.append('quantity', qty);
+
+          fetch('/cart/add.js', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(data) {
+            buynowBtn.textContent = origText;
+            buynowBtn.disabled = false;
+            document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+
+            // Refresh drawer and open without full cart redirect
+            fetch('/cart?section_id=cart-drawer-section')
+              .then(function(r) { return r.text(); })
+              .then(function(html) {
+                var container = document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
+                if (container) {
+                  var parser = new DOMParser();
+                  var doc = parser.parseFromString(html, 'text/html');
+                  var newInner = doc.querySelector('.cart-drawer__inner');
+                  var currentInner = container.querySelector('.cart-drawer__inner');
+                  if (newInner && currentInner) {
+                    currentInner.innerHTML = newInner.innerHTML;
+                    currentInner.className = newInner.className;
+                  }
+                }
+                var nativeDrawer = document.getElementById('cart-drawer');
+                if (nativeDrawer) {
+                  if (typeof nativeDrawer.open === 'function') {
+                    nativeDrawer.open();
+                  } else {
+                    nativeDrawer.setAttribute('open', '');
+                  }
+                }
+              })
+              .catch(function() {
+                var nativeDrawer = document.getElementById('cart-drawer');
+                if (nativeDrawer && typeof nativeDrawer.open === 'function') nativeDrawer.open();
+              });
+          })
+          .catch(function(err) {
+            console.error('Buy Now ATC error:', err);
+            buynowBtn.textContent = origText;
+            buynowBtn.disabled = false;
+          });
+        }
+      });
+    }
+
+    // 7. Lightbox Image Zoom
+    function initLightbox() {
+      var zoomBtn = document.getElementById('samyak-pdp-zoom-btn');
+      var lightbox = document.getElementById('samyak-pdp-lightbox');
+      var overlay = document.getElementById('samyak-lightbox-close-overlay');
+      var closeBtn = document.getElementById('samyak-lightbox-close-btn');
+      var lightboxImg = document.getElementById('samyak-lightbox-img');
+      var mainImg = document.getElementById('samyak-pdp-main-img');
+
+      if (!zoomBtn || !lightbox || !lightboxImg || !mainImg) return;
+
+      function openZoom() {
+        lightboxImg.src = mainImg.src;
+        lightbox.classList.add('is-open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeZoom() {
+        lightbox.classList.remove('is-open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      zoomBtn.addEventListener('click', openZoom);
+      if (overlay) overlay.addEventListener('click', closeZoom);
+      if (closeBtn) closeBtn.addEventListener('click', closeZoom);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && lightbox.classList.contains('is-open')) {
+          closeZoom();
+        }
+      });
+    }
+
+    // 7. Wishlist Interaction & Drawer Sync
+    function initWishlist() {
+      var wishlistBtn = document.getElementById('samyak-pdp-wishlist-btn');
+      var wishlistText = document.getElementById('samyak-pdp-wishlist-text');
+      if (!wishlistBtn) return;
+
+      var productId = wishlistBtn.getAttribute('data-product-id');
+      var STORAGE_KEY = 'samyak_wishlist';
+
+      function getWishlist() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function saveWishlist(items) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        } catch(e) {}
+      }
+
+      function updateState() {
+        var list = getWishlist();
+        var exists = list.some(function(item) {
+          var id = typeof item === 'object' && item !== null ? String(item.id) : String(item);
+          return id === String(productId);
+        });
+
+        if (exists) {
+          wishlistBtn.classList.add('is-active');
+          wishlistBtn.setAttribute('aria-pressed', 'true');
+          if (wishlistText) wishlistText.textContent = '✓ Saved in Wishlist';
+        } else {
+          wishlistBtn.classList.remove('is-active');
+          wishlistBtn.setAttribute('aria-pressed', 'false');
+          if (wishlistText) wishlistText.textContent = 'Save to Wishlist';
+        }
+      }
+
+      updateState();
+
+      wishlistBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var list = getWishlist();
+        var idx = -1;
+        for (var i = 0; i < list.length; i++) {
+          var id = typeof list[i] === 'object' && list[i] !== null ? String(list[i].id) : String(list[i]);
+          if (id === String(productId)) {
+            idx = i;
+            break;
+          }
+        }
+
+        if (idx > -1) {
+          list.splice(idx, 1);
+        } else {
+          list.push(productId);
+        }
+
+        saveWishlist(list);
+        updateState();
+
+        document.querySelectorAll('.samyak-wishlist-badge').forEach(function(badge) {
+          badge.textContent = list.length;
+          badge.style.display = list.length > 0 ? 'flex' : 'none';
+        });
+
+        if (typeof window.openWishlistDrawer === 'function') {
+          window.openWishlistDrawer();
+        }
+      });
+    }
+
+    // Initialize all components on DOM ready
+    function initAll() {
+      initPinChecker();
+      initThumbnails();
+      initVariants();
+      initQuantity();
+      initAddToCart();
+      initBuyNow();
+      initLightbox();
+      initWishlist();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
+    }
+
+    document.addEventListener('shopify:section:load', initAll);
+  })();
+</script>

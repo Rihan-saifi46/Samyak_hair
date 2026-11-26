@@ -137,10 +137,12 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 14px;
+        padding: 6px 14px;
         gap: 10px;
         position: relative;
-        height: 60px;
+        min-height: 58px;
+        height: auto;
+        box-sizing: border-box;
       }
 
       /* Left: Hamburger menu only */
@@ -201,10 +203,11 @@
       }
 
       .samyak-hdr-logo--mobile .samyak-header-logo-img {
-        height: 38px !important;
-        max-height: 38px !important;
+        height: 42px !important;
+        max-height: 42px !important;
         width: auto !important;
-        object-fit: contain;
+        object-fit: contain !important;
+        display: block !important;
       }
 
       .samyak-hdr-desktop-center {

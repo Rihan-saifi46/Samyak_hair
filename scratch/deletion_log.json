@@ -1,0 +1,156 @@
+[
+  {
+    "filePath": "assets/hero-model-1.webp",
+    "sizeBytes": 111478,
+    "sizeKB": "108.9",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-model-1.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-model-2.webp",
+    "sizeBytes": 134274,
+    "sizeKB": "131.1",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-model-2.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-model-3.webp",
+    "sizeBytes": 117620,
+    "sizeKB": "114.9",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-model-3.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-model-4.webp",
+    "sizeBytes": 124754,
+    "sizeKB": "121.8",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-model-4.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-piece-1.webp",
+    "sizeBytes": 133562,
+    "sizeKB": "130.4",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-piece-1.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-piece-2.webp",
+    "sizeBytes": 126402,
+    "sizeKB": "123.4",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-piece-2.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-piece-3.webp",
+    "sizeBytes": 164830,
+    "sizeKB": "161.0",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-piece-3.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/hero-piece-4.webp",
+    "sizeBytes": 62424,
+    "sizeKB": "61.0",
+    "backedUpTo": "_backup_pre_implementation\\assets\\hero-piece-4.webp",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-card-1.jpg",
+    "sizeBytes": 14310,
+    "sizeKB": "14.0",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-card-1.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-card-2.jpg",
+    "sizeBytes": 18922,
+    "sizeKB": "18.5",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-card-2.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-card-3.jpg",
+    "sizeBytes": 12466,
+    "sizeKB": "12.2",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-card-3.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-card-4.jpg",
+    "sizeBytes": 11476,
+    "sizeKB": "11.2",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-card-4.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-hero-desktop.jpg",
+    "sizeBytes": 55361,
+    "sizeKB": "54.1",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-hero-desktop.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-hero-editorial-ref.jpg",
+    "sizeBytes": 282040,
+    "sizeKB": "275.4",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-hero-editorial-ref.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-hero-mobile.jpg",
+    "sizeBytes": 79052,
+    "sizeKB": "77.2",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-hero-mobile.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-hero-tablet.jpg",
+    "sizeBytes": 244067,
+    "sizeKB": "238.3",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-hero-tablet.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/samyak-hero-top.jpg",
+    "sizeBytes": 120995,
+    "sizeKB": "118.2",
+    "backedUpTo": "_backup_pre_implementation\\assets\\samyak-hero-top.jpg",
+    "reason": "Unused legacy prototype image with 0 references in active theme code or JSON templates"
+  },
+  {
+    "filePath": "assets/package.json",
+    "sizeBytes": 23,
+    "sizeKB": "0.0",
+    "backedUpTo": "_backup_pre_implementation\\assets\\package.json",
+    "reason": "Misplaced developer configuration/type definition file inside public theme assets CDN folder"
+  },
+  {
+    "filePath": "assets/jsconfig.json",
+    "sizeBytes": 345,
+    "sizeKB": "0.3",
+    "backedUpTo": "_backup_pre_implementation\\assets\\jsconfig.json",
+    "reason": "Misplaced developer configuration/type definition file inside public theme assets CDN folder"
+  },
+  {
+    "filePath": "assets/standard-actions.d.ts",
+    "sizeBytes": 4312,
+    "sizeKB": "4.2",
+    "backedUpTo": "_backup_pre_implementation\\assets\\standard-actions.d.ts",
+    "reason": "Misplaced developer configuration/type definition file inside public theme assets CDN folder"
+  },
+  {
+    "filePath": "assets/view-event-elements.d.ts",
+    "sizeBytes": 893,
+    "sizeKB": "0.9",
+    "backedUpTo": "_backup_pre_implementation\\assets\\view-event-elements.d.ts",
+    "reason": "Misplaced developer configuration/type definition file inside public theme assets CDN folder"
+  },
+  {
+    "filePath": "blocks/ai_gen_block_68e7006.liquid",
+    "sizeBytes": 5396,
+    "sizeKB": "5.3",
+    "backedUpTo": "_backup_pre_implementation\\blocks\\ai_gen_block_68e7006.liquid",
+    "reason": "Orphaned AI-generated trial block with 0 references in active theme"
+  }
+]

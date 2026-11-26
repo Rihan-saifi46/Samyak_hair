@@ -77,16 +77,24 @@
     href="{{ routes.cart_url }}"
     class="samyak-mbn-item"
     aria-label="Cart Bag"
-    onclick="var d=document.getElementById('cart-drawer');if(d&&typeof d.open==='function'){event.preventDefault();d.open();}"
+    {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+      on:click="#cart-drawer/toggle"
+      onclick="var d=document.getElementById('cart-drawer');if(d&&typeof d.open==='function'){event.preventDefault();d.open();}"
+    {% endif %}
   >
     <div class="samyak-mbn-icon samyak-mbn-cart-wrap">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8h12l1 12H5L6 8Z"/>
         <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
       </svg>
-      {% if cart.item_count > 0 %}
-        <span class="samyak-mbn-badge">{{ cart.item_count }}</span>
-      {% endif %}
+      <span
+        class="samyak-mbn-badge"
+        id="samyak-mbn-cart-count"
+        aria-hidden="true"
+        {% if cart.item_count == 0 %}style="display: none;"{% endif %}
+      >
+        {{- cart.item_count -}}
+      </span>
     </div>
     <span class="samyak-mbn-label">Bag</span>
   </a>
@@ -203,3 +211,118 @@
     }
   }
 </style>
+
+<script>
+  (function() {
+    /* --- 1. Wishlist Badge Synchronization --- */
+    function syncMbnWishlistBadge() {
+      try {
+        var raw = localStorage.getItem('samyak_wishlist');
+        var list = raw ? JSON.parse(raw) : [];
+        var count = Array.isArray(list) ? list.length : 0;
+        var badge = document.getElementById('samyak-mbn-wishlist-count');
+        if (badge) {
+          badge.textContent = count;
+          badge.style.display = count > 0 ? 'flex' : 'none';
+        }
+      } catch (e) {}
+    }
+
+    // Initialize immediately and on events
+    syncMbnWishlistBadge();
+    document.addEventListener('DOMContentLoaded', syncMbnWishlistBadge);
+    document.addEventListener('wishlist:updated', syncMbnWishlistBadge);
+
+    /* --- 2. Cart Badge Synchronization --- */
+    function updateAllCartBadges(count) {
+      var num = parseInt(count, 10);
+      var valid = !isNaN(num) && num >= 0 ? num : 0;
+
+      // Mobile bottom nav badge
+      var mbnBadge = document.getElementById('samyak-mbn-cart-count');
+      if (mbnBadge) {
+        mbnBadge.textContent = valid;
+        mbnBadge.style.display = valid > 0 ? 'flex' : 'none';
+      }
+
+      // Desktop header badge
+      var hdrBadge = document.getElementById('samyak-header-cart-count');
+      if (hdrBadge) {
+        hdrBadge.textContent = valid;
+        hdrBadge.style.display = valid > 0 ? 'flex' : 'none';
+      }
+
+      // Legacy header cart button badge support
+      var legacyBadges = document.querySelectorAll('.samyak-hdr-cart-btn .samyak-hdr-cart-badge');
+      legacyBadges.forEach(function(b) {
+        b.textContent = valid;
+        b.style.display = valid > 0 ? 'flex' : 'none';
+      });
+    }
+
+    function fetchLiveCartCount() {
+      fetch('/cart.js')
+        .then(function(res) {
+          if (!res.ok) throw new Error('Cart fetch failed');
+          return res.json();
+        })
+        .then(function(cart) {
+          if (cart && typeof cart.item_count !== 'undefined') {
+            updateAllCartBadges(cart.item_count);
+          }
+        })
+        .catch(function() {});
+    }
+
+    // Event handler for Shopify cartLinesUpdate and custom cart update events
+    function handleCartEvent(event) {
+      if (event && event.promise && typeof event.promise.then === 'function') {
+        event.promise
+          .then(function(result) {
+            var cart = result && result.cart;
+            var detail = result && result.detail;
+            var count = (cart && typeof cart.totalQuantity !== 'undefined')
+              ? cart.totalQuantity
+              : (detail && typeof detail.itemCount !== 'undefined')
+                ? detail.itemCount
+                : null;
+            if (count !== null && count !== undefined) {
+              updateAllCartBadges(count);
+            } else {
+              fetchLiveCartCount();
+            }
+          })
+          .catch(function() {
+            fetchLiveCartCount();
+          });
+      } else if (event && event.detail && typeof event.detail.itemCount !== 'undefined') {
+        updateAllCartBadges(event.detail.itemCount);
+      } else if (event && event.detail && event.detail.cart && typeof event.detail.cart.item_count !== 'undefined') {
+        updateAllCartBadges(event.detail.cart.item_count);
+      } else {
+        fetchLiveCartCount();
+      }
+    }
+
+    // Listen to standard theme and Shopify events
+    document.addEventListener('cart:lines-update', handleCartEvent);
+    document.addEventListener('shopify:cart:lines-update', handleCartEvent);
+    document.addEventListener('cart:updated', handleCartEvent);
+    document.addEventListener('shopify:cart:refresh', handleCartEvent);
+
+    // Support @shopify/events module StandardEvents.cartLinesUpdate if dynamically resolvable
+    try {
+      import('@shopify/events').then(function(mod) {
+        if (mod && mod.StandardEvents && mod.StandardEvents.cartLinesUpdate) {
+          document.addEventListener(mod.StandardEvents.cartLinesUpdate, handleCartEvent);
+        }
+      }).catch(function() {});
+    } catch (e) {}
+
+    // Synchronize on Back/Forward cache navigation (bfcache)
+    window.addEventListener('pageshow', function() {
+      fetchLiveCartCount();
+      syncMbnWishlistBadge();
+    });
+  })();
+</script>

@@ -490,6 +490,23 @@
             .then(function(data) {
               atcBtn.textContent = 'ADDED ✓';
               document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+
+              // Refresh cart drawer section HTML via Section Rendering API
+              fetch('/cart?section_id=cart-drawer-section')
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                  var container = document.getElementById('shopify-section-cart-drawer-section') || document.getElementById('shopify-section-cart-drawer') || document.getElementById('cart-drawer');
+                  var parser = new DOMParser();
+                  var doc = parser.parseFromString(html, 'text/html');
+                  var newInner = doc.querySelector('.cart-drawer__inner');
+                  var curInner = container ? container.querySelector('.cart-drawer__inner') : document.querySelector('.cart-drawer__inner');
+                  if (newInner && curInner) {
+                    curInner.innerHTML = newInner.innerHTML;
+                    curInner.className = newInner.className;
+                  }
+                })
+                .catch(function() {});
+
               setTimeout(function() {
                 atcBtn.textContent = origText;
                 atcBtn.disabled = false;

@@ -8,6 +8,18 @@
   <div class="samyak-login-container">
     <!-- Login Form Card -->
     <div id="samyak-customer-login" class="samyak-auth-card">
+      <div class="samyak-auth-logo-wrap">
+        <a href="{{ routes.root_url }}" aria-label="Samyak Hair Accessories">
+          <img
+            src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+            alt="SAMYAK HAIR ACCESSORIES"
+            class="samyak-auth-logo-img"
+            width="180"
+            height="46"
+            loading="eager"
+          >
+        </a>
+      </div>
       <div class="samyak-auth-header">
         <h1 class="samyak-auth-title">Customer Sign In</h1>
         <p class="samyak-auth-subtitle">Access your boutique wholesale orders, wishlist, and account details</p>
@@ -77,6 +89,18 @@
 
     <!-- Password Recovery Card (Initially Hidden) -->
     <div id="samyak-customer-recover" class="samyak-auth-card" style="display: none;">
+      <div class="samyak-auth-logo-wrap">
+        <a href="{{ routes.root_url }}" aria-label="Samyak Hair Accessories">
+          <img
+            src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+            alt="SAMYAK HAIR ACCESSORIES"
+            class="samyak-auth-logo-img"
+            width="180"
+            height="46"
+            loading="eager"
+          >
+        </a>
+      </div>
       <div class="samyak-auth-header">
         <h2 class="samyak-auth-title">Reset Your Password</h2>
         <p class="samyak-auth-subtitle">We will send you an email to reset your account password</p>
@@ -181,6 +205,33 @@
     border-radius: 16px;
     padding: clamp(28px, 4vw, 42px) clamp(22px, 3.5vw, 36px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  .samyak-auth-logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+
+  .samyak-auth-logo-wrap a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .samyak-auth-logo-wrap a:hover {
+    opacity: 0.85;
+  }
+
+  .samyak-auth-logo-img {
+    height: 48px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
   }
 
   .samyak-auth-header {

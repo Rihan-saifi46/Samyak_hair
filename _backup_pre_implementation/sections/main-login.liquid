@@ -1,0 +1,408 @@
+{% comment %}
+  Section: Main Customer Login
+  Renders Shopify's official authenticated customer login & password recovery forms.
+  Styled to match Samyak Hair Accessories luxury boutique aesthetic.
+{% endcomment %}
+
+<div class="samyak-login-section">
+  <div class="samyak-login-container">
+    <!-- Login Form Card -->
+    <div id="samyak-customer-login" class="samyak-auth-card">
+      <div class="samyak-auth-logo-wrap">
+        <a href="{{ routes.root_url }}" aria-label="Samyak Hair Accessories">
+          <img
+            src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+            alt="SAMYAK HAIR ACCESSORIES"
+            class="samyak-auth-logo-img"
+            width="180"
+            height="46"
+            loading="eager"
+          >
+        </a>
+      </div>
+      <div class="samyak-auth-header">
+        <h1 class="samyak-auth-title">Customer Sign In</h1>
+        <p class="samyak-auth-subtitle">Access your boutique wholesale orders, wishlist, and account details</p>
+      </div>
+
+      {%- form 'customer_login', class: 'samyak-auth-form' -%}
+        {%- if form.errors -%}
+          <div class="samyak-auth-error" role="alert" tabindex="-1" autofocus>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+              {{ form.errors | default_errors }}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if recover_success == true -%}
+          <div class="samyak-auth-success" role="status">
+            We've sent you an email with a link to update your password.
+          </div>
+        {%- endif -%}
+
+        <div class="samyak-form-field">
+          <label for="CustomerEmail" class="samyak-field-label">Email Address</label>
+          <input
+            type="email"
+            name="customer[email]"
+            id="CustomerEmail"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            class="samyak-field-input"
+            placeholder="e.g. boutique@domain.com"
+            required
+          >
+        </div>
+
+        {%- if form.password_needed -%}
+          <div class="samyak-form-field">
+            <div class="samyak-label-row">
+              <label for="CustomerPassword" class="samyak-field-label">Password</label>
+              <a href="#recover" id="samyak-recover-link" class="samyak-link-sm">Forgot password?</a>
+            </div>
+            <input
+              type="password"
+              name="customer[password]"
+              id="CustomerPassword"
+              autocomplete="current-password"
+              class="samyak-field-input"
+              placeholder="Enter your password"
+              required
+            >
+          </div>
+        {%- endif -%}
+
+        <button type="submit" class="samyak-auth-submit-btn">
+          Sign In
+        </button>
+
+        <div class="samyak-auth-footer">
+          <p>Don't have an account yet? <a href="{{ routes.account_register_url | default: '/account/register' }}" class="samyak-auth-link">Create Account</a></p>
+          <p><a href="{{ routes.root_url }}" class="samyak-auth-link-back">&larr; Return to Store</a></p>
+        </div>
+      {%- endform -%}
+    </div>
+
+    <!-- Password Recovery Card (Initially Hidden) -->
+    <div id="samyak-customer-recover" class="samyak-auth-card" style="display: none;">
+      <div class="samyak-auth-logo-wrap">
+        <a href="{{ routes.root_url }}" aria-label="Samyak Hair Accessories">
+          <img
+            src="{{ 'samyak-logo-emerald.jpg' | asset_url }}"
+            alt="SAMYAK HAIR ACCESSORIES"
+            class="samyak-auth-logo-img"
+            width="180"
+            height="46"
+            loading="eager"
+          >
+        </a>
+      </div>
+      <div class="samyak-auth-header">
+        <h2 class="samyak-auth-title">Reset Your Password</h2>
+        <p class="samyak-auth-subtitle">We will send you an email to reset your account password</p>
+      </div>
+
+      {%- form 'recover_customer_password', class: 'samyak-auth-form' -%}
+        {%- assign recover_success = form.posted_successfully? -%}
+        {%- if form.errors -%}
+          <div class="samyak-auth-error" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="samyak-form-field">
+          <label for="RecoverEmail" class="samyak-field-label">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            id="RecoverEmail"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            class="samyak-field-input"
+            placeholder="e.g. boutique@domain.com"
+            required
+          >
+        </div>
+
+        <button type="submit" class="samyak-auth-submit-btn">
+          Submit
+        </button>
+
+        <div class="samyak-auth-footer">
+          <p><a href="#login" id="samyak-cancel-recover" class="samyak-auth-link">Cancel and return to Sign In</a></p>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function initAuthToggle() {
+      var loginCard = document.getElementById('samyak-customer-login');
+      var recoverCard = document.getElementById('samyak-customer-recover');
+      var recoverLink = document.getElementById('samyak-recover-link');
+      var cancelLink = document.getElementById('samyak-cancel-recover');
+
+      if (!loginCard || !recoverCard) return;
+
+      function showRecover(e) {
+        if (e) e.preventDefault();
+        loginCard.style.display = 'none';
+        recoverCard.style.display = 'block';
+        window.location.hash = '#recover';
+      }
+
+      function showLogin(e) {
+        if (e) e.preventDefault();
+        recoverCard.style.display = 'none';
+        loginCard.style.display = 'block';
+        window.location.hash = '';
+      }
+
+      if (recoverLink) recoverLink.addEventListener('click', showRecover);
+      if (cancelLink) cancelLink.addEventListener('click', showLogin);
+
+      if (window.location.hash === '#recover') {
+        showRecover();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAuthToggle);
+    } else {
+      initAuthToggle();
+    }
+  })();
+</script>
+
+{% stylesheet %}
+  .samyak-login-section {
+    background-color: #FAF8F5;
+    padding-block: clamp(48px, 6vw, 84px);
+    padding-inline: 20px;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .samyak-login-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .samyak-auth-card {
+    background: #FFFFFF;
+    border: 1px solid #ECE7E1;
+    border-radius: 16px;
+    padding: clamp(28px, 4vw, 42px) clamp(22px, 3.5vw, 36px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  .samyak-auth-logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+
+  .samyak-auth-logo-wrap a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .samyak-auth-logo-wrap a:hover {
+    opacity: 0.85;
+  }
+
+  .samyak-auth-logo-img {
+    height: 48px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .samyak-auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .samyak-auth-title {
+    font-family: var(--font-heading--family, 'Playfair Display', Georgia, serif);
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 600;
+    color: #113B32;
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+
+  .samyak-auth-subtitle {
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 13.5px;
+    color: #636865;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .samyak-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .samyak-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .samyak-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .samyak-field-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #181A19;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .samyak-link-sm {
+    font-size: 12px;
+    color: #113B32;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .samyak-link-sm:hover {
+    text-decoration: underline;
+  }
+
+  .samyak-field-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 14px;
+    color: #181A19;
+    background: #FAF8F5;
+    border: 1px solid #DFD9D1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .samyak-field-input:focus {
+    border-color: #113B32;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(17, 59, 50, 0.1);
+  }
+
+  .samyak-auth-submit-btn {
+    width: 100%;
+    height: 48px;
+    background: #113B32;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 30px;
+    font-family: var(--font-body--family, 'Plus Jakarta Sans', sans-serif);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(17, 59, 50, 0.25);
+    transition: background 0.2s ease, transform 0.2s ease;
+    margin-top: 6px;
+  }
+
+  .samyak-auth-submit-btn:hover {
+    background: #0B2922;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(17, 59, 50, 0.35);
+  }
+
+  .samyak-auth-error {
+    background: #FDF2F2;
+    border: 1px solid #F8D7DA;
+    color: #B02A37;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.4;
+  }
+
+  .samyak-auth-error ul {
+    margin: 0;
+    padding-left: 16px;
+  }
+
+  .samyak-auth-success {
+    background: #EDF7ED;
+    border: 1px solid #D4EDDA;
+    color: #155724;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .samyak-auth-footer {
+    text-align: center;
+    border-top: 1px solid #F0ECE4;
+    padding-top: 18px;
+    margin-top: 10px;
+  }
+
+  .samyak-auth-footer p {
+    font-size: 13px;
+    color: #636865;
+    margin: 6px 0;
+  }
+
+  .samyak-auth-link {
+    color: #113B32;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .samyak-auth-link:hover {
+    text-decoration: underline;
+  }
+
+  .samyak-auth-link-back {
+    color: #8C928F;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .samyak-auth-link-back:hover {
+    color: #181A19;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Customer Login",
+  "settings": []
+}
+{% endschema %}

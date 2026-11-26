@@ -23,9 +23,14 @@
       <path d="M6 8h12l1 12H5L6 8Z"/>
       <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
     </svg>
-    {% if cart.item_count > 0 %}
-      <span class="samyak-hdr-cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
-    {% endif %}
+    <span
+      class="samyak-hdr-cart-badge"
+      id="samyak-header-cart-count"
+      aria-hidden="true"
+      {% if cart.item_count == 0 %}style="display: none;"{% endif %}
+    >
+      {{- cart.item_count -}}
+    </span>
   </a>
 
   <!-- 2. Wishlist Heart icon -->
@@ -115,16 +120,22 @@
 
   @media screen and (max-width: 768px) {
     .samyak-hdr-actions-wrap {
-      gap: 12px;
+      gap: 10px;
     }
 
-    .samyak-hdr-instagram-btn {
+    .samyak-hdr-instagram-btn,
+    .samyak-hdr-cart-btn,
+    .samyak-hdr-wishlist-btn {
       display: none !important;
     }
 
+    .samyak-hdr-account-btn {
+      display: inline-flex !important;
+    }
+
     .samyak-hdr-action-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
     }
   }
 </style>
