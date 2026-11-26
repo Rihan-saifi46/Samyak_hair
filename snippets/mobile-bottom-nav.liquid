@@ -123,6 +123,17 @@
       align-items: center;
       padding: 0 8px calc(env(safe-area-inset-bottom, 0px) + 2px);
       box-sizing: border-box;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    /* Gracefully dismiss mobile dock when cart, quick-shop, or wishlist drawers are open */
+    body:has(theme-drawer#cart-drawer[open]) .samyak-mobile-bottom-nav,
+    body:has(theme-drawer#cart-drawer.active) .samyak-mobile-bottom-nav,
+    body:has(#samyak-quick-shop-modal.samyak-quick-shop-drawer--open) .samyak-mobile-bottom-nav,
+    body:has(#samyak-wishlist-drawer.is-active) .samyak-mobile-bottom-nav {
+      transform: translateY(100%);
+      pointer-events: none;
+      opacity: 0;
     }
 
     body {
